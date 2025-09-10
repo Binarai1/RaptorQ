@@ -1762,6 +1762,26 @@ const Dashboard = ({ wallet, onLogout }) => {
         onClose={() => setShowAICreator(false)}
         onAssetCreated={handleAssetCreated}
       />
+      <QRReceiveDialog 
+        isOpen={showQRReceive} 
+        onClose={() => setShowQRReceive(false)}
+        wallet={wallet}
+      />
+      <QRScanDialog 
+        isOpen={showQRScan} 
+        onClose={() => setShowQRScan(false)}
+        onScanResult={handleQRScanResult}
+      />
+      <SendDialog 
+        isOpen={showSendDialog} 
+        onClose={() => setShowSendDialog(false)}
+        sendToAddress={sendToAddress}
+        setSendToAddress={setSendToAddress}
+        sendAmount={sendAmount}
+        setSendAmount={setSendAmount}
+        onSend={handleSendTransaction}
+        wallet={wallet}
+      />
 
       <Toaster />
     </div>
