@@ -762,6 +762,232 @@ const QRScanDialog = ({ isOpen, onClose, onScanResult }) => {
   );
 };
 
+const SettingsDialog = ({ isOpen, onClose, wallet, onColorChange, onSecurityUpdate }) => {
+  const [selectedColor, setSelectedColor] = useState(wallet?.colorTheme || 'blue');
+  const [autoLockTime, setAutoLockTime] = useState('5');
+  const [twoFAEnabled, setTwoFAEnabled] = useState(false);
+  const [threeFAEnabled, setThreeFAEnabled] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [pruningEnabled, setPruningEnabled] = useState(true);
+  const [proModeEnabled, setProModeEnabled] = useState(false);
+
+  const colorThemes = [
+    { value: 'blue', name: 'Quantum Blue', colors: 'from-blue-600 to-cyan-500' },
+    { value: 'purple', name: 'Cosmic Purple', colors: 'from-purple-600 to-pink-500' },
+    { value: 'green', name: 'Matrix Green', colors: 'from-green-600 to-emerald-500' },
+    { value: 'red', name: 'Crimson Red', colors: 'from-red-600 to-orange-500' },
+    { value: 'gold', name: 'Golden Chrome', colors: 'from-yellow-600 to-orange-500' },
+    { value: 'teal', name: 'Cyber Teal', colors: 'from-teal-600 to-blue-500' }
+  ];
+
+  const handleSave = () => {
+    onColorChange?.(selectedColor);
+    onSecurityUpdate?.({
+      twoFA: twoFAEnabled,
+      threeFA: threeFAEnabled,
+      autoLockTime: parseInt(autoLockTime),
+      pruning: pruningEnabled,
+      proMode: proModeEnabled
+    });
+    
+    toast({ 
+      title: "Settings Saved", 
+      description: "Your preferences have been updated" 
+    });
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-2">
+            <Settings className="h-5 w-5 text-blue-400" />
+            <span>Wallet Settings</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-6">
+          {/* Color Theme Section */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-white flex items-center">
+              <Palette className="mr-2 h-4 w-4 text-purple-400" />
+              Color Theme
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {colorThemes.map((theme) => (
+                <Button
+                  key={theme.value}
+                  onClick={() => setSelectedColor(theme.value)}
+                  variant={selectedColor === theme.value ? "default" : "outline"}
+                  className={`p-3 h-auto flex flex-col space-y-1 ${
+                    selectedColor === theme.value 
+                      ? `bg-gradient-to-r ${theme.colors} text-white` 
+                      : 'border-gray-600 text-gray-300 hover:bg-gray-800'
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${theme.colors}`}></div>
+                  <span className="text-xs">{theme.name}</span>
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Security Section */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-white flex items-center">
+              <Shield className="mr-2 h-4 w-4 text-green-400" />
+              Security Settings
+            </h3>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-white">Two-Factor Authentication</Label>
+                  <p className="text-xs text-gray-400">SMS + App verification</p>
+                </div>
+                <Switch
+                  checked={twoFAEnabled}
+                  onCheckedChange={setTwoFAEnabled}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-white">Three-Factor Authentication</Label>
+                  <p className="text-xs text-gray-400">SMS + App + Biometric</p>
+                </div>
+                <Switch
+                  checked={threeFAEnabled && twoFAEnabled}
+                  onCheckedChange={setThreeFAEnabled}
+                  disabled={!twoFAEnabled}
+                />
+              </div>
+              
+              <div>
+                <Label className="text-white">Auto-Lock Time (minutes)</Label>
+                <Select value={autoLockTime} onValueChange={setAutoLockTime}>
+                  <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-600 text-white">
+                    <SelectItem value="1" className="text-white">1 minute</SelectItem>
+                    <SelectItem value="5" className="text-white">5 minutes</SelectItem>
+                    <SelectItem value="15" className="text-white">15 minutes</SelectItem>
+                    <SelectItem value="30" className="text-white">30 minutes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Pro Mode Section */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-white flex items-center">
+              <TrendingUp className="mr-2 h-4 w-4 text-yellow-400" />
+              Pro Mode
+            </h3>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white">Smart Node Setup</Label>
+                <p className="text-xs text-gray-400">Easy smart node configuration</p>
+              </div>
+              <Switch
+                checked={proModeEnabled}
+                onCheckedChange={setProModeEnabled}
+              />
+            </div>
+          </div>
+
+          {/* Mobile Optimization Section */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-white flex items-center">
+              <Smartphone className="mr-2 h-4 w-4 text-teal-400" />
+              Mobile Settings
+            </h3>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white">Blockchain Pruning</Label>
+                <p className="text-xs text-gray-400">Reduce storage requirements</p>
+              </div>
+              <Switch
+                checked={pruningEnabled}
+                onCheckedChange={setPruningEnabled}
+              />
+            </div>
+            
+            {pruningEnabled && (
+              <div className="p-3 bg-gradient-to-r from-teal-950/30 to-blue-950/30 rounded-lg border border-teal-800/30">
+                <div className="flex items-center space-x-2 mb-2">
+                  <HardDrive className="h-4 w-4 text-teal-400" />
+                  <span className="text-sm font-medium text-teal-300">Pruning Active</span>
+                </div>
+                <p className="text-xs text-gray-300">
+                  Automatically removes old blockchain data on mobile devices to save storage while maintaining security.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Advanced Settings */}
+          <div className="space-y-3">
+            <Button
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              variant="ghost"
+              className="w-full justify-between text-gray-300 hover:text-white"
+            >
+              <span>Advanced Settings</span>
+              {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+            
+            {showAdvanced && (
+              <div className="space-y-3 p-3 bg-gray-800/30 rounded-lg">
+                <div className="text-sm text-gray-300 space-y-2">
+                  <div className="flex justify-between">
+                    <span>Quantum Security Level:</span>
+                    <span className="text-green-400">SHA3-2048 Equivalent</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Network:</span>
+                    <span className="text-blue-400">Raptoreum UTXO</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Wallet Version:</span>
+                    <span className="text-purple-400">RaptorQ v1.0.0</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Created by:</span>
+                    <span className="text-yellow-400">Binarai</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex space-x-2">
+            <Button 
+              onClick={onClose}
+              variant="outline"
+              className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSave}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Save Settings
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const LockScreen = ({ onUnlock, wallet }) => {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
