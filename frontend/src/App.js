@@ -2733,6 +2733,28 @@ const Dashboard = ({ wallet, onLogout }) => {
                 </div>
               </TabsContent>
 
+              <TabsContent value="swaps" className="space-y-6">
+                <div className="text-center py-12">
+                  <div className="mx-auto w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-6">
+                    <ArrowLeftRight className="h-12 w-12 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Swaps Coming Soon</h3>
+                  <p className="text-gray-400 mb-6 max-w-md mx-auto">
+                    Quantum-resistant token swaps with advanced security features will be available soon. 
+                    Stay tuned for instant, secure cross-chain swapping capabilities.
+                  </p>
+                  <div className="p-4 bg-gradient-to-r from-blue-950/30 to-purple-950/30 rounded-lg border border-blue-800/30 max-w-md mx-auto">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Shield className="h-4 w-4 text-blue-400" />
+                      <span className="text-sm font-medium text-blue-300">Quantum-Secured Swaps</span>
+                    </div>
+                    <p className="text-xs text-gray-300">
+                      Future swaps will be protected with post-quantum cryptography for ultimate security
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+
               <TabsContent value="history">
                 <Card className="quantum-glass">
                   <CardHeader>
