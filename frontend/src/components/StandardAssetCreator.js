@@ -50,10 +50,11 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
   });
 
   const [fees, setFees] = useState({
-    creationFee: RAPTOREUM_FEES.STANDARD_ASSET,
+    creationFee: RAPTOREUM_FEES.ASSET_CREATION,
+    mintingFee: RAPTOREUM_FEES.ASSET_MINTING,
     transactionFee: RAPTOREUM_FEES.TRANSACTION_FEE,
     ipfsFee: 0,
-    totalFee: RAPTOREUM_FEES.STANDARD_ASSET + RAPTOREUM_FEES.TRANSACTION_FEE
+    totalFee: RAPTOREUM_FEES.TOTAL_ASSET_FEE + RAPTOREUM_FEES.TRANSACTION_FEE
   });
 
   const [uploading, setUploading] = useState(false);
