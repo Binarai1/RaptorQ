@@ -86,20 +86,36 @@ python server.py  # Backend (port 8001)
 
 To receive payments for premium services, update your RTM wallet address in `/app/backend/server.py`:
 
-```python
-# Replace this line with your actual RTM wallet address
-PAYMENT_WALLET_ADDRESS = "RTM1YourActualRTMWalletAddressForPayments"
-```
+**⚠️ SECURITY NOTE: The payment address is encrypted in the source code for security.**
 
-**Premium Services Available:**
-- **BinarAi Asset Creation**: $0.50 USD equivalent in RTM per asset (dynamic pricing)
+**Current Services & Pricing (Dynamic RTM conversion via CoinGecko):**
+- **BinarAi Asset Creation**: $0.50 USD equivalent in RTM per asset
+- **Quantum RTM Smartnode**: $1.00 USD equivalent in RTM (one-time)
 - **BinarAi Unlimited**: $25 USD equivalent in RTM (30 days unlimited)
-- **Pro Mode Annual**: $100 USD equivalent in RTM (365 days)
-- **Premium Themes**: $10 USD equivalent in RTM (one-time)
+- **Premium Themes**: $0.10 USD equivalent in RTM (one-time)
 - **Advanced Analytics**: $30 USD equivalent in RTM (90 days)
-- **Priority Support**: $50 USD equivalent in RTM (365 days)
+- **Banner Advertising**: $100 USD equivalent in RTM (per day)
 
-All pricing is automatically calculated based on real-time RTM market price from CoinGecko.
+**Free Services:**
+- Pro Mode Access (smart node features)
+- Basic wallet functionality
+- QR code generation and scanning
+- Asset viewing and management
+
+**Direct Purchase System:**
+- One-click purchases through wallet
+- No manual transaction IDs required
+- Instant service activation
+- Confirmation dialogs with "cannot be reversed" warnings
+
+**Advertising System:**
+- 2 banner slots: wallet bottom + asset creation bottom
+- JPG image validation and malicious content scanning
+- Click/impression analytics
+- Future booking system for next month
+- Automatic removal when expired
+
+All pricing automatically calculated based on real-time RTM market price from CoinGecko.
 
 ## 🔐 **Quantum Security Comparison**
 
