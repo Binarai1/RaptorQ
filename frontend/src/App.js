@@ -2693,11 +2693,15 @@ const Dashboard = ({ wallet, onLogout }) => {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="bg-gray-800/50 mb-6">
                 <TabsTrigger value="assets" className="data-[state=active]:bg-blue-600">
-                  <Smartphone className="mr-2 h-4 w-4" />
-                  Quantum Assets
+                  <Package className="mr-2 h-4 w-4" />
+                  Assets
+                </TabsTrigger>
+                <TabsTrigger value="swaps" className="data-[state=active]:bg-blue-600">
+                  <ArrowLeftRight className="mr-2 h-4 w-4" />
+                  Swaps
                 </TabsTrigger>
                 <TabsTrigger value="history" className="data-[state=active]:bg-blue-600">
-                  <History className="mr-2 h-4 w-4" />
+                  <Clock className="mr-2 h-4 w-4" />
                   History
                 </TabsTrigger>
               </TabsList>
