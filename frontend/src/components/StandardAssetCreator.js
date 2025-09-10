@@ -220,7 +220,7 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
       setFormData({
         name: '',
         description: '',
-        quantity: 1,
+        circulation: 1,
         decimals: 0,
         reissuable: false,
         hasIPFS: false,
