@@ -352,7 +352,7 @@ async def self_healing_monitor():
 @api_router.get("/")
 async def root():
     return {
-        "message": "QUANTXO Wallet API - Quantum-Resistant Raptoreum Asset Management",
+        "message": "RaptorQ Wallet API - Quantum-Resistant Raptoreum Asset Management",
         "version": "1.0.0",
         "created_by": "Binarai",
         "quantum_resistant": True,
