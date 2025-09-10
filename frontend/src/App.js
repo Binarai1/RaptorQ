@@ -859,6 +859,388 @@ const QRScanDialog = ({ isOpen, onClose, onScanResult }) => {
   );
 };
 
+const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
+  const [services, setServices] = useState([]);
+  const [selectedService, setSelectedService] = useState(null);
+  const [purchaseStep, setPurchaseStep] = useState('browse'); // browse, purchase, payment, processing, complete
+  const [purchaseData, setPurchaseData] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState('');
+  const [transactionHash, setTransactionHash] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchPremiumServices();
+    }
+  }, [isOpen]);
+
+  const fetchPremiumServices = async () => {
+    try {
+      const response = await axios.get(`${API}/services/premium`);
+      setServices(response.data.services);
+    } catch (error) {
+      console.error('Failed to fetch premium services:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load premium services",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleServiceSelect = (service) => {
+    setSelectedService(service);
+    setPurchaseStep('purchase');
+  };
+
+  const handlePurchaseConfirm = async () => {
+    if (!selectedService || !wallet?.address) return;
+
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${API}/services/purchase`, {
+        service_id: selectedService.service_id,
+        user_wallet: wallet.address,
+        user_agreement: true
+      });
+
+      setPurchaseData(response.data);
+      setPurchaseStep('payment');
+      
+      toast({
+        title: "Purchase Initiated",
+        description: `Please send ${response.data.price_rtm} RTM to complete your purchase`
+      });
+    } catch (error) {
+      console.error('Purchase initiation failed:', error);
+      toast({
+        title: "Error",
+        description: "Failed to initiate purchase",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePaymentSent = async () => {
+    if (!transactionHash.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter the transaction hash",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setPurchaseStep('processing');
+    setPaymentStatus('verifying');
+
+    try {
+      // Start payment verification
+      const response = await axios.post(`${API}/services/verify-payment`, {
+        purchase_id: purchaseData.purchase_id,
+        transaction_hash: transactionHash
+      });
+
+      if (response.data.status === 'confirmed') {
+        setPaymentStatus('confirmed');
+        setPurchaseStep('complete');
+        toast({
+          title: "Payment Confirmed!",
+          description: `${selectedService.name} has been activated`
+        });
+      } else {
+        setPaymentStatus('pending');
+        // Start polling for confirmation
+        pollPaymentStatus();
+      }
+    } catch (error) {
+      console.error('Payment verification failed:', error);
+      setPaymentStatus('failed');
+      toast({
+        title: "Verification Error",
+        description: "Failed to verify payment. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const pollPaymentStatus = async () => {
+    const maxPolls = 20; // Poll for up to 10 minutes
+    let pollCount = 0;
+
+    const poll = async () => {
+      if (pollCount >= maxPolls) {
+        setPaymentStatus('timeout');
+        return;
+      }
+
+      try {
+        const response = await axios.post(`${API}/services/verify-payment`, {
+          purchase_id: purchaseData.purchase_id,
+          transaction_hash: transactionHash
+        });
+
+        if (response.data.status === 'confirmed') {
+          setPaymentStatus('confirmed');
+          setPurchaseStep('complete');
+          toast({
+            title: "Payment Confirmed! 🎉",
+            description: `${selectedService.name} has been activated`
+          });
+        } else {
+          pollCount++;
+          setTimeout(poll, 30000); // Poll every 30 seconds
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+        pollCount++;
+        setTimeout(poll, 30000);
+      }
+    };
+
+    setTimeout(poll, 30000); // Start polling after 30 seconds
+  };
+
+  const resetPurchase = () => {
+    setPurchaseStep('browse');
+    setSelectedService(null);
+    setPurchaseData(null);
+    setPaymentStatus('');
+    setTransactionHash('');
+  };
+
+  const renderServiceCard = (service) => (
+    <div key={service.service_id} className="p-4 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-lg border border-gray-600/30 hover:border-blue-400/50 transition-all cursor-pointer"
+         onClick={() => handleServiceSelect(service)}>
+      <div className="flex justify-between items-start mb-3">
+        <h3 className="text-lg font-semibold text-white">{service.name}</h3>
+        <div className="text-right">
+          <div className="text-xl font-bold text-blue-400">{service.price_rtm} RTM</div>
+          {service.duration_days && (
+            <div className="text-xs text-gray-400">{service.duration_days} days</div>
+          )}
+        </div>
+      </div>
+      <p className="text-gray-300 text-sm mb-3">{service.description}</p>
+      <div className="flex items-center justify-between">
+        <span className="text-xs bg-blue-900/30 text-blue-300 px-2 py-1 rounded-full">
+          {service.category.replace('_', ' ').toUpperCase()}
+        </span>
+        <span className="text-xs text-gray-400">
+          {service.is_subscription ? 'Subscription' : 'One-time'}
+        </span>
+      </div>
+    </div>
+  );
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-2">
+            <Star className="h-5 w-5 text-yellow-400" />
+            <span>Premium Services</span>
+          </DialogTitle>
+        </DialogHeader>
+
+        {purchaseStep === 'browse' && (
+          <div className="space-y-4">
+            <div className="p-4 bg-gradient-to-r from-yellow-950/30 to-orange-950/30 rounded-lg border border-yellow-800/30">
+              <div className="flex items-center space-x-2 mb-2">
+                <Star className="h-4 w-4 text-yellow-400" />
+                <span className="text-sm font-medium text-yellow-300">Premium Features</span>
+              </div>
+              <p className="text-xs text-gray-300">Enhance your RaptorQ experience with premium services</p>
+            </div>
+
+            <div className="grid gap-4 max-h-96 overflow-y-auto">
+              {services.map(renderServiceCard)}
+            </div>
+          </div>
+        )}
+
+        {purchaseStep === 'purchase' && selectedService && (
+          <div className="space-y-4">
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-white mb-2">{selectedService.name}</h3>
+              <p className="text-gray-300 mb-4">{selectedService.description}</p>
+              <div className="text-3xl font-bold text-blue-400 mb-2">{selectedService.price_rtm} RTM</div>
+              {selectedService.duration_days && (
+                <p className="text-gray-400">Valid for {selectedService.duration_days} days</p>
+              )}
+            </div>
+
+            <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30">
+              <h4 className="font-semibold text-blue-300 mb-2">Purchase Agreement</h4>
+              <div className="text-sm text-gray-300 space-y-1">
+                <p>• Payment will be processed on Raptoreum blockchain</p>
+                <p>• Service activation occurs after payment confirmation</p>
+                <p>• Typical confirmation time: 2-5 minutes</p>
+                <p>• All payments are non-refundable</p>
+              </div>
+            </div>
+
+            <div className="flex space-x-2">
+              <Button 
+                onClick={() => setPurchaseStep('browse')}
+                variant="outline"
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Back
+              </Button>
+              <Button 
+                onClick={handlePurchaseConfirm}
+                disabled={isLoading}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              >
+                {isLoading ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Confirm Purchase
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {purchaseStep === 'payment' && purchaseData && (
+          <div className="space-y-4">
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-white mb-2">Send Payment</h3>
+              <p className="text-gray-300 mb-4">Send exactly {purchaseData.price_rtm} RTM to complete your purchase</p>
+            </div>
+
+            <div className="flex justify-center p-4 bg-white rounded-lg">
+              <img 
+                src={`data:image/png;base64,${purchaseData.qr_code_data}`}
+                alt="Payment QR Code"
+                className="w-48 h-48"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white">Payment Address</Label>
+              <div className="flex space-x-2">
+                <Input
+                  value={purchaseData.payment_address}
+                  readOnly
+                  className="bg-gray-800/50 border-gray-600 text-white font-mono text-xs"
+                />
+                <Button
+                  onClick={() => navigator.clipboard.writeText(purchaseData.payment_address)}
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white">Transaction Hash (after sending)</Label>
+              <Input
+                placeholder="Enter transaction hash here..."
+                value={transactionHash}
+                onChange={(e) => setTransactionHash(e.target.value)}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 font-mono text-xs"
+              />
+            </div>
+
+            <div className="p-3 bg-gradient-to-r from-yellow-950/30 to-orange-950/30 rounded-lg border border-yellow-800/30">
+              <div className="flex items-center space-x-2 mb-1">
+                <Clock className="h-3 w-3 text-yellow-400" />
+                <span className="text-xs font-medium text-yellow-300">Payment Expires In</span>
+              </div>
+              <p className="text-xs text-gray-300">This payment request expires in 1 hour</p>
+            </div>
+
+            <div className="flex space-x-2">
+              <Button 
+                onClick={resetPurchase}
+                variant="outline"
+                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handlePaymentSent}
+                disabled={!transactionHash.trim()}
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                I've Sent Payment
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {purchaseStep === 'processing' && (
+          <div className="space-y-4 text-center">
+            <div className="p-8">
+              <RefreshCw className="h-16 w-16 text-blue-400 animate-spin mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Processing Payment</h3>
+              <p className="text-gray-300 mb-4">Verifying your transaction on the Raptoreum blockchain...</p>
+              
+              {paymentStatus === 'verifying' && (
+                <div className="space-y-2">
+                  <div className="text-sm text-blue-400">🔍 Searching for transaction...</div>
+                </div>
+              )}
+              
+              {paymentStatus === 'pending' && (
+                <div className="space-y-2">
+                  <div className="text-sm text-yellow-400">⏳ Waiting for confirmations...</div>
+                  <div className="text-xs text-gray-400">This usually takes 2-5 minutes</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {purchaseStep === 'complete' && (
+          <div className="space-y-4 text-center">
+            <div className="p-8">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Payment Confirmed!</h3>
+              <p className="text-gray-300 mb-4">{selectedService?.name} has been activated</p>
+              
+              <div className="p-4 bg-gradient-to-r from-green-950/30 to-blue-950/30 rounded-lg border border-green-800/30">
+                <div className="text-sm text-green-300">
+                  ✅ Service activated successfully<br />
+                  ✅ Features now available in your wallet<br />
+                  ✅ Transaction recorded on blockchain
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => {
+                  resetPurchase();
+                  onClose();
+                }}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                Start Using Service
+              </Button>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const SettingsDialog = ({ isOpen, onClose, wallet, onColorChange, onSecurityUpdate }) => {
   const [selectedColor, setSelectedColor] = useState(wallet?.colorTheme || 'blue');
   const [autoLockTime, setAutoLockTime] = useState('5');
