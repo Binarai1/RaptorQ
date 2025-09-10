@@ -1743,6 +1743,15 @@ const Dashboard = ({ wallet, onLogout }) => {
   const [isLocked, setIsLocked] = useState(false);
   const [lockTimeout, setLockTimeout] = useState(null);
   const [lastActivity, setLastActivity] = useState(Date.now());
+  const [showSettings, setShowSettings] = useState(false);
+  const [walletSettings, setWalletSettings] = useState({
+    colorTheme: wallet?.colorTheme || 'blue',
+    twoFA: false,
+    threeFA: false,
+    autoLockTime: 5,
+    pruning: true,
+    proMode: false
+  });
 
   // Auto-lock functionality
   const AUTO_LOCK_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
