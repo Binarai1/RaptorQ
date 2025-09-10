@@ -154,10 +154,10 @@ RTM_PRICE_CACHE = {
 USD_PRICES = {
     "binarai_single_asset": 0.50,  # $0.50 per AI asset creation
     "binarai_unlimited": 25.00,    # $25 for unlimited (30 days)
-    "pro_mode_annual": 100.00,     # $100 for pro mode (365 days)
-    "premium_themes": 10.00,       # $10 for theme pack
+    "quantum_smartnode": 1.00,     # $1 for quantum RTM smartnode deployment
+    "premium_themes": 0.10,        # $0.10 for theme pack
     "advanced_analytics": 30.00,   # $30 for analytics (90 days)
-    "priority_support": 50.00      # $50 for priority support (365 days)
+    "advertising_daily": 100.00    # $100 per day for advertising banner
 }
 
 async def get_rtm_price_usd() -> float:
