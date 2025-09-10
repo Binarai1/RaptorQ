@@ -524,7 +524,7 @@ def main():
     print("🚀 Starting RaptorQ Wallet API Tests")
     print("=" * 50)
     
-    tester = TalonWalletAPITester()
+    tester = RaptorQWalletTester()
     
     # Blockchain Pruning tests (PRIORITY FOCUS as per review request)
     pruning_tests = [
