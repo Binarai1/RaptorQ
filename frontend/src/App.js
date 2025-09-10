@@ -78,8 +78,91 @@ import {
   Package
 } from 'lucide-react';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Raptoreum blockchain integration utilities
+const RaptoreumAPI = {
+  // Main explorer endpoint
+  EXPLORER_API: 'https://explorer.raptoreum.com/api',
+  
+  // RPC commands for real blockchain interaction
+  RPC_COMMANDS: {
+    createasset: 'createasset',
+    mintasset: 'mintasset', 
+    sendasset: 'sendasset',
+    getassetdetailsbyname: 'getassetdetailsbyname',
+    listassetsbalance: 'listassetsbalance',
+    listunspentassets: 'listunspentassets',
+    getblockcount: 'getblockcount',
+    getblockchaininfo: 'getblockchaininfo',
+    smartnode: 'smartnode'
+  },
+  
+  // Asset creation fees (in RTM)
+  FEES: {
+    STANDARD_ASSET: 1000, // 1000 RTM for standard asset creation
+    REISSUABLE_ASSET: 1500, // 1500 RTM for reissuable asset
+    UNIQUE_ASSET: 100, // 100 RTM for unique asset
+    SUB_ASSET: 100, // 100 RTM for sub-asset
+    TRANSACTION_FEE: 0.001 // Standard transaction fee
+  },
+  
+  // Smartnode requirements
+  SMARTNODE: {
+    COLLATERAL: 1800000, // 1.8 million RTM collateral
+    MIN_CONFIRMATIONS: 15,
+    VPS_REQUIREMENTS: {
+      RAM: '4GB',
+      CPU: '2 cores',
+      STORAGE: '50GB',
+      OS: 'Ubuntu 20/22'
+    }
+  },
+
+  // Get real asset data from explorer
+  getAssetDetails: async (assetId) => {
+    try {
+      const response = await axios.get(`${RaptoreumAPI.EXPLORER_API}/asset/${assetId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch asset details:', error);
+      return null;
+    }
+  },
+
+  // Get blockchain info
+  getBlockchainInfo: async () => {
+    try {
+      const response = await axios.get(`${RaptoreumAPI.EXPLORER_API}/status`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch blockchain info:', error);
+      return null;
+    }
+  },
+
+  // Search assets by various criteria
+  searchAssets: async (query, type = 'name') => {
+    try {
+      const response = await axios.get(`${RaptoreumAPI.EXPLORER_API}/assets/search`, {
+        params: { query, type }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Asset search failed:', error);
+      return [];
+    }
+  },
+
+  // Get all smartnodes
+  getSmartnodes: async () => {
+    try {
+      const response = await axios.get(`${RaptoreumAPI.EXPLORER_API}/smartnodes`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch smartnodes:', error);
+      return [];
+    }
+  }
+};
 
 // Mobile detection utility
 const isMobileDevice = () => {
