@@ -1053,7 +1053,10 @@ const Dashboard = ({ wallet, onLogout }) => {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-white">Quantum Assets</h2>
                   <div className="flex space-x-2">
-                    <Button className="quantum-btn-primary">
+                    <Button 
+                      className="quantum-btn-primary"
+                      onClick={() => setShowAICreator(true)}
+                    >
                       <Plus className="mr-2 h-4 w-4" />
                       Create Asset
                     </Button>
