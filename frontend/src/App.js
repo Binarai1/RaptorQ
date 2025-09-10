@@ -78,6 +78,9 @@ import {
   Package
 } from 'lucide-react';
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
 // Raptoreum blockchain integration utilities
 const RaptoreumAPI = {
   // Main explorer endpoint
