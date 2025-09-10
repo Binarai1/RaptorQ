@@ -142,6 +142,52 @@ class QRCodeResponse(BaseModel):
     address: str
     wallet_info: Dict[str, Any]
 
+# Configuration for premium services
+PREMIUM_SERVICES = {
+    "binarai_unlimited": {
+        "name": "BinarAi Unlimited",
+        "description": "Unlimited AI asset creation for 30 days",
+        "price_rtm": 10.0,
+        "category": "ai_services",
+        "duration_days": 30
+    },
+    "pro_mode_annual": {
+        "name": "Pro Mode Annual",
+        "description": "Advanced smart node features for 365 days",
+        "price_rtm": 50.0,
+        "category": "pro_features",
+        "duration_days": 365
+    },
+    "premium_themes": {
+        "name": "Premium Theme Pack",
+        "description": "Exclusive quantum-themed wallet designs",
+        "price_rtm": 5.0,
+        "category": "customization",
+        "duration_days": None  # One-time purchase
+    },
+    "advanced_analytics": {
+        "name": "Advanced Analytics",
+        "description": "Detailed transaction and asset analytics for 90 days",
+        "price_rtm": 15.0,
+        "category": "analytics",
+        "duration_days": 90
+    },
+    "priority_support": {
+        "name": "Priority Support",
+        "description": "24/7 priority customer support for 365 days",
+        "price_rtm": 25.0,
+        "category": "support",
+        "duration_days": 365
+    }
+}
+
+# Your RTM wallet address for receiving payments (replace with your actual address)
+PAYMENT_WALLET_ADDRESS = "RTM1YourWalletAddressHere123456789"
+
+# Purchase tracking
+purchase_database = {}
+user_services = {}  # Track user's active services
+
 class BlockchainPruneRequest(BaseModel):
     mobile: bool = False
     aggressive: bool = False
