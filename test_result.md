@@ -106,7 +106,7 @@ user_problem_statement: "Complete QR code functionality for RaptorQ wallet: 1) R
 
 backend:
   - task: "QR Code Generation API"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
@@ -115,11 +115,11 @@ backend:
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "Need to implement API endpoint for generating QR codes with wallet logo overlay"
+          comment: "Implemented QR code generation API with quantum logo overlay, RTM address validation endpoint"
 
 frontend:
   - task: "QR Code Receive Functionality"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "App.js"
     stuck_count: 0
@@ -128,10 +128,10 @@ frontend:
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "Need to implement QR code generation with wallet logo in center for receive addresses"
+          comment: "Implemented QR receive dialog with logo in center, address copy, amount/message fields"
 
   - task: "QR Code Send/Scan Functionality"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "App.js"
     stuck_count: 0
@@ -140,7 +140,7 @@ frontend:
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "Need to implement camera-based QR code scanning for send transactions"
+          comment: "Implemented camera-based QR scanning with Html5QrcodeScanner, send dialog with validation"
 
 metadata:
   created_by: "main_agent"
