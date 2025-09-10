@@ -536,7 +536,7 @@ async def create_quantum_asset(asset_data: dict):
             creator_social=metadata.get("creator_social", {}),
             custom_metadata=metadata.get("custom_metadata", {}),
             quantxo_signature={
-                "created_with": "QUANTXO by Binarai",
+                "created_with": "RaptorQ by Binarai",
                 "quantum_resistant": True,
                 "utxo_blockchain": "Raptoreum",
                 "version": "1.0.0",
