@@ -1146,116 +1146,34 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
           </div>
         )}
 
-        {purchaseStep === 'payment' && purchaseData && (
-          <div className="space-y-4">
-            <div className="text-center">
-              <h3 className="text-xl font-bold text-white mb-2">Send Payment</h3>
-              <p className="text-gray-300 mb-2">Send exactly {purchaseData.price_rtm.toFixed(8)} RTM to complete your purchase</p>
-              <p className="text-sm text-green-400">${selectedService?.price_usd.toFixed(2)} USD equivalent</p>
-            </div>
-
-            <div className="flex justify-center p-4 bg-white rounded-lg">
-              <img 
-                src={`data:image/png;base64,${purchaseData.qr_code_data}`}
-                alt="Payment QR Code"
-                className="w-48 h-48"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-white">Payment Address</Label>
-              <div className="flex space-x-2">
-                <Input
-                  value={purchaseData.payment_address}
-                  readOnly
-                  className="bg-gray-800/50 border-gray-600 text-white font-mono text-xs"
-                />
-                <Button
-                  onClick={() => navigator.clipboard.writeText(purchaseData.payment_address)}
-                  variant="outline"
-                  size="sm"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-white">Transaction Hash (after sending)</Label>
-              <Input
-                placeholder="Enter transaction hash here..."
-                value={transactionHash}
-                onChange={(e) => setTransactionHash(e.target.value)}
-                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 font-mono text-xs"
-              />
-            </div>
-
-            <div className="p-3 bg-gradient-to-r from-yellow-950/30 to-orange-950/30 rounded-lg border border-yellow-800/30">
-              <div className="flex items-center space-x-2 mb-1">
-                <Clock className="h-3 w-3 text-yellow-400" />
-                <span className="text-xs font-medium text-yellow-300">Payment Expires In</span>
-              </div>
-              <p className="text-xs text-gray-300">This payment request expires in 1 hour</p>
-            </div>
-
-            <div className="flex space-x-2">
-              <Button 
-                onClick={resetPurchase}
-                variant="outline"
-                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handlePaymentSent}
-                disabled={!transactionHash.trim()}
-                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
-              >
-                <Send className="mr-2 h-4 w-4" />
-                I've Sent Payment
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {purchaseStep === 'processing' && (
-          <div className="space-y-4 text-center">
-            <div className="p-8">
-              <RefreshCw className="h-16 w-16 text-blue-400 animate-spin mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Processing Payment</h3>
-              <p className="text-gray-300 mb-4">Verifying your transaction on the Raptoreum blockchain...</p>
-              
-              {paymentStatus === 'verifying' && (
-                <div className="space-y-2">
-                  <div className="text-sm text-blue-400">🔍 Searching for transaction...</div>
-                </div>
-              )}
-              
-              {paymentStatus === 'pending' && (
-                <div className="space-y-2">
-                  <div className="text-sm text-yellow-400">⏳ Waiting for confirmations...</div>
-                  <div className="text-xs text-gray-400">This usually takes 2-5 minutes</div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {purchaseStep === 'complete' && (
           <div className="space-y-4 text-center">
             <div className="p-8">
               <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Check className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Payment Confirmed!</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Purchase Complete!</h3>
               <p className="text-gray-300 mb-4">{selectedService?.name} has been activated</p>
+              
+              {purchaseData && (
+                <div className="space-y-2 mb-4">
+                  <div className="text-sm text-green-400">
+                    Amount Paid: {purchaseData.amount_paid_rtm?.toFixed(8)} RTM
+                  </div>
+                  <div className="text-sm text-green-400">
+                    USD Equivalent: ${purchaseData.amount_paid_usd?.toFixed(2)}
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    Activated: {new Date(purchaseData.activated_at).toLocaleString()}
+                  </div>
+                </div>
+              )}
               
               <div className="p-4 bg-gradient-to-r from-green-950/30 to-blue-950/30 rounded-lg border border-green-800/30">
                 <div className="text-sm text-green-300">
                   ✅ Service activated successfully<br />
                   ✅ Features now available in your wallet<br />
-                  ✅ Transaction recorded on blockchain
+                  ✅ Transaction processed securely
                 </div>
               </div>
 
@@ -1264,7 +1182,7 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
                   resetPurchase();
                   onClose();
                 }}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 mt-4"
               >
                 <Sparkles className="mr-2 h-4 w-4" />
                 Start Using Service
