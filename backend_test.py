@@ -377,6 +377,126 @@ class TalonWalletAPITester:
         
         return success1 and success2 and success3
 
+    def test_blockchain_prune_mobile(self):
+        """Test blockchain pruning for mobile devices"""
+        prune_data = {
+            "mobile": True,
+            "aggressive": True,
+            "storage_limit_gb": 2
+        }
+        
+        success, response = self.run_test(
+            "Blockchain Pruning - Mobile",
+            "POST",
+            "blockchain/prune",
+            200,
+            data=prune_data
+        )
+        
+        if success:
+            stats = response.get('pruning_stats', {})
+            print(f"   Mobile Optimized: {response.get('mobile_optimized', 'N/A')}")
+            print(f"   Space Saved: {stats.get('space_saved_gb', 'N/A')} GB")
+            print(f"   Performance Boost: {response.get('performance_boost', 'N/A')}")
+            print(f"   Blocks Pruned: {stats.get('blocks_pruned', 'N/A')}")
+            print(f"   Retention Days: {stats.get('retention_days', 'N/A')}")
+        
+        return success
+
+    def test_blockchain_prune_desktop(self):
+        """Test blockchain pruning for desktop devices"""
+        prune_data = {
+            "mobile": False,
+            "aggressive": False,
+            "storage_limit_gb": 10
+        }
+        
+        success, response = self.run_test(
+            "Blockchain Pruning - Desktop",
+            "POST",
+            "blockchain/prune",
+            200,
+            data=prune_data
+        )
+        
+        if success:
+            stats = response.get('pruning_stats', {})
+            print(f"   Mobile Optimized: {response.get('mobile_optimized', 'N/A')}")
+            print(f"   Space Saved: {stats.get('space_saved_gb', 'N/A')} GB")
+            print(f"   Performance Boost: {response.get('performance_boost', 'N/A')}")
+            print(f"   Aggressive Mode: {stats.get('aggressive_mode', 'N/A')}")
+            print(f"   Next Prune Hours: {stats.get('next_prune_in_hours', 'N/A')}")
+        
+        return success
+
+    def test_blockchain_prune_custom_storage(self):
+        """Test blockchain pruning with custom storage limits"""
+        prune_data = {
+            "mobile": True,
+            "aggressive": False,
+            "storage_limit_gb": 5
+        }
+        
+        success, response = self.run_test(
+            "Blockchain Pruning - Custom Storage",
+            "POST",
+            "blockchain/prune",
+            200,
+            data=prune_data
+        )
+        
+        if success:
+            stats = response.get('pruning_stats', {})
+            print(f"   Initial Size: {stats.get('initial_size_gb', 'N/A')} GB")
+            print(f"   Pruned Size: {stats.get('pruned_size_gb', 'N/A')} GB")
+            print(f"   Quantum Security: {response.get('quantum_security', 'N/A')}")
+        
+        return success
+
+    def test_blockchain_pruning_status(self):
+        """Test getting blockchain pruning status"""
+        success, response = self.run_test(
+            "Blockchain Pruning Status",
+            "GET",
+            "blockchain/pruning-status",
+            200
+        )
+        
+        if success:
+            print(f"   Enabled: {response.get('enabled', 'N/A')}")
+            print(f"   Mode: {response.get('mode', 'N/A')}")
+            print(f"   Storage Saved: {response.get('storage_saved', 'N/A')}")
+            print(f"   Performance Improvement: {response.get('performance_improvement', 'N/A')}")
+            print(f"   Mobile Optimized: {response.get('mobile_optimized', 'N/A')}")
+            print(f"   Last Prune: {response.get('last_prune', 'N/A')}")
+            print(f"   Next Prune: {response.get('next_prune', 'N/A')}")
+        
+        return success
+
+    def test_blockchain_prune_edge_cases(self):
+        """Test blockchain pruning edge cases"""
+        print("\n🔍 Testing Blockchain Pruning Edge Cases...")
+        
+        # Test with minimal data
+        success1, _ = self.run_test(
+            "Blockchain Pruning - Minimal Data",
+            "POST",
+            "blockchain/prune",
+            200,
+            data={}
+        )
+        
+        # Test with extreme storage limit
+        success2, _ = self.run_test(
+            "Blockchain Pruning - Large Storage",
+            "POST",
+            "blockchain/prune",
+            200,
+            data={"mobile": False, "aggressive": True, "storage_limit_gb": 100}
+        )
+        
+        return success1 and success2
+
     def test_invalid_endpoints(self):
         """Test error handling for invalid endpoints"""
         print("\n🔍 Testing Error Handling...")
