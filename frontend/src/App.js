@@ -1848,6 +1848,43 @@ const WalletSetup = ({ onWalletCreated }) => {
   const [seedPhrase, setSeedPhrase] = useState('');
   const [importMode, setImportMode] = useState(false);
   const [colorTheme, setColorTheme] = useState('blue');
+
+  // Apply color theme to CSS variables
+  useEffect(() => {
+    const applyColorTheme = (theme) => {
+      const root = document.documentElement;
+      
+      const themes = {
+        blue: {
+          primary: '#3b82f6',
+          secondary: '#1e40af',
+          accent: '#06b6d4'
+        },
+        purple: {
+          primary: '#8b5cf6',
+          secondary: '#7c3aed',
+          accent: '#a855f7'
+        },
+        green: {
+          primary: '#10b981',
+          secondary: '#059669',
+          accent: '#34d399'
+        },
+        red: {
+          primary: '#ef4444',
+          secondary: '#dc2626',
+          accent: '#f87171'
+        }
+      };
+
+      const selectedTheme = themes[theme] || themes.blue;
+      root.style.setProperty('--color-primary', selectedTheme.primary);
+      root.style.setProperty('--color-secondary', selectedTheme.secondary);
+      root.style.setProperty('--color-accent', selectedTheme.accent);
+    };
+
+    applyColorTheme(colorTheme);
+  }, [colorTheme]);
   const [step, setStep] = useState('create');
   const [generatedSeed, setGeneratedSeed] = useState('');
   const [showSeedPhrase, setShowSeedPhrase] = useState(false);
