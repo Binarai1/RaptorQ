@@ -39,7 +39,7 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    quantity: 1,
+    circulation: 1, // Changed from quantity to circulation
     decimals: 0,
     reissuable: false,
     hasIPFS: false,
