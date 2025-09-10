@@ -567,12 +567,27 @@ const WalletSetup = ({ onWalletCreated }) => {
   const [colorTheme, setColorTheme] = useState('blue');
   const [step, setStep] = useState('create');
   const [generatedSeed, setGeneratedSeed] = useState('');
+  const [showSeedPhrase, setShowSeedPhrase] = useState(false);
+  const [verificationWords, setVerificationWords] = useState([]);
+  const [userInputs, setUserInputs] = useState({});
 
   const generateSeedPhrase = () => {
     const words = ['quantum', 'secure', 'wallet', 'binarai', 'resistance', 'crypto', 'asset', 'blockchain', 'utxo', 'raptoreum', 'technology', 'future'];
     const phrase = Array.from({length: 12}, () => words[Math.floor(Math.random() * words.length)]).join(' ');
     setGeneratedSeed(phrase);
     setSeedPhrase(phrase);
+    
+    // Select 3 random positions for verification
+    const words_array = phrase.split(' ');
+    const randomPositions = [];
+    while (randomPositions.length < 3) {
+      const pos = Math.floor(Math.random() * 12);
+      if (!randomPositions.includes(pos)) {
+        randomPositions.push(pos);
+      }
+    }
+    setVerificationWords(randomPositions.map(pos => ({ position: pos + 1, word: words_array[pos] })));
+    setStep('show-seed');
   };
 
   const handleCreateWallet = async () => {
@@ -581,9 +596,13 @@ const WalletSetup = ({ onWalletCreated }) => {
       return;
     }
 
+    if (importMode && !seedPhrase.trim()) {
+      toast({ title: "Error", description: "Please enter your seed phrase", variant: "destructive" });
+      return;
+    }
+
     if (!importMode && !generatedSeed) {
       generateSeedPhrase();
-      setStep('verify');
       return;
     }
 
@@ -596,20 +615,72 @@ const WalletSetup = ({ onWalletCreated }) => {
       colorTheme,
       version: '1.0.0',
       quantumResistant: true,
-      createdWith: 'QUANTXO by Binarai'
+      createdWith: 'RaptorQ by Binarai'
     };
 
     onWalletCreated(wallet);
     toast({ 
       title: "Success", 
-      description: `QUANTXO Wallet "${walletName}" created with quantum resistance!` 
+      description: `RaptorQ Wallet "${walletName}" created with quantum resistance on Raptoreum!` 
     });
   };
 
   const handleSeedVerified = () => {
-    setStep('complete');
-    handleCreateWallet();
+    const isValid = verificationWords.every(({ position, word }) => 
+      userInputs[position]?.toLowerCase().trim() === word.toLowerCase()
+    );
+    
+    if (isValid) {
+      setStep('complete');
+      handleCreateWallet();
+    } else {
+      toast({ title: "Verification Failed", description: "Please check your words and try again.", variant: "destructive" });
+    }
   };
+
+  const continueToVerification = () => {
+    setStep('verify');
+  };
+
+  if (step === 'show-seed' && generatedSeed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
+        <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
+          <CardHeader className="text-center">
+            <QuantumLogo size={64} className="mx-auto mb-4 quantum-float" />
+            <CardTitle className="text-2xl font-bold text-white">Save Your Seed Phrase</CardTitle>
+            <p className="text-gray-400">Write down these words in order</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 bg-gradient-to-r from-red-950/30 to-orange-950/30 rounded-lg border border-red-800/30">
+              <div className="flex items-center space-x-2 mb-2">
+                <AlertTriangle className="h-4 w-4 text-red-400" />
+                <span className="text-sm font-medium text-red-300">Critical: Write This Down!</span>
+              </div>
+              <p className="text-xs text-gray-300">This is the ONLY way to recover your wallet. Store it safely offline.</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 p-4 bg-gray-800/50 rounded-lg">
+              {generatedSeed.split(' ').map((word, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-xs text-gray-400">{index + 1}</div>
+                  <div className="font-mono text-white bg-gray-700/50 rounded px-2 py-1 text-sm">{word}</div>
+                </div>
+              ))}
+            </div>
+
+            <Button 
+              onClick={continueToVerification}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white quantum-btn-primary"
+            >
+              <CheckCircle className="mr-2 h-4 w-4" />
+              I've Written It Down Safely
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (step === 'verify' && generatedSeed) {
     return (
@@ -618,15 +689,37 @@ const WalletSetup = ({ onWalletCreated }) => {
           <CardHeader className="text-center">
             <QuantumLogo size={64} className="mx-auto mb-4 quantum-float" />
             <CardTitle className="text-2xl font-bold text-white">Verify Seed Phrase</CardTitle>
-            <p className="text-gray-400">Secure your QUANTXO Wallet</p>
+            <p className="text-gray-400">Prove you've written it down</p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <div className="p-4 bg-gradient-to-r from-yellow-950/30 to-orange-950/30 rounded-lg border border-yellow-800/30">
+              <div className="flex items-center space-x-2 mb-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                <span className="text-sm font-medium text-yellow-300">Verification Required</span>
+              </div>
+              <p className="text-xs text-gray-300">Enter the requested words from your seed phrase.</p>
+            </div>
+
+            <div className="space-y-3">
+              {verificationWords.map(({ position }) => (
+                <div key={position}>
+                  <Label className="text-white">Word #{position}</Label>
+                  <Input
+                    placeholder={`Enter word #${position}`}
+                    value={userInputs[position] || ''}
+                    onChange={(e) => setUserInputs(prev => ({ ...prev, [position]: e.target.value }))}
+                    className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                  />
+                </div>
+              ))}
+            </div>
+
             <Button 
               onClick={handleSeedVerified}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white quantum-btn-primary"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
             >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Confirm Seed Phrase Saved
+              <Shield className="mr-2 h-4 w-4" />
+              Verify & Create Wallet
             </Button>
           </CardContent>
         </Card>
@@ -639,17 +732,17 @@ const WalletSetup = ({ onWalletCreated }) => {
       <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
         <CardHeader className="text-center">
           <QuantumLogo size={64} className="mx-auto mb-4 quantum-float" />
-          <CardTitle className="text-2xl font-bold quantum-brand-text">QUANTXO Wallet</CardTitle>
-          <p className="text-gray-400">Quantum-Resistant Asset Management</p>
+          <CardTitle className="text-2xl font-bold quantum-brand-text">RaptorQ Wallet</CardTitle>
+          <p className="text-gray-400">Quantum Raptoreum Revolutionizing UTXO</p>
           <Badge className="mt-2 bg-blue-900/30 text-blue-300 border-blue-700/50">
-            First Truly Quantum-Resistant UTXO
+            Quantum-Resistant Raptoreum UTXO
           </Badge>
         </CardHeader>
         <CardContent className="space-y-6">
           <Tabs value={importMode ? "import" : "create"} onValueChange={(v) => setImportMode(v === "import")}>
             <TabsList className="grid w-full grid-cols-2 bg-gray-800/50">
-              <TabsTrigger value="create" className="data-[state=active]:bg-blue-600">Create New</TabsTrigger>
-              <TabsTrigger value="import" className="data-[state=active]:bg-blue-600">Import Existing</TabsTrigger>
+              <TabsTrigger value="create" className="data-[state=active]:bg-blue-600 text-white">Create New</TabsTrigger>
+              <TabsTrigger value="import" className="data-[state=active]:bg-blue-600 text-white">Import Existing</TabsTrigger>
             </TabsList>
             
             <TabsContent value="create" className="space-y-4">
@@ -657,7 +750,7 @@ const WalletSetup = ({ onWalletCreated }) => {
                 <Label htmlFor="walletName" className="text-white">Wallet Nickname</Label>
                 <Input
                   id="walletName"
-                  placeholder="My QUANTXO Wallet"
+                  placeholder="My RaptorQ Wallet"
                   value={walletName}
                   onChange={(e) => setWalletName(e.target.value)}
                   className="quantum-input text-white placeholder-gray-400"
@@ -667,14 +760,14 @@ const WalletSetup = ({ onWalletCreated }) => {
               <div>
                 <Label className="text-white">Color Theme</Label>
                 <Select value={colorTheme} onValueChange={setColorTheme}>
-                  <SelectTrigger className="quantum-input">
+                  <SelectTrigger className="quantum-input text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-600">
-                    <SelectItem value="blue">Quantum Blue</SelectItem>
-                    <SelectItem value="purple">Cosmic Purple</SelectItem>
-                    <SelectItem value="green">Matrix Green</SelectItem>
-                    <SelectItem value="red">Crimson Red</SelectItem>
+                  <SelectContent className="bg-gray-800 border-gray-600 text-white">
+                    <SelectItem value="blue" className="text-white">Quantum Blue</SelectItem>
+                    <SelectItem value="purple" className="text-white">Cosmic Purple</SelectItem>
+                    <SelectItem value="green" className="text-white">Matrix Green</SelectItem>
+                    <SelectItem value="red" className="text-white">Crimson Red</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -682,9 +775,9 @@ const WalletSetup = ({ onWalletCreated }) => {
               <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30 quantum-glow">
                 <div className="flex items-center space-x-2 mb-2">
                   <Hexagon className="h-4 w-4 text-blue-400" />
-                  <span className="text-sm font-medium text-blue-300">Quantum-Resistant Security</span>
+                  <span className="text-sm font-medium text-blue-300">Quantum Raptoreum UTXO</span>
                 </div>
-                <p className="text-xs text-gray-300">Protected by Binarai's post-quantum cryptography against future quantum computing threats.</p>
+                <p className="text-xs text-gray-300">Powered by Raptoreum's revolutionary UTXO blockchain with Binarai's post-quantum cryptography.</p>
               </div>
             </TabsContent>
             
@@ -693,7 +786,7 @@ const WalletSetup = ({ onWalletCreated }) => {
                 <Label htmlFor="walletName" className="text-white">Wallet Nickname</Label>
                 <Input
                   id="walletName"
-                  placeholder="Imported QUANTXO Wallet"
+                  placeholder="Imported RaptorQ Wallet"
                   value={walletName}
                   onChange={(e) => setWalletName(e.target.value)}
                   className="quantum-input text-white placeholder-gray-400"
@@ -702,13 +795,24 @@ const WalletSetup = ({ onWalletCreated }) => {
               
               <div>
                 <Label htmlFor="seedPhrase" className="text-white">12-Word Seed Phrase</Label>
-                <Textarea
-                  id="seedPhrase"
-                  placeholder="Enter your 12-word seed phrase"
-                  value={seedPhrase}
-                  onChange={(e) => setSeedPhrase(e.target.value)}
-                  className="quantum-input text-white placeholder-gray-400"
-                />
+                <div className="relative">
+                  <Textarea
+                    id="seedPhrase"
+                    placeholder="Enter your 12-word seed phrase"
+                    value={seedPhrase}
+                    onChange={(e) => setSeedPhrase(e.target.value)}
+                    className="quantum-input text-white placeholder-gray-400 pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-2 text-gray-400 hover:text-white"
+                    onClick={() => setShowSeedPhrase(!showSeedPhrase)}
+                  >
+                    {showSeedPhrase ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
               </div>
             </TabsContent>
           </Tabs>
