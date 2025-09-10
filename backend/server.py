@@ -357,8 +357,12 @@ async def get_wallet_transactions(wallet_id: str):
         logger.error(f"Transaction history retrieval failed: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get transactions: {str(e)}")
 
+class IPFSUpload(BaseModel):
+    file_content: str
+    file_name: str
+
 @api_router.post("/ipfs/upload")
-async def upload_to_ipfs(file_content: str, file_name: str):
+async def upload_to_ipfs(upload_data: IPFSUpload):
     """Upload file to Raptoreum IPFS cluster"""
     try:
         # Mock IPFS upload (implement with actual IPFS API)
