@@ -58,7 +58,7 @@ import {
   HardDrive,
   Cpu,
   Activity,
-  Update,
+  RotateCcw as Update,
   Github,
   Info,
   BookOpen,
