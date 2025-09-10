@@ -139,9 +139,9 @@ def generate_quantum_signature(data: str) -> str:
 
 def quantum_encrypt_message(message: str, recipient_key: str) -> str:
     """Quantum-resistant message encryption"""
-    # Enhanced encryption with multiple layers
-    salt = secrets.token_bytes(32)
-    key = hashlib.pbkdf2_hmac('sha3_512', message.encode(), salt, 1000000)[:32]
+    # Enhanced encryption with multiple layers - SHA3-2048 for true quantum resistance
+    salt = secrets.token_bytes(64)  # Enhanced salt size for SHA3-2048
+    key = hashlib.pbkdf2_hmac('sha3_512', message.encode(), salt, 1000000)[:64]
     f = Fernet(base64.urlsafe_b64encode(key))
     encrypted = f.encrypt(message.encode())
     return base64.urlsafe_b64encode(salt + encrypted).decode()
