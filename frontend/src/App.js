@@ -2032,6 +2032,15 @@ const Dashboard = ({ wallet, onLogout }) => {
                 />
               </div>
               
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowSettings(true)}
+                className="text-gray-400 hover:text-white"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+              
               <Button 
                 variant="ghost" 
                 size="sm" 
