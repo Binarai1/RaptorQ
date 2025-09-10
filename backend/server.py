@@ -147,6 +147,33 @@ class BlockchainPruneRequest(BaseModel):
     aggressive: bool = False
     storage_limit_gb: Optional[int] = None
 
+# Premium Service Models
+class PremiumService(BaseModel):
+    service_id: str
+    name: str
+    description: str
+    price_rtm: float
+    category: str
+    duration_days: Optional[int] = None  # None for one-time purchases
+
+class ServicePurchaseRequest(BaseModel):
+    service_id: str
+    user_wallet: str
+    user_agreement: bool = True
+
+class ServicePurchaseResponse(BaseModel):
+    purchase_id: str
+    service_name: str
+    price_rtm: float
+    payment_address: str  # Your RTM wallet address
+    qr_code_data: str
+    estimated_confirmation_time: str
+    status: str = "pending_payment"
+
+class PaymentVerificationRequest(BaseModel):
+    purchase_id: str
+    transaction_hash: str
+
 # Asset Like Model
 class AssetLike(BaseModel):
     asset_id: str
