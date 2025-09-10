@@ -15,6 +15,16 @@
 
 [🚀 Download](https://raptorq.com) • [📖 Documentation](./docs/) • [💬 Community](https://discord.gg/raptorq) • [🐛 Report Bug](https://github.com/binarai/raptorq-wallet/issues)
 
+### 📚 **Complete Documentation Suite**
+
+| Document | Description | Target Audience |
+|----------|-------------|-----------------|
+| **[📄 Whitepaper](./docs/RAPTORQ_WHITEPAPER.md)** | Comprehensive technical analysis | Researchers, Developers |
+| **[📋 Litepaper](./docs/RAPTORQ_LITEPAPER.md)** | Easy-to-understand overview | General Users, Investors |
+| **[🔬 Quantum Study](./docs/RAPTORQ_QUANTUM_STUDY.md)** | Mathematical security proof | Security Experts, Auditors |
+| **[⚖️ Comparison Analysis](./docs/RAPTORQ_COMPARISON.md)** | vs MetaMask, Trust Wallet, etc. | Decision Makers, Users |
+| **[👩‍💻 Developer Guide](./docs/RAPTORQ_DEVELOPER_GUIDE.md)** | Integration tutorials & APIs | Developers, Integrators |
+
 </div>
 
 ---
