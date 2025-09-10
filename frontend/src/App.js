@@ -1154,6 +1154,11 @@ const Dashboard = ({ wallet, onLogout }) => {
 
       <QuantumMessaging isOpen={showMessaging} onClose={() => setShowMessaging(false)} />
       <AboutDialog isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      <AIAssetCreator 
+        isOpen={showAICreator} 
+        onClose={() => setShowAICreator(false)}
+        onAssetCreated={handleAssetCreated}
+      />
 
       <Toaster />
     </div>
