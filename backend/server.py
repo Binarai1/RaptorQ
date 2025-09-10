@@ -566,7 +566,7 @@ async def get_integration_guide():
         "quantum_security": True,
         "integration_methods": {
             "web3_connection": {
-                "endpoint": f"{BACKEND_URL}/api/web3/connect",
+                "endpoint": "/api/web3/connect",
                 "method": "POST",
                 "quantum_encrypted": True,
                 "example": {
@@ -576,12 +576,12 @@ async def get_integration_guide():
                 }
             },
             "asset_verification": {
-                "endpoint": f"{BACKEND_URL}/api/assets/verify",
+                "endpoint": "/api/assets/verify",
                 "method": "GET",
                 "quantum_signatures": True
             },
             "transaction_monitoring": {
-                "websocket": f"wss://{BACKEND_URL}/ws/transactions",
+                "websocket": "wss://your-domain.com/ws/transactions",
                 "real_time": True,
                 "instasend_support": True
             }
