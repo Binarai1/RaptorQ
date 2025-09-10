@@ -6,7 +6,32 @@
   --color-accent: #06b6d4;
 }
 
-body {
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Dynamic theme colors */
+.theme-primary {
+  background-color: var(--color-primary);
+}
+
+.theme-secondary {
+  background-color: var(--color-secondary);
+}
+
+.theme-accent {
+  background-color: var(--color-accent);
+}
+
+.theme-border-primary {
+  border-color: var(--color-primary);
+}
+
+.theme-text-primary {
+  color: var(--color-primary);
+}
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
