@@ -1319,6 +1319,79 @@ const Dashboard = ({ wallet, onLogout }) => {
     toast({ title: "Asset Created", description: `${newAsset.name} has been added to your quantum assets!` });
   };
 
+  const handleQRScanResult = (result) => {
+    console.log('QR Scan Result:', result);
+    
+    // Parse QR code result
+    let address = result;
+    let amount = '';
+    
+    // Check if it's a URI format (raptoreum:address?amount=x)
+    if (result.includes(':')) {
+      const parts = result.split(':');
+      if (parts.length > 1) {
+        address = parts[1].split('?')[0];
+        
+        // Extract amount if present
+        const urlParams = new URLSearchParams(result.split('?')[1] || '');
+        if (urlParams.get('amount')) {
+          amount = urlParams.get('amount');
+        }
+      }
+    }
+    
+    setSendToAddress(address);
+    setSendAmount(amount);
+    setShowSendDialog(true);
+    
+    toast({ 
+      title: "QR Code Scanned", 
+      description: `Address: ${address.substring(0, 10)}...` 
+    });
+  };
+
+  const handleSendTransaction = async () => {
+    if (!sendToAddress || !sendAmount) {
+      toast({ 
+        title: "Error", 
+        description: "Please enter address and amount", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    try {
+      // Validate address format
+      const validation = await axios.get(`${API}/qr/validate/${sendToAddress}`);
+      if (!validation.data.valid) {
+        toast({ 
+          title: "Error", 
+          description: "Invalid RTM address format", 
+          variant: "destructive" 
+        });
+        return;
+      }
+
+      // Mock transaction send
+      toast({ 
+        title: "Transaction Initiated", 
+        description: `Sending ${sendAmount} RTM to ${sendToAddress.substring(0, 10)}...`,
+      });
+      
+      setShowSendDialog(false);
+      setSendToAddress('');
+      setSendAmount('');
+      
+    } catch (error) {
+      console.error('Send transaction failed:', error);
+      toast({ 
+        title: "Error", 
+        description: "Transaction failed", 
+        variant: "destructive" 
+      });
+    }
+  };
+
   // Real-time balance animation
   useEffect(() => {
     const interval = setInterval(() => {
