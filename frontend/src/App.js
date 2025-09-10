@@ -1753,6 +1753,34 @@ const Dashboard = ({ wallet, onLogout }) => {
     proMode: false
   });
 
+  const handleColorChange = (newColor) => {
+    setWalletSettings(prev => ({ ...prev, colorTheme: newColor }));
+    // Apply color theme to CSS variables
+    document.documentElement.style.setProperty('--primary-color', newColor);
+    toast({ 
+      title: "Theme Updated", 
+      description: `Switched to ${newColor} theme` 
+    });
+  };
+
+  const handleSecurityUpdate = (securitySettings) => {
+    setWalletSettings(prev => ({ ...prev, ...securitySettings }));
+    
+    if (securitySettings.twoFA || securitySettings.threeFA) {
+      toast({ 
+        title: "Security Enhanced", 
+        description: "Multi-factor authentication enabled" 
+      });
+    }
+    
+    if (securitySettings.proMode) {
+      toast({ 
+        title: "Pro Mode Activated", 
+        description: "Smart node features now available" 
+      });
+    }
+  };
+
   // Auto-lock functionality
   const AUTO_LOCK_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
 
