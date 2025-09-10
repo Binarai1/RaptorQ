@@ -78,6 +78,50 @@ import {
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Mobile detection utility
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         window.innerWidth <= 768;
+};
+
+// Blockchain pruning service for mobile
+const BlockchainPruningService = {
+  isEnabled: () => localStorage.getItem('blockchain_pruning') !== 'false',
+  
+  enable: () => {
+    localStorage.setItem('blockchain_pruning', 'true');
+    return true;
+  },
+  
+  disable: () => {
+    localStorage.setItem('blockchain_pruning', 'false');
+    return false;
+  },
+  
+  getPruningInfo: () => ({
+    enabled: BlockchainPruningService.isEnabled(),
+    isMobile: isMobileDevice(),
+    storageLimit: isMobileDevice() ? '2GB' : '10GB',
+    pruningInterval: isMobileDevice() ? '1 hour' : '24 hours',
+    dataRetention: isMobileDevice() ? '7 days' : '30 days'
+  }),
+  
+  startPruning: async () => {
+    if (!BlockchainPruningService.isEnabled()) return;
+    
+    try {
+      const response = await axios.post(`${API}/blockchain/prune`, {
+        mobile: isMobileDevice(),
+        aggressive: isMobileDevice()
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Pruning failed:', error);
+      return null;
+    }
+  }
+};
+
 // Quantum logo SVG component
 const QuantumLogo = ({ size = 40, className = "" }) => (
   <div className={`quantum-logo ${className}`} style={{ width: size, height: size }}>
