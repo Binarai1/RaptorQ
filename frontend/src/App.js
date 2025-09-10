@@ -1846,7 +1846,7 @@ const Dashboard = ({ wallet, onLogout }) => {
   const [sendAmount, setSendAmount] = useState('');
   const [showSendDialog, setShowSendDialog] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
-  const [lockTimeout, setLockTimeout] = useState(null);
+  const lockTimeoutRef = useRef(null);
   const [lastActivity, setLastActivity] = useState(Date.now());
   const [showSettings, setShowSettings] = useState(false);
   const [walletSettings, setWalletSettings] = useState({
