@@ -1259,6 +1259,11 @@ const Dashboard = ({ wallet, onLogout }) => {
   const [showMessaging, setShowMessaging] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showAICreator, setShowAICreator] = useState(false);
+  const [showQRReceive, setShowQRReceive] = useState(false);
+  const [showQRScan, setShowQRScan] = useState(false);
+  const [sendToAddress, setSendToAddress] = useState('');
+  const [sendAmount, setSendAmount] = useState('');
+  const [showSendDialog, setShowSendDialog] = useState(false);
 
   const handleAssetClick = (asset) => {
     setSelectedAsset(asset);
