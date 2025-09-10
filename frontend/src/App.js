@@ -2133,8 +2133,8 @@ const Dashboard = ({ wallet, onLogout }) => {
                       className="quantum-btn-primary"
                       onClick={() => setShowAICreator(true)}
                     >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create Asset
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      BinarAi Create
                     </Button>
                   </div>
                 </div>
