@@ -309,6 +309,10 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
             <span className="text-white">{fees.creationFee} RTM</span>
           </div>
           <div className="flex justify-between">
+            <span className="text-gray-400">Asset Minting:</span>
+            <span className="text-white">{fees.mintingFee} RTM</span>
+          </div>
+          <div className="flex justify-between">
             <span className="text-gray-400">Transaction Fee:</span>
             <span className="text-white">{fees.transactionFee} RTM</span>
           </div>
@@ -322,6 +326,9 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
           <div className="flex justify-between font-semibold">
             <span className="text-yellow-300">Total Fee:</span>
             <span className="text-yellow-300">{fees.totalFee} RTM</span>
+          </div>
+          <div className="text-xs text-gray-400 mt-2">
+            Includes creation (100 RTM) + minting (100 RTM) in one process
           </div>
         </div>
         
