@@ -130,6 +130,19 @@ class UpdateInfo(BaseModel):
     changelog: List[str] = []
     download_url: Optional[str] = None
 
+# QR Code Models
+class QRCodeRequest(BaseModel):
+    address: str
+    wallet_name: str = "RaptorQ Wallet"
+    amount: Optional[float] = None
+    message: Optional[str] = None
+
+class QRCodeResponse(BaseModel):
+    qr_code_base64: str
+    address: str
+    wallet_info: Dict[str, Any]
+
+# Asset Like Model
 class AssetLike(BaseModel):
     asset_id: str
     wallet_id: str
