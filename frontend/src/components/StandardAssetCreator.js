@@ -86,27 +86,20 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
   };
 
   const calculateFees = () => {
-    let creationFee = RAPTOREUM_FEES.STANDARD_ASSET;
+    let creationFee = RAPTOREUM_FEES.ASSET_CREATION; // 100 RTM
+    let mintingFee = RAPTOREUM_FEES.ASSET_MINTING; // 100 RTM
     let ipfsFee = 0;
-
-    // Calculate fees based on asset type
-    if (formData.isUnique) {
-      creationFee = RAPTOREUM_FEES.UNIQUE_ASSET;
-    } else if (formData.reissuable) {
-      creationFee = RAPTOREUM_FEES.REISSUABLE_ASSET;
-    } else if (formData.parentAsset) {
-      creationFee = RAPTOREUM_FEES.SUB_ASSET;
-    }
 
     // Add IPFS fee if applicable
     if (formData.hasIPFS && formData.ipfsData) {
       ipfsFee = RAPTOREUM_FEES.IPFS_UPLOAD;
     }
 
-    const totalFee = creationFee + RAPTOREUM_FEES.TRANSACTION_FEE + ipfsFee;
+    const totalFee = creationFee + mintingFee + RAPTOREUM_FEES.TRANSACTION_FEE + ipfsFee;
 
     setFees({
       creationFee,
+      mintingFee,
       transactionFee: RAPTOREUM_FEES.TRANSACTION_FEE,
       ipfsFee,
       totalFee
