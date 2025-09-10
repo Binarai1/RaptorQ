@@ -194,15 +194,18 @@ frontend:
 
   - task: "Pro Mode Smart Nodes"
     implemented: true
-    working: "NA"
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implemented Pro Mode toggle in settings for smart node configuration"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED: Pro Mode smart node functionality working. Toggle switch available in Settings dialog under Pro Mode section. When enabled, provides easy smart node configuration access. Pro Mode toggle also visible in main header. Settings save and notifications work correctly."
 
   - task: "Mobile Blockchain Pruning"
     implemented: true
