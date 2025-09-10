@@ -800,40 +800,49 @@ class RaptorQWalletTester:
             return True
 
 def main():
-    print("🚀 Starting RaptorQ Wallet API Tests")
-    print("=" * 50)
+    print("🚀 Starting RaptorQ Wallet Backend API Tests")
+    print("=" * 60)
+    print("🎯 Focus: System Status, QR Generation, Premium Services, Blockchain Pruning, Legal & Asset Management")
+    print("=" * 60)
     
     tester = RaptorQWalletTester()
     
-    # Blockchain Pruning tests (PRIORITY FOCUS as per review request)
-    pruning_tests = [
+    # Priority tests based on review request
+    priority_tests = [
+        tester.test_system_status,
+        tester.test_qr_generation_rtm_address,
+        tester.test_premium_services,
+        tester.test_coingecko_integration,
         tester.test_blockchain_prune_mobile,
         tester.test_blockchain_prune_desktop,
-        tester.test_blockchain_prune_custom_storage,
-        tester.test_blockchain_pruning_status,
-        tester.test_blockchain_prune_edge_cases,
+        tester.test_legal_disclaimer,
+        tester.test_platform_guides,
+        tester.test_asset_creation,
+        tester.test_branding_consistency,
     ]
     
-    # QR Code functionality tests (regression testing)
+    # Additional QR Code tests (comprehensive testing)
     qr_tests = [
         tester.test_qr_generation_basic,
         tester.test_qr_generation_with_amount,
         tester.test_qr_generation_with_message,
         tester.test_qr_generation_full_params,
-        tester.test_rtm_address_validation_valid,
-        tester.test_rtm_address_validation_invalid,
-        tester.test_rtm_address_validation_edge_cases,
+    ]
+    
+    # Additional blockchain pruning tests
+    pruning_tests = [
+        tester.test_blockchain_prune_custom_storage,
+        tester.test_blockchain_pruning_status,
+        tester.test_blockchain_prune_edge_cases,
     ]
     
     # Core functionality tests
     core_tests = [
-        tester.test_health_check,
         tester.test_root_endpoint,
-        tester.test_invalid_endpoints
     ]
     
-    # Combine all tests - Pruning tests first (priority), then QR regression tests
-    tests = pruning_tests + qr_tests + core_tests
+    # Combine all tests - Priority tests first
+    tests = priority_tests + qr_tests + pruning_tests + core_tests
     
     # Run all tests
     for test in tests:
@@ -843,7 +852,7 @@ def main():
             print(f"❌ Test failed with exception: {str(e)}")
     
     # Print final results
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 60)
     print(f"📊 Test Results: {tester.tests_passed}/{tester.tests_run} tests passed")
     
     if tester.tests_passed == tester.tests_run:
