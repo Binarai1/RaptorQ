@@ -246,7 +246,6 @@ test_plan:
     - "2FA/3FA Authentication" 
     - "Custom Wallet Colors"
     - "Pro Mode Smart Nodes"
-    - "Mobile Blockchain Pruning"
     - "BinarAi Image Creation"
     - "Performance Optimizations"
   stuck_tasks: []
