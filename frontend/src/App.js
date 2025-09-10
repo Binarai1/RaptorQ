@@ -475,6 +475,173 @@ const AssetCard = ({ asset, onClick, onLike }) => {
   );
 };
 
+const QRReceiveDialog = ({ isOpen, onClose, wallet }) => {
+  const [qrCodeData, setQrCodeData] = useState(null);
+  const [amount, setAmount] = useState('');
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(wallet?.address || '');
+
+  useEffect(() => {
+    if (isOpen && wallet) {
+      generateQRCode();
+    }
+  }, [isOpen, wallet, amount, message]);
+
+  const generateQRCode = async () => {
+    if (!wallet?.address) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${API}/qr/generate`, {
+        address: selectedAddress,
+        wallet_name: wallet.name,
+        amount: amount ? parseFloat(amount) : null,
+        message: message || null
+      });
+      
+      setQrCodeData(response.data);
+    } catch (error) {
+      console.error('QR generation failed:', error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to generate QR code", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const copyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(selectedAddress);
+      toast({ 
+        title: "Copied!", 
+        description: "Address copied to clipboard" 
+      });
+    } catch (error) {
+      console.error('Copy failed:', error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to copy address", 
+        variant: "destructive" 
+      });
+    }
+  };
+
+  const downloadQR = () => {
+    if (!qrCodeData?.qr_code_base64) return;
+    
+    const link = document.createElement('a');
+    link.href = `data:image/png;base64,${qrCodeData.qr_code_base64}`;
+    link.download = `${wallet.name}_receive_qr.png`;
+    link.click();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-2">
+            <QrCode className="h-5 w-5 text-blue-400" />
+            <span>Receive RTM</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <Shield className="h-4 w-4 text-blue-400" />
+              <span className="text-sm font-medium text-blue-300">Quantum-Secure QR Code</span>
+            </div>
+            <p className="text-xs text-gray-300">Generated with RaptorQ logo for quantum-resistant transactions</p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <Label className="text-white">Amount (Optional)</Label>
+              <Input
+                placeholder="0.00 RTM"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                type="number"
+                step="0.01"
+                min="0"
+              />
+            </div>
+
+            <div>
+              <Label className="text-white">Message (Optional)</Label>
+              <Input
+                placeholder="Payment for..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+              />
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <RefreshCw className="h-6 w-6 text-blue-400 animate-spin" />
+              <span className="ml-2 text-gray-300">Generating QR Code...</span>
+            </div>
+          ) : qrCodeData ? (
+            <div className="space-y-4">
+              <div className="flex justify-center p-4 bg-white rounded-lg">
+                <img 
+                  src={`data:image/png;base64,${qrCodeData.qr_code_base64}`}
+                  alt="Receive QR Code"
+                  className="w-48 h-48"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-white">Your Address</Label>
+                <div className="flex space-x-2">
+                  <Input
+                    value={selectedAddress}
+                    readOnly
+                    className="bg-gray-800/50 border-gray-600 text-white font-mono text-xs"
+                  />
+                  <Button
+                    onClick={copyAddress}
+                    variant="outline"
+                    size="sm"
+                    className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex space-x-2">
+                <Button 
+                  onClick={downloadQR}
+                  variant="outline"
+                  className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download QR
+                </Button>
+                <Button 
+                  onClick={copyAddress}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                >
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy Address  
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const AboutDialog = ({ isOpen, onClose }) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-2xl">
