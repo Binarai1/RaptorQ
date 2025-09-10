@@ -2782,6 +2782,11 @@ const Dashboard = ({ wallet, onLogout }) => {
         onColorChange={handleColorChange}
         onSecurityUpdate={handleSecurityUpdate}
       />
+      <PremiumServicesDialog 
+        isOpen={showPremiumServices} 
+        onClose={() => setShowPremiumServices(false)}
+        wallet={wallet}
+      />
 
       <Toaster />
     </div>
