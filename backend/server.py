@@ -62,7 +62,8 @@ RAPTOREUM_RPC_USER = os.environ.get('RAPTOREUM_RPC_USER', 'rpcuser')
 RAPTOREUM_RPC_PASS = os.environ.get('RAPTOREUM_RPC_PASS', 'rpcpass')
 IPFS_GATEWAY = os.environ.get('IPFS_GATEWAY', 'https://ipfs.raptoreum.com')
 IPFS_API_URL = os.environ.get('IPFS_API_URL', 'https://api.ipfs.raptoreum.com')
-EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
+# API configuration (remove emergent dependencies)
+# EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 GITHUB_API_URL = "https://api.github.com/repos/Raptor3um/raptoreum"
 
 # Global system status
