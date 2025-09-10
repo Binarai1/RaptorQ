@@ -192,15 +192,16 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
 
     setCreating(true);
     try {
-      // Prepare asset creation data for Raptoreum RPC
+      // Prepare asset creation data for Raptoreum RPC (combines creation + minting)
       const assetData = {
         name: formData.name,
-        qty: formData.quantity,
+        qty: formData.circulation, // Circulation amount to mint immediately
         units: formData.decimals,
         reissuable: formData.reissuable ? 1 : 0,
         has_ipfs: formData.hasIPFS ? 1 : 0,
         ipfs_hash: formData.ipfsData || '',
-        description: formData.description
+        description: formData.description,
+        create_and_mint: true // Combined process flag
       };
 
       // In production, this would call the actual Raptoreum RPC createasset command
