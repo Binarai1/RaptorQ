@@ -2246,6 +2246,13 @@ const Dashboard = ({ wallet, onLogout }) => {
         onSend={handleSendTransaction}
         wallet={wallet}
       />
+      <SettingsDialog 
+        isOpen={showSettings} 
+        onClose={() => setShowSettings(false)}
+        wallet={wallet}
+        onColorChange={handleColorChange}
+        onSecurityUpdate={handleSecurityUpdate}
+      />
 
       <Toaster />
     </div>
