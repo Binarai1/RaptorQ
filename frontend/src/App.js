@@ -1093,14 +1093,27 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
               )}
             </div>
 
-            <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30">
-              <h4 className="font-semibold text-blue-300 mb-2">Purchase Agreement</h4>
+            <div className="p-4 bg-gradient-to-r from-red-950/30 to-orange-950/30 rounded-lg border border-red-800/30">
+              <h4 className="font-semibold text-red-300 mb-2">⚠️ Purchase Confirmation</h4>
               <div className="text-sm text-gray-300 space-y-1">
-                <p>• Payment will be processed on Raptoreum blockchain</p>
-                <p>• Service activation occurs after payment confirmation</p>
-                <p>• Typical confirmation time: 2-5 minutes</p>
+                <p>• <strong>This transaction cannot be reversed</strong></p>
+                <p>• {selectedService.price_rtm.toFixed(8)} RTM will be deducted from your wallet</p>
+                <p>• Service will be activated immediately upon payment</p>
+                <p>• By clicking "Complete Purchase" you agree to proceed</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30">
+              <h4 className="font-semibold text-blue-300 mb-2">Service Details</h4>
+              <div className="text-sm text-gray-300 space-y-1">
+                <p>• Service activation occurs instantly</p>
+                <p>• Quantum-secured transaction processing</p>
                 <p>• Pricing based on live RTM market rates</p>
-                <p>• All payments are non-refundable</p>
+                {selectedService.duration_days ? (
+                  <p>• Valid for {selectedService.duration_days} days from activation</p>
+                ) : (
+                  <p>• One-time purchase with permanent access</p>
+                )}
               </div>
             </div>
 
