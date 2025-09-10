@@ -1518,6 +1518,66 @@ const Dashboard = ({ wallet, onLogout }) => {
   const [lockTimeout, setLockTimeout] = useState(null);
   const [lastActivity, setLastActivity] = useState(Date.now());
 
+  // Auto-lock functionality
+  const AUTO_LOCK_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+  const resetLockTimer = useCallback(() => {
+    setLastActivity(Date.now());
+    
+    if (lockTimeout) {
+      clearTimeout(lockTimeout);
+    }
+    
+    const newTimeout = setTimeout(() => {
+      setIsLocked(true);
+      toast({ 
+        title: "Wallet Locked", 
+        description: "Wallet locked for security after inactivity",
+        variant: "default"
+      });
+    }, AUTO_LOCK_TIME);
+    
+    setLockTimeout(newTimeout);
+  }, [lockTimeout]);
+
+  const handleUnlock = () => {
+    setIsLocked(false);
+    resetLockTimer();
+    toast({ 
+      title: "Wallet Unlocked", 
+      description: "Welcome back to your quantum wallet" 
+    });
+  };
+
+  // Activity tracking
+  useEffect(() => {
+    const handleActivity = () => {
+      if (!isLocked) {
+        resetLockTimer();
+      }
+    };
+
+    // Track mouse and keyboard activity
+    document.addEventListener('mousedown', handleActivity);
+    document.addEventListener('keydown', handleActivity);
+    document.addEventListener('scroll', handleActivity);
+    document.addEventListener('touchstart', handleActivity);
+
+    // Initialize timer
+    resetLockTimer();
+
+    return () => {
+      document.removeEventListener('mousedown', handleActivity);
+      document.removeEventListener('keydown', handleActivity);
+      document.removeEventListener('scroll', handleActivity);
+      document.removeEventListener('touchstart', handleActivity);
+      
+      if (lockTimeout) {
+        clearTimeout(lockTimeout);
+      }
+    };
+  }, [isLocked, resetLockTimer]);
+
   const handleAssetClick = (asset) => {
     setSelectedAsset(asset);
   };
