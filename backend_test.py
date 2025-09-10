@@ -221,6 +221,162 @@ class TalonWalletAPITester:
         
         return success
 
+    def test_qr_generation_basic(self):
+        """Test basic QR code generation"""
+        qr_data = {
+            "address": "RPTM1abcdefghijklmnopqrstuv123456",
+            "wallet_name": "RaptorQ Test Wallet"
+        }
+        
+        success, response = self.run_test(
+            "QR Code Generation - Basic",
+            "POST",
+            "qr/generate",
+            200,
+            data=qr_data
+        )
+        
+        if success:
+            print(f"   QR Generated: {'Yes' if response.get('qr_code_base64') else 'No'}")
+            print(f"   Address: {response.get('address', 'N/A')}")
+            print(f"   Quantum Secured: {response.get('wallet_info', {}).get('quantum_secured', 'N/A')}")
+        
+        return success
+
+    def test_qr_generation_with_amount(self):
+        """Test QR code generation with amount"""
+        qr_data = {
+            "address": "RPTM1abcdefghijklmnopqrstuv123456",
+            "wallet_name": "RaptorQ Test Wallet",
+            "amount": 10.5
+        }
+        
+        success, response = self.run_test(
+            "QR Code Generation - With Amount",
+            "POST",
+            "qr/generate",
+            200,
+            data=qr_data
+        )
+        
+        if success:
+            print(f"   Amount: {response.get('wallet_info', {}).get('amount', 'N/A')}")
+            print(f"   QR Format: {response.get('wallet_info', {}).get('qr_format', 'N/A')}")
+        
+        return success
+
+    def test_qr_generation_with_message(self):
+        """Test QR code generation with message"""
+        qr_data = {
+            "address": "RPTM1abcdefghijklmnopqrstuv123456",
+            "wallet_name": "RaptorQ Test Wallet",
+            "message": "Payment for services"
+        }
+        
+        success, response = self.run_test(
+            "QR Code Generation - With Message",
+            "POST",
+            "qr/generate",
+            200,
+            data=qr_data
+        )
+        
+        if success:
+            print(f"   Message: {response.get('wallet_info', {}).get('message', 'N/A')}")
+            print(f"   Created By: {response.get('wallet_info', {}).get('created_by', 'N/A')}")
+        
+        return success
+
+    def test_qr_generation_full_params(self):
+        """Test QR code generation with all parameters"""
+        qr_data = {
+            "address": "RPTM1abcdefghijklmnopqrstuv123456",
+            "wallet_name": "RaptorQ Test Wallet",
+            "amount": 25.75,
+            "message": "Full parameter test payment"
+        }
+        
+        success, response = self.run_test(
+            "QR Code Generation - Full Parameters",
+            "POST",
+            "qr/generate",
+            200,
+            data=qr_data
+        )
+        
+        if success:
+            wallet_info = response.get('wallet_info', {})
+            print(f"   Amount: {wallet_info.get('amount', 'N/A')}")
+            print(f"   Message: {wallet_info.get('message', 'N/A')}")
+            print(f"   Quantum Secured: {wallet_info.get('quantum_secured', 'N/A')}")
+        
+        return success
+
+    def test_rtm_address_validation_valid(self):
+        """Test RTM address validation with valid address"""
+        test_address = "R1234567890123456789012345678"
+        
+        success, response = self.run_test(
+            "RTM Address Validation - Valid",
+            "GET",
+            f"qr/validate/{test_address}",
+            200
+        )
+        
+        if success:
+            print(f"   Valid: {response.get('valid', 'N/A')}")
+            print(f"   Format: {response.get('format', 'N/A')}")
+            print(f"   Quantum Verified: {response.get('quantum_verified', 'N/A')}")
+        
+        return success
+
+    def test_rtm_address_validation_invalid(self):
+        """Test RTM address validation with invalid address"""
+        test_address = "invalid_address_format"
+        
+        success, response = self.run_test(
+            "RTM Address Validation - Invalid",
+            "GET",
+            f"qr/validate/{test_address}",
+            200
+        )
+        
+        if success:
+            print(f"   Valid: {response.get('valid', 'N/A')}")
+            print(f"   Address: {response.get('address', 'N/A')}")
+        
+        return success
+
+    def test_rtm_address_validation_edge_cases(self):
+        """Test RTM address validation edge cases"""
+        print("\n🔍 Testing RTM Address Validation Edge Cases...")
+        
+        # Test short address
+        success1, _ = self.run_test(
+            "RTM Address - Too Short",
+            "GET",
+            "qr/validate/R123",
+            200
+        )
+        
+        # Test long address
+        success2, _ = self.run_test(
+            "RTM Address - Too Long",
+            "GET",
+            "qr/validate/R12345678901234567890123456789012345",
+            200
+        )
+        
+        # Test wrong starting character
+        success3, _ = self.run_test(
+            "RTM Address - Wrong Start",
+            "GET",
+            "qr/validate/X1234567890123456789012345678",
+            200
+        )
+        
+        return success1 and success2 and success3
+
     def test_invalid_endpoints(self):
         """Test error handling for invalid endpoints"""
         print("\n🔍 Testing Error Handling...")
@@ -233,13 +389,13 @@ class TalonWalletAPITester:
             404
         )
         
-        # Test missing required fields
+        # Test missing required fields for QR generation
         success2, _ = self.run_test(
-            "Create Wallet Missing Name",
+            "QR Generation Missing Address",
             "POST",
-            "wallet/create",
+            "qr/generate",
             422,  # Validation error
-            data={"is_import": False}
+            data={"wallet_name": "Test"}
         )
         
         return success and success2
