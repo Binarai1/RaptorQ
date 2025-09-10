@@ -259,15 +259,9 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Auto-Lock Functionality"
-    - "2FA/3FA Authentication" 
-    - "Custom Wallet Colors"
-    - "Pro Mode Smart Nodes"
-    - "BinarAi Image Creation"
-    - "Performance Optimizations"
+  current_focus: []
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
