@@ -101,3 +101,62 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Complete QR code functionality for RaptorQ wallet: 1) Receive functionality - generate custom QR codes with wallet logo in the middle, and allow copying of the selected address. 2) Send functionality - allow device camera (mobile or desktop) to read other RTM QR codes for transactions. Then implement all other pending features including lock function, 2FA/3FA, custom wallet colors, Pro Mode, etc."
+
+backend:
+  - task: "QR Code Generation API"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to implement API endpoint for generating QR codes with wallet logo overlay"
+
+frontend:
+  - task: "QR Code Receive Functionality"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to implement QR code generation with wallet logo in center for receive addresses"
+
+  - task: "QR Code Send/Scan Functionality"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to implement camera-based QR code scanning for send transactions"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "QR Code Receive Functionality"
+    - "QR Code Send/Scan Functionality"
+    - "QR Code Generation API"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Starting QR code implementation with receive functionality (QR + logo) and send functionality (camera scanning). Libraries already installed: html5-qrcode, qrcode, qrcode-generator, react-qr-code."
