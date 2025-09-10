@@ -563,7 +563,7 @@ async def create_quantum_asset(asset_data: dict):
             "message": "Quantum asset created successfully",
             "asset_id": asset.asset_id,
             "quantum_signature": quantxo_metadata.quantxo_signature,
-            "created_by": "QUANTXO by Binarai"
+            "created_by": "RaptorQ by Binarai"
         }
         
     except HTTPException:
