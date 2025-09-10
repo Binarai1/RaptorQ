@@ -1921,7 +1921,22 @@ const Dashboard = ({ wallet, onLogout }) => {
   useEffect(() => {
     const handleActivity = () => {
       if (!isLocked) {
-        resetLockTimer();
+        setLastActivity(Date.now());
+        
+        if (lockTimeout) {
+          clearTimeout(lockTimeout);
+        }
+        
+        const newTimeout = setTimeout(() => {
+          setIsLocked(true);
+          toast({ 
+            title: "Wallet Locked", 
+            description: "Wallet locked for security after inactivity",
+            variant: "default"
+          });
+        }, AUTO_LOCK_TIME);
+        
+        setLockTimeout(newTimeout);
       }
     };
 
@@ -1932,7 +1947,7 @@ const Dashboard = ({ wallet, onLogout }) => {
     document.addEventListener('touchstart', handleActivity);
 
     // Initialize timer
-    resetLockTimer();
+    handleActivity();
 
     return () => {
       document.removeEventListener('mousedown', handleActivity);
@@ -1944,7 +1959,7 @@ const Dashboard = ({ wallet, onLogout }) => {
         clearTimeout(lockTimeout);
       }
     };
-  }, [isLocked, resetLockTimer]);
+  }, [isLocked, lockTimeout]);
 
   const handleAssetClick = (asset) => {
     setSelectedAsset(asset);
