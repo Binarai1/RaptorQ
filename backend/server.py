@@ -25,7 +25,8 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
-from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+# Remove emergent integration imports - use direct API calls instead
+# from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 import requests
 import time
 import subprocess
