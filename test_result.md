@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Complete QR code functionality for RaptorQ wallet: 1) Receive functionality - generate custom QR codes with wallet logo in the middle, and allow copying of the selected address. 2) Send functionality - allow device camera (mobile or desktop) to read other RTM QR codes for transactions. Then implement all other pending features including lock function, 2FA/3FA, custom wallet colors, Pro Mode, etc."
+user_problem_statement: "Complete QR code functionality for RaptorQ wallet: 1) Receive functionality - generate custom QR codes with wallet logo in the middle, and allow copying of the selected address. 2) Send functionality - allow device camera (mobile or desktop) to read other RTM QR codes for transactions. Then implement all other pending features including lock function, 2FA/3FA, custom wallet colors, Pro Mode, mobile blockchain pruning, and ensure AI image creation is called 'BinarAi image creation'. Make wallet fast and snappy."
 
 backend:
   - task: "QR Code Generation API"
