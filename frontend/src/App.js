@@ -726,6 +726,136 @@ const WalletSetup = ({ onWalletCreated }) => {
   );
 };
 
+const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
+  const [prompt, setPrompt] = useState('');
+  const [assetType, setAssetType] = useState('image');
+  const [assetName, setAssetName] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedAsset, setGeneratedAsset] = useState(null);
+
+  const handleGenerate = async () => {
+    if (!prompt.trim() || !assetName.trim()) {
+      toast({ title: "Error", description: "Please enter both asset name and prompt", variant: "destructive" });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const response = await axios.post(`${API}/ai/generate-asset`, {
+        prompt,
+        asset_type: assetType,
+        name: assetName
+      });
+      
+      setGeneratedAsset(response.data);
+      toast({ title: "Success", description: "Quantum-secure asset generated!" });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to generate asset", variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCreateAsset = () => {
+    if (generatedAsset) {
+      onAssetCreated(generatedAsset);
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-2">
+            <Zap className="h-5 w-5 text-purple-400" />
+            <span>RaptorQ AI Asset Creator</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div>
+            <Label className="text-white">Asset Name</Label>
+            <Input
+              placeholder="MY_ASSET_NAME"
+              value={assetName}
+              onChange={(e) => setAssetName(e.target.value.toUpperCase())}
+              className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+            />
+            <p className="text-xs text-gray-400 mt-1">Use uppercase letters, numbers, and underscores only</p>
+          </div>
+
+          <div>
+            <Label className="text-white">Asset Type</Label>
+            <Select value={assetType} onValueChange={setAssetType}>
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
+                <SelectItem value="image" className="text-white">NFT Image</SelectItem>
+                <SelectItem value="gif" className="text-white">Animated GIF</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="text-white">AI Prompt</Label>
+            <Textarea
+              placeholder="Describe your quantum-resistant NFT creation..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 h-24"
+            />
+          </div>
+
+          <div className="p-3 bg-gradient-to-r from-purple-950/30 to-blue-950/30 rounded-lg border border-purple-800/30">
+            <div className="flex items-center space-x-2 mb-1">
+              <Shield className="h-3 w-3 text-purple-400" />
+              <span className="text-xs font-medium text-purple-300">Quantum-Secure Generation</span>
+            </div>
+            <p className="text-xs text-gray-300">Assets generated with post-quantum cryptographic signatures on Raptoreum</p>
+          </div>
+
+          {generatedAsset && (
+            <div className="space-y-2">
+              <img 
+                src={generatedAsset.preview_url} 
+                alt="Generated asset"
+                className="w-full h-32 object-cover rounded-lg"
+              />
+              <Button 
+                onClick={handleCreateAsset}
+                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Mint This Asset
+              </Button>
+            </div>
+          )}
+
+          <Button 
+            onClick={handleGenerate}
+            disabled={isGenerating || !prompt || !assetName}
+            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+          >
+            {isGenerating ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Zap className="mr-2 h-4 w-4" />
+                Generate Asset
+              </>
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const Dashboard = ({ wallet, onLogout }) => {
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [showBalance, setShowBalance] = useState(false);
