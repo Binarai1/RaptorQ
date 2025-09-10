@@ -642,6 +642,126 @@ const QRReceiveDialog = ({ isOpen, onClose, wallet }) => {
   );
 };
 
+const QRScanDialog = ({ isOpen, onClose, onScanResult }) => {
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanResult, setScanResult] = useState('');
+  const [error, setError] = useState('');
+  const scannerRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && !isScanning) {
+      startScanner();
+    }
+    
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.clear();
+      }
+    };
+  }, [isOpen]);
+
+  const startScanner = async () => {
+    try {
+      setIsScanning(true);
+      setError('');
+      
+      const scanner = new Html5QrcodeScanner(
+        "qr-scanner",
+        { 
+          fps: 10, 
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0
+        },
+        false
+      );
+      
+      scannerRef.current = scanner;
+      
+      scanner.render(
+        (decodedText) => {
+          // Successful scan
+          setScanResult(decodedText);
+          onScanResult(decodedText);
+          scanner.clear();
+          setIsScanning(false);
+          onClose();
+        },
+        (error) => {
+          // Scan error - we can ignore these as they happen frequently
+          console.log('Scan error:', error);
+        }
+      );
+      
+    } catch (error) {
+      console.error('Scanner start failed:', error);
+      setError('Failed to start camera scanner');
+      setIsScanning(false);
+    }
+  };
+
+  const handleManualInput = () => {
+    if (scanResult.trim()) {
+      onScanResult(scanResult.trim());
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-2">
+            <Camera className="h-5 w-5 text-blue-400" />
+            <span>Scan QR Code</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <Shield className="h-4 w-4 text-blue-400" />
+              <span className="text-sm font-medium text-blue-300">Secure QR Scanner</span>
+            </div>
+            <p className="text-xs text-gray-300">Scan RTM addresses and payment requests securely</p>
+          </div>
+
+          {error && (
+            <div className="p-3 bg-red-950/30 border border-red-800/30 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="h-4 w-4 text-red-400" />
+                <span className="text-sm text-red-300">{error}</span>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div id="qr-scanner" className="w-full"></div>
+            
+            <div className="space-y-2">
+              <Label className="text-white">Or Enter Manually</Label>
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="RTM Address or QR Code Data"
+                  value={scanResult}
+                  onChange={(e) => setScanResult(e.target.value)}
+                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 font-mono text-xs"
+                />
+                <Button
+                  onClick={handleManualInput}
+                  disabled={!scanResult.trim()}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const AboutDialog = ({ isOpen, onClose }) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-2xl">
