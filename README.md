@@ -192,11 +192,35 @@ RaptorQ Wallet/
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 **Support**
+## 🤝 **Support & Community**
 
-- 📧 Email: support@binarai.com
-- 💬 Discord: [Join our community](https://discord.gg/raptorq)
-- 🐛 Issues: [GitHub Issues](https://github.com/binarai/raptorq-wallet/issues)
+### 🆘 **Get Help**
+- 📧 **Email**: support@binarai.com
+- 💬 **Discord**: [Join our community](https://discord.gg/raptorq)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/binarai/raptorq-wallet/issues)
+- 📚 **Documentation**: [Complete docs suite](./docs/)
+
+### 👥 **For Different Audiences**
+
+**🔒 Security Teams & Auditors**
+- Read our [Quantum Security Study](./docs/RAPTORQ_QUANTUM_STUDY.md) for mathematical proofs
+- Review [Technical Whitepaper](./docs/RAPTORQ_WHITEPAPER.md) for implementation details
+- Contact security@binarai.com for security-specific questions
+
+**👩‍💻 Developers & Integrators**  
+- Start with [Developer Guide](./docs/RAPTORQ_DEVELOPER_GUIDE.md) for integration tutorials
+- Join [Developer Discord](https://discord.gg/raptorq-dev) for technical support
+- Email developers@binarai.com for API questions
+
+**💼 Business Decision Makers**
+- Review [Competitive Analysis](./docs/RAPTORQ_COMPARISON.md) for feature comparisons  
+- Read [Litepaper](./docs/RAPTORQ_LITEPAPER.md) for business overview
+- Contact enterprise@binarai.com for enterprise solutions
+
+**👤 End Users**
+- Start with [Litepaper](./docs/RAPTORQ_LITEPAPER.md) for easy introduction
+- Join [Community Discord](https://discord.gg/raptorq) for user support
+- Email support@binarai.com for user questions
 
 ## 🙏 **Acknowledgments**
 
