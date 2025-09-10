@@ -2099,6 +2099,22 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
   const [assetName, setAssetName] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedAsset, setGeneratedAsset] = useState(null);
+  const [binaraiPricing, setBinaraiPricing] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchBinaraiPricing();
+    }
+  }, [isOpen]);
+
+  const fetchBinaraiPricing = async () => {
+    try {
+      const response = await axios.get(`${API}/services/premium`);
+      setBinaraiPricing(response.data.binarai_single_asset);
+    } catch (error) {
+      console.error('Failed to fetch BinarAi pricing:', error);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim() || !assetName.trim()) {
@@ -2146,7 +2162,14 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
               <Star className="h-4 w-4 text-purple-400" />
               <span className="text-sm font-medium text-purple-300">BinarAi Powered</span>
             </div>
-            <p className="text-xs text-gray-300">Create quantum-resistant NFTs with advanced AI technology</p>
+            <p className="text-xs text-gray-300">
+              Create quantum-resistant NFTs with advanced AI technology
+              {binaraiPricing && (
+                <span className="block mt-1 text-yellow-300">
+                  Cost: {binaraiPricing.price_rtm.toFixed(8)} RTM (${binaraiPricing.price_usd.toFixed(2)} USD) per asset
+                </span>
+              )}
+            </p>
           </div>
 
           <div>
@@ -2191,6 +2214,20 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
             <p className="text-xs text-gray-300">Assets generated with post-quantum cryptographic signatures on Raptoreum</p>
           </div>
 
+          {binaraiPricing && (
+            <div className="p-3 bg-gradient-to-r from-yellow-950/30 to-orange-950/30 rounded-lg border border-yellow-800/30">
+              <div className="flex items-center space-x-2 mb-1">
+                <DollarSign className="h-3 w-3 text-yellow-400" />
+                <span className="text-xs font-medium text-yellow-300">Per-Asset Pricing</span>
+              </div>
+              <p className="text-xs text-gray-300">
+                Each AI asset costs {binaraiPricing.price_rtm.toFixed(8)} RTM (${binaraiPricing.price_usd.toFixed(2)} USD)
+                <br />
+                <span className="text-yellow-300">Get unlimited for 30 days with BinarAi Unlimited subscription!</span>
+              </p>
+            </div>
+          )}
+
           {generatedAsset && (
             <div className="space-y-2">
               <img 
@@ -2210,8 +2247,8 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
 
           <Button 
             onClick={handleGenerate}
-            disabled={isGenerating || !prompt || !assetName}
-            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+            disabled={isGenerating || !prompt.trim() || !assetName.trim()}
+            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
           >
             {isGenerating ? (
               <>
