@@ -2231,6 +2231,7 @@ const Dashboard = ({ wallet, onLogout }) => {
   const lockTimeoutRef = useRef(null);
   const [lastActivity, setLastActivity] = useState(Date.now());
   const [showSettings, setShowSettings] = useState(false);
+  const [showPremiumServices, setShowPremiumServices] = useState(false);
   const [walletSettings, setWalletSettings] = useState({
     colorTheme: wallet?.colorTheme || 'blue',
     twoFA: false,
