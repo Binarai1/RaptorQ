@@ -1910,7 +1910,23 @@ const Dashboard = ({ wallet, onLogout }) => {
 
   const handleUnlock = () => {
     setIsLocked(false);
-    resetLockTimer();
+    setLastActivity(Date.now());
+    
+    if (lockTimeout) {
+      clearTimeout(lockTimeout);
+    }
+    
+    const newTimeout = setTimeout(() => {
+      setIsLocked(true);
+      toast({ 
+        title: "Wallet Locked", 
+        description: "Wallet locked for security after inactivity",
+        variant: "default"
+      });
+    }, AUTO_LOCK_TIME);
+    
+    setLockTimeout(newTimeout);
+    
     toast({ 
       title: "Wallet Unlocked", 
       description: "Welcome back to your quantum wallet" 
