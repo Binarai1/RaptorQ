@@ -169,6 +169,10 @@ async def call_raptoreum_rpc(method: str, params: List[Any] = []) -> Dict[str, A
             return {"result": address, "error": None}
         elif method == "sendtoaddress":
             return {"result": f"tx_{secrets.token_hex(32)}", "error": None}
+        elif method == "createasset":
+            return {"result": f"asset_{secrets.token_hex(16)}", "error": None}
+        elif method == "sendasset":
+            return {"result": f"tx_{secrets.token_hex(32)}", "error": None}
         else:
             return {"result": None, "error": "Method not implemented in mock"}
             
