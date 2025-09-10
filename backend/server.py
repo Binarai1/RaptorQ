@@ -22,6 +22,10 @@ import base64
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 import time
 import subprocess
+import qrcode
+from PIL import Image, ImageDraw
+import io
+import base64
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
