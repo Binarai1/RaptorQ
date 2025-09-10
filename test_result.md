@@ -149,15 +149,18 @@ frontend:
           comment: "Implemented camera-based QR scanning with Html5QrcodeScanner, send dialog with validation"
   - task: "Auto-Lock Functionality"
     implemented: true
-    working: "NA"
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implemented auto-lock with PIN unlock, activity tracking, and 5-minute timeout"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED: Auto-lock functionality fully implemented and working. Fixed React infinite loop issue with useCallback/useEffect dependencies. Activity tracking active for mouse, keyboard, scroll, and touch events. 5-minute timeout configured. PIN unlock screen component available. Lock screen UI components present and functional."
 
   - task: "2FA/3FA Authentication"
     implemented: true
