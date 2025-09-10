@@ -1,0 +1,101 @@
+<analysis>
+The previous AI engineer initiated development based on a user request for a Discord bot, which evolved into a web-based Raptoreum wallet after platform limitations were identified. The project underwent several iterations, incorporating extensive user feedback. Key phases included initial web app scaffolding, re-branding from Talon Wallet to QUANTXO then RaptorQ, and a significant focus on quantum-resistant cryptography (SHA3-512 initially, then upgraded to SHA3-2048 equivalent). The engineer implemented core wallet features, asset management, UI/UX improvements, and comprehensive documentation. Challenges included continuous integration of new requirements, resolving UI glitches, and handling GitHub upload limitations. The work is currently focused on adding QR code functionality for transactions. The trajectory shows a strong emphasis on security, user experience, and robust blockchain integration with Raptoreum.
+</analysis>
+
+<product_requirements>
+The initial request was for a Discord bot to send/receive Raptoreum coins/assets, display IPFS images, manage private keys, and check balances privately. Due to platform limitations, this pivoted to a web-based Talon Wallet (later QUANTXO, then RaptorQ), functioning like MetaMask. The wallet must feature secure private key management, seed phrase backup/recovery, UTXO/InstaSend transaction support, real-time balance, IPFS asset image display (PDF, MP3, MP4, PNG, JPG, GIF), asset minting/viewing, and mobile-style asset grid layout.
+
+Crucial requirements include:
+-   **Quantum Resistance:** Superior encryption (SHA3-2048 equivalent, 1024-bit quantum security), quantum-safe key derivation, self-healing security, post-quantum readiness.
+-   **User Experience:** Clean, sharp UI with black, chrome, dark red theme; Poppins font; custom wallet colors; 2FA/3FA; lock function; real-time balance auto-refresh; smooth animations; seed phrase verification on creation.
+-   **Asset Management:** Master/sub asset hierarchy, custom metadata with social media/website links, AI-powered NFT image/GIF creation, social sharing (Facebook, X, Instagram, TikTok), asset liking/unliking, monitoring for inappropriate content.
+-   **Raptoreum Integration:** Emphasis on Quantum Raptoreum revolutionizing UTXO, connection to websites, downloadable wallet for running a local node, auto-upgrade when new blockchain files are detected.
+-   **Documentation:** Developer integration guide (secure, quantum-resistant), multi-platform user guides, legal disclaimer, quantum resistance comparison.
+-   **Transaction Features:** Custom QR code for receiving (with wallet logo), copy address, device camera scan for sending RTM QR codes.
+</product_requirements>
+
+<key_technical_concepts>
+-   **Full-Stack Development**: React (Frontend), FastAPI (Backend), MongoDB (Database).
+-   **Blockchain Integration**: Raptoreum (UTXO, InstaSend transactions, asset management, RPC API).
+-   **Cryptography**: SHA3-2048 (equivalent, SHAKE256), PBKDF2, Fernet encryption, quantum-resistant key derivation, SHA3-512 (initial).
+-   **UI/UX Frameworks**: Shadcn UI, Tailwind CSS, Radix UI.
+-   **Decentralized Storage**: IPFS for asset images.
+-   **Security**: Private key management, seed phrase recovery, 2FA/3FA (pending), secure client-side storage.
+-   **API Integration**: LLM integration via Emergent LLM key for AI asset creation.
+</key_technical_concepts>
+
+<code_architecture>
+The application follows a standard full-stack architecture:
+
+
+
+**Detailed File Descriptions and Changes:**
+-   : Main FastAPI application.
+    -   **Summary:** Handles backend API routes, database interactions, and core logic for wallet management, transactions, and quantum-resistant cryptography. It defines endpoints for user creation, wallet operations, asset management, and integrates LLM functionality for AI asset creation.
+    -   **Changes:** Initially set up for basic wallet operations. Significantly modified to incorporate SHA3-2048 equivalent security (SHAKE256 functions for signatures and encryption), integrate the Emergent LLM key, and support new asset features and security mechanisms. It also includes error handling and ensures adherence to the  prefix for routes.
+-   : Main React component.
+    -   **Summary:** The central React application component, responsible for rendering the wallet's UI, managing state, routing, and interacting with the FastAPI backend. It integrates Shadcn UI components for a modern look and feel.
+    -   **Changes:** Extensively modified to implement the various UI/UX requirements: wallet creation flow, seed phrase verification, asset display, AI asset creation dialog, social sharing features, and branding updates (from Talon to QUANTXO to RaptorQ). It reflects the quantum security enhancements and adheres to the specified design guidelines (colors, fonts, animations).
+-   : Global styles for the React application.
+    -   **Summary:** Defines the visual styling of the application, primarily using Tailwind CSS for utility-first styling.
+    -   **Changes:** Updated to implement the desired aesthetic, including custom color themes (black, chrome, dark red), Poppins font, improved button contrast, dropdown text visibility, and quantum-themed styling elements to align with the RaptorQ brand.
+-   : Environment variables for the backend.
+    -   **Summary:** Stores critical environment variables like  and .
+    -   **Changes:**  was added to enable LLM integration for AI-powered asset creation.
+-   : Environment variables for the frontend.
+    -   **Summary:** Stores  for API communication.
+    -   **Changes:** Modified to ensure correct backend URL configuration.
+-   : Python dependencies for the FastAPI backend.
+    -   **Summary:** Lists all necessary Python packages.
+    -   **Changes:** Updated to include  and other libraries required for LLM and enhanced cryptographic functions.
+-   : Node.js dependencies and scripts for the React frontend.
+    -   **Summary:** Defines project metadata and frontend dependencies.
+    -   **Changes:** Updated as new UI libraries or React components were required.
+-   : Developer integration guide document.
+    -   **Summary:** Provides instructions for web developers to integrate with the wallet.
+    -   **Changes:** Created to detail secure, quantum-resistant integration methods.
+-   : Multi-platform user guide.
+    -   **Summary:** Provides guidance for using the wallet across different platforms.
+    -   **Changes:** Created to address multi-platform usage.
+-   : Legal disclaimer document.
+    -   **Summary:** Covers legal aspects and disclaimers for the wallet.
+    -   **Changes:** Created for legal protection.
+-   : Technical analysis of quantum resistance.
+    -   **Summary:** Details QUANTXO's quantum resistance advantages over competitors.
+    -   **Changes:** Created initially as a detailed markdown report, later updated to reflect SHA3-2048.
+-   : Marketing material for Telegram.
+    -   **Summary:** A concise, marketing-focused summary of quantum resistance for social media.
+    -   **Changes:** Created specifically for Telegram, then updated to highlight SHA3-2048.
+-   : Project documentation.
+    -   **Summary:** The main project README file.
+    -   **Changes:** Updated with project name (QUANTXO/RaptorQ), description, features, and setup instructions.
+</code_architecture>
+
+<pending_tasks>
+-   Implement advertising space sales to businesses for set times and RTM rates.
+-   Add Pro Mode switch for setting up smart nodes easily.
+-   Implement a lock function if the wallet is unattended for too long.
+-   Implement 2FA and 3FA functionality for enhanced user security.
+-   Allow users to set their own custom colors for the wallet in settings.
+-   Create a sharp Chrome logo and integrate it into the application UI.
+-   Implement multi-platform support (Windows, Linux, Mac, Android, iOS) beyond just documentation.
+-   Integrate the legal disclaimer and About section into the wallet's UI.
+-   Implement a feature for the wallet to auto-upgrade upon detecting new blockchain files from Raptoreum GitHub, with a user-clickable popup button.
+-   Implement self-monitoring and self-fixing capabilities for the wallet.
+-   Implement master asset and sub-asset hierarchy within the asset system.
+-   Add a UI element to change the selected asset from RTM to an RTM asset.
+-   Enable users to download the wallet to run their own Raptoreum node.
+-   Refine the monitoring system to prevent pornographic images as assets.
+</pending_tasks>
+
+<current_work>
+The previous AI engineer was working on enhancing the RaptorQ wallet based on recent user feedback. The immediate focus was on implementing QR code functionality for transactions. Specifically, the user requested:
+1.  **Receive Functionality**: When clicking receive, the wallet should produce a custom QR code with the wallet logo in the middle, and allow copying of the selected address.
+2.  **Send Functionality**: When sending a transaction, it should allow the option to securely use the device camera (mobile or desktop) to read other RTM QR codes.
+
+The AI engineer has just initiated this task by stating: First, let me install the necessary QR code libraries: This indicates that the installation of dependencies for QR code generation and scanning is the current, ongoing work. The core QR code generation and scanning logic, along with UI integration, are yet to be implemented.
+</current_work>
+
+<optional_next_step>
+Install the necessary QR code libraries for both frontend and backend.
+</optional_next_step>
