@@ -867,6 +867,8 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
   const [paymentStatus, setPaymentStatus] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [rtmPrice, setRtmPrice] = useState(0);
+  const [binaraiSinglePrice, setBinaraiSinglePrice] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -878,6 +880,8 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
     try {
       const response = await axios.get(`${API}/services/premium`);
       setServices(response.data.services);
+      setRtmPrice(response.data.rtm_market_price);
+      setBinaraiSinglePrice(response.data.binarai_single_asset);
     } catch (error) {
       console.error('Failed to fetch premium services:', error);
       toast({
@@ -909,7 +913,7 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
       
       toast({
         title: "Purchase Initiated",
-        description: `Please send ${response.data.price_rtm} RTM to complete your purchase`
+        description: `Please send ${response.data.price_rtm.toFixed(8)} RTM to complete your purchase`
       });
     } catch (error) {
       console.error('Purchase initiation failed:', error);
@@ -1017,7 +1021,8 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
       <div className="flex justify-between items-start mb-3">
         <h3 className="text-lg font-semibold text-white">{service.name}</h3>
         <div className="text-right">
-          <div className="text-xl font-bold text-blue-400">{service.price_rtm} RTM</div>
+          <div className="text-xl font-bold text-blue-400">{service.price_rtm.toFixed(8)} RTM</div>
+          <div className="text-sm text-green-400">${service.price_usd.toFixed(2)} USD</div>
           {service.duration_days && (
             <div className="text-xs text-gray-400">{service.duration_days} days</div>
           )}
@@ -1052,7 +1057,14 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
                 <Star className="h-4 w-4 text-yellow-400" />
                 <span className="text-sm font-medium text-yellow-300">Premium Features</span>
               </div>
-              <p className="text-xs text-gray-300">Enhance your RaptorQ experience with premium services</p>
+              <p className="text-xs text-gray-300">
+                Enhance your RaptorQ experience • RTM Price: ${rtmPrice.toFixed(4)} USD
+                {binaraiSinglePrice && (
+                  <span className="block mt-1">
+                    BinarAi Asset Creation: {binaraiSinglePrice.price_rtm.toFixed(8)} RTM (${binaraiSinglePrice.price_usd.toFixed(2)})
+                  </span>
+                )}
+              </p>
             </div>
 
             <div className="grid gap-4 max-h-96 overflow-y-auto">
@@ -1066,7 +1078,11 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
             <div className="text-center">
               <h3 className="text-xl font-bold text-white mb-2">{selectedService.name}</h3>
               <p className="text-gray-300 mb-4">{selectedService.description}</p>
-              <div className="text-3xl font-bold text-blue-400 mb-2">{selectedService.price_rtm} RTM</div>
+              <div className="space-y-1 mb-2">
+                <div className="text-3xl font-bold text-blue-400">{selectedService.price_rtm.toFixed(8)} RTM</div>
+                <div className="text-lg text-green-400">${selectedService.price_usd.toFixed(2)} USD</div>
+                <div className="text-xs text-gray-400">Based on current RTM market price</div>
+              </div>
               {selectedService.duration_days && (
                 <p className="text-gray-400">Valid for {selectedService.duration_days} days</p>
               )}
@@ -1078,6 +1094,7 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
                 <p>• Payment will be processed on Raptoreum blockchain</p>
                 <p>• Service activation occurs after payment confirmation</p>
                 <p>• Typical confirmation time: 2-5 minutes</p>
+                <p>• Pricing based on live RTM market rates</p>
                 <p>• All payments are non-refundable</p>
               </div>
             </div>
@@ -1115,7 +1132,8 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
           <div className="space-y-4">
             <div className="text-center">
               <h3 className="text-xl font-bold text-white mb-2">Send Payment</h3>
-              <p className="text-gray-300 mb-4">Send exactly {purchaseData.price_rtm} RTM to complete your purchase</p>
+              <p className="text-gray-300 mb-2">Send exactly {purchaseData.price_rtm.toFixed(8)} RTM to complete your purchase</p>
+              <p className="text-sm text-green-400">${selectedService?.price_usd.toFixed(2)} USD equivalent</p>
             </div>
 
             <div className="flex justify-center p-4 bg-white rounded-lg">
