@@ -1514,6 +1514,9 @@ const Dashboard = ({ wallet, onLogout }) => {
   const [sendToAddress, setSendToAddress] = useState('');
   const [sendAmount, setSendAmount] = useState('');
   const [showSendDialog, setShowSendDialog] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockTimeout, setLockTimeout] = useState(null);
+  const [lastActivity, setLastActivity] = useState(Date.now());
 
   const handleAssetClick = (asset) => {
     setSelectedAsset(asset);
