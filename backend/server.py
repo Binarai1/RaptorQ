@@ -630,6 +630,68 @@ async def get_legal_disclaimer():
         "contact": "legal@binarai.com"
     }
 
+@api_router.post("/qr/generate", response_model=QRCodeResponse)
+async def generate_receive_qr(qr_request: QRCodeRequest):
+    """Generate QR code for receiving RTM with wallet logo"""
+    try:
+        # Format the QR data for Raptoreum address
+        qr_data = qr_request.address
+        
+        # Add amount if specified
+        if qr_request.amount:
+            qr_data += f"?amount={qr_request.amount}"
+        
+        # Add message if specified
+        if qr_request.message:
+            separator = "&" if "?" in qr_data else "?"
+            qr_data += f"{separator}message={qr_request.message}"
+        
+        # Generate QR code with logo
+        qr_base64 = generate_qr_with_logo(qr_data, qr_request.wallet_name)
+        
+        # Create response
+        return QRCodeResponse(
+            qr_code_base64=qr_base64,
+            address=qr_request.address,
+            wallet_info={
+                "name": qr_request.wallet_name,
+                "amount": qr_request.amount,
+                "message": qr_request.message,
+                "qr_format": "raptoreum_address",
+                "quantum_secured": True,
+                "created_by": "RaptorQ by Binarai"
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"QR generation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate QR code: {str(e)}")
+
+@api_router.get("/qr/validate/{address}")
+async def validate_rtm_address(address: str):
+    """Validate Raptoreum address format"""
+    try:
+        # Basic RTM address validation
+        is_valid = (
+            address.startswith(('R', 'r')) and 
+            len(address) >= 26 and 
+            len(address) <= 34 and
+            address.isalnum()
+        )
+        
+        return {
+            "valid": is_valid,
+            "address": address,
+            "format": "raptoreum",
+            "quantum_verified": True
+        }
+        
+    except Exception as e:
+        logger.error(f"Address validation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Address validation failed: {str(e)}")
+
 @api_router.get("/health")
 async def quantum_health_check():
     """Comprehensive quantum health check"""
