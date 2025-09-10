@@ -893,6 +893,34 @@ const Dashboard = ({ wallet, onLogout }) => {
     toast({ title: "System Updated", description: "QUANTXO updated successfully with latest blockchain improvements" });
   };
 
+  const handleAssetCreated = (newAsset) => {
+    const asset = {
+      id: Date.now().toString(),
+      name: newAsset.name,
+      type: newAsset.asset_type,
+      ipfsHash: newAsset.ipfs_hash || 'QmGenerated' + Date.now(),
+      fileType: newAsset.asset_type === 'image' ? 'png' : 'gif',
+      likes: 0,
+      isLiked: false,
+      metadata: {
+        description: newAsset.description || 'AI-generated quantum asset',
+        quantxo_signature: {
+          created_with: "QUANTXO by Binarai",
+          quantum_resistant: true,
+          utxo_blockchain: "Raptoreum",
+          version: "1.0.0",
+          security_level: "SHA3-2048_equivalent",
+          quantum_strength: "1024_bit_quantum_security",
+          timestamp: new Date().toISOString()
+        }
+      },
+      thumbnail: newAsset.preview_url || 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=200&h=200&fit=crop'
+    };
+    
+    setAssets(prev => [asset, ...prev]);
+    toast({ title: "Asset Created", description: `${newAsset.name} has been added to your quantum assets!` });
+  };
+
   // Real-time balance animation
   useEffect(() => {
     const interval = setInterval(() => {
