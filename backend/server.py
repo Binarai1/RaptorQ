@@ -142,6 +142,11 @@ class QRCodeResponse(BaseModel):
     address: str
     wallet_info: Dict[str, Any]
 
+class BlockchainPruneRequest(BaseModel):
+    mobile: bool = False
+    aggressive: bool = False
+    storage_limit_gb: Optional[int] = None
+
 # Asset Like Model
 class AssetLike(BaseModel):
     asset_id: str
