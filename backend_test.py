@@ -526,7 +526,16 @@ def main():
     
     tester = TalonWalletAPITester()
     
-    # QR Code functionality tests (priority focus)
+    # Blockchain Pruning tests (PRIORITY FOCUS as per review request)
+    pruning_tests = [
+        tester.test_blockchain_prune_mobile,
+        tester.test_blockchain_prune_desktop,
+        tester.test_blockchain_prune_custom_storage,
+        tester.test_blockchain_pruning_status,
+        tester.test_blockchain_prune_edge_cases,
+    ]
+    
+    # QR Code functionality tests (regression testing)
     qr_tests = [
         tester.test_qr_generation_basic,
         tester.test_qr_generation_with_amount,
@@ -544,8 +553,8 @@ def main():
         tester.test_invalid_endpoints
     ]
     
-    # Combine all tests - QR tests first (priority)
-    tests = qr_tests + core_tests
+    # Combine all tests - Pruning tests first (priority), then QR regression tests
+    tests = pruning_tests + qr_tests + core_tests
     
     # Run all tests
     for test in tests:
