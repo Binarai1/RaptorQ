@@ -1637,8 +1637,8 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
       <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
-            <Zap className="h-5 w-5 text-purple-400" />
-            <span>RaptorQ AI Asset Creator</span>
+            <Sparkles className="h-5 w-5 text-purple-400" />
+            <span>BinarAi Image Creation</span>
           </DialogTitle>
         </DialogHeader>
         
