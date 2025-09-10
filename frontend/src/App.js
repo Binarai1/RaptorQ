@@ -905,24 +905,26 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(`${API}/services/purchase`, {
+      // Direct purchase through wallet
+      const response = await axios.post(`${API}/services/purchase-direct`, {
         service_id: selectedService.service_id,
         user_wallet: wallet.address,
-        user_agreement: true
+        confirmation: true
       });
 
-      setPurchaseData(response.data);
-      setPurchaseStep('payment');
-      
       toast({
-        title: "Purchase Initiated",
-        description: `Please send ${response.data.price_rtm.toFixed(8)} RTM to complete your purchase`
+        title: "Purchase Successful! 🎉",
+        description: `${selectedService.name} has been activated`,
       });
+      
+      setPurchaseStep('complete');
+      setPurchaseData(response.data);
+      
     } catch (error) {
-      console.error('Purchase initiation failed:', error);
+      console.error('Direct purchase failed:', error);
       toast({
-        title: "Error",
-        description: "Failed to initiate purchase",
+        title: "Purchase Failed",
+        description: error.response?.data?.detail || "Transaction failed - please check your balance",
         variant: "destructive"
       });
     } finally {
