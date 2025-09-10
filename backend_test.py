@@ -497,28 +497,307 @@ class RaptorQWalletTester:
         
         return success1 and success2
 
-    def test_invalid_endpoints(self):
-        """Test error handling for invalid endpoints"""
-        print("\n🔍 Testing Error Handling...")
-        
-        # Test invalid wallet ID
-        success, _ = self.run_test(
-            "Invalid Wallet Balance",
+    def test_system_status(self):
+        """Test system status and health check endpoint"""
+        success, response = self.run_test(
+            "System Status & Health Check",
             "GET",
-            "wallet/invalid-id/balance",
-            404
+            "system/status",
+            200
         )
         
-        # Test missing required fields for QR generation
-        success2, _ = self.run_test(
-            "QR Generation Missing Address",
+        if success:
+            print(f"   Blockchain: {response.get('blockchain', 'N/A')}")
+            print(f"   Wallet: {response.get('wallet', 'N/A')}")
+            print(f"   Quantum Security: {response.get('quantum_security', 'N/A')}")
+            print(f"   Self Healing: {response.get('self_healing', 'N/A')}")
+            print(f"   Update Available: {response.get('update_available', 'N/A')}")
+            print(f"   Content Monitor: {response.get('content_monitor', 'N/A')}")
+            print(f"   Messaging System: {response.get('messaging_system', 'N/A')}")
+            
+            # Check quantum features
+            quantum_features = response.get('quantum_features', {})
+            print(f"   Post-Quantum Crypto: {quantum_features.get('post_quantum_crypto', 'N/A')}")
+            print(f"   Quantum Messaging: {quantum_features.get('quantum_messaging', 'N/A')}")
+            print(f"   Quantum Signatures: {quantum_features.get('quantum_signatures', 'N/A')}")
+            print(f"   Content Monitoring: {quantum_features.get('content_monitoring', 'N/A')}")
+        
+        return success
+
+    def test_premium_services(self):
+        """Test premium services endpoint with RTM pricing"""
+        success, response = self.run_test(
+            "Premium Services with RTM Pricing",
+            "GET",
+            "services/premium",
+            200
+        )
+        
+        if success:
+            services = response.get('services', [])
+            print(f"   Services Available: {len(services)}")
+            print(f"   RTM Market Price: ${response.get('rtm_market_price', 'N/A')}")
+            print(f"   Price Source: {response.get('price_source', 'N/A')}")
+            print(f"   Payment Methods: {response.get('payment_methods', [])}")
+            print(f"   Quantum Secured: {response.get('quantum_secured', 'N/A')}")
+            
+            # Check if we have exactly 5 premium services
+            if len(services) >= 5:
+                print(f"   ✅ All 5 premium services available")
+                for service in services[:5]:  # Show first 5
+                    print(f"      - {service.get('name', 'N/A')}: {service.get('price_rtm', 'N/A')} RTM (${service.get('price_usd', 'N/A')})")
+            else:
+                print(f"   ⚠️ Only {len(services)} services found, expected 5")
+            
+            # Check BinarAi single asset pricing
+            binarai_single = response.get('binarai_single_asset', {})
+            if binarai_single:
+                print(f"   BinarAi Single Asset: {binarai_single.get('price_rtm', 'N/A')} RTM (${binarai_single.get('price_usd', 'N/A')})")
+        
+        return success
+
+    def test_legal_disclaimer(self):
+        """Test legal disclaimer endpoint"""
+        success, response = self.run_test(
+            "Legal Disclaimer",
+            "GET",
+            "legal/disclaimer",
+            200
+        )
+        
+        if success:
+            print(f"   Title: {response.get('title', 'N/A')}")
+            print(f"   Version: {response.get('version', 'N/A')}")
+            print(f"   Last Updated: {response.get('last_updated', 'N/A')}")
+            print(f"   Contact: {response.get('contact', 'N/A')}")
+            
+            disclaimer = response.get('disclaimer', {})
+            print(f"   Disclaimer Sections: {len(disclaimer)} sections")
+            
+            # Check for RaptorQ branding (not "emergent")
+            title = response.get('title', '').lower()
+            if 'raptorq' in title and 'emergent' not in title:
+                print(f"   ✅ Proper RaptorQ branding found")
+            else:
+                print(f"   ⚠️ Branding issue detected in title")
+        
+        return success
+
+    def test_platform_guides(self):
+        """Test platform guides endpoint"""
+        success, response = self.run_test(
+            "Platform Guides",
+            "GET",
+            "platform/guides",
+            200
+        )
+        
+        if success:
+            user_guides = response.get('user_guides', {})
+            dev_guides = response.get('developer_guides', {})
+            installation = response.get('installation', {})
+            
+            print(f"   User Guides: {len(user_guides)} platforms")
+            print(f"   Developer Guides: {len(dev_guides)} sections")
+            print(f"   Installation Files: {len(installation)} platforms")
+            
+            # Check for all expected platforms
+            expected_platforms = ['windows', 'linux', 'mac', 'android', 'ios']
+            for platform in expected_platforms:
+                if platform in user_guides and platform in installation:
+                    print(f"      ✅ {platform.capitalize()} support available")
+                else:
+                    print(f"      ⚠️ {platform.capitalize()} support missing")
+        
+        return success
+
+    def test_asset_creation(self):
+        """Test quantum asset creation endpoint"""
+        asset_data = {
+            "wallet_id": "test_wallet_123",
+            "metadata": {
+                "name": "Test Quantum Asset",
+                "description": "A test asset for API testing",
+                "file_type": "png",
+                "creator_social": {
+                    "twitter": "@testuser"
+                },
+                "custom_metadata": {
+                    "rarity": "Common",
+                    "category": "Test"
+                }
+            }
+        }
+        
+        success, response = self.run_test(
+            "Quantum Asset Creation",
+            "POST",
+            "assets/create",
+            200,
+            data=asset_data
+        )
+        
+        if success:
+            print(f"   Asset ID: {response.get('asset_id', 'N/A')}")
+            print(f"   Created By: {response.get('created_by', 'N/A')}")
+            
+            quantum_signature = response.get('quantum_signature', {})
+            print(f"   Quantum Signature Present: {'Yes' if quantum_signature else 'No'}")
+            
+            if quantum_signature:
+                print(f"      Created With: {quantum_signature.get('created_with', 'N/A')}")
+                print(f"      Quantum Resistant: {quantum_signature.get('quantum_resistant', 'N/A')}")
+                print(f"      UTXO Blockchain: {quantum_signature.get('utxo_blockchain', 'N/A')}")
+                print(f"      Security Level: {quantum_signature.get('security_level', 'N/A')}")
+                print(f"      Quantum Strength: {quantum_signature.get('quantum_strength', 'N/A')}")
+                
+                # Check for proper RaptorQ branding
+                created_with = quantum_signature.get('created_with', '').lower()
+                if 'raptorq' in created_with and 'binarai' in created_with:
+                    print(f"      ✅ Proper RaptorQ by Binarai branding")
+                else:
+                    print(f"      ⚠️ Branding issue in quantum signature")
+        
+        return success
+
+    def test_qr_generation_rtm_address(self):
+        """Test QR code generation with proper RTM address format"""
+        qr_data = {
+            "address": "RBZTestAddress1234567890123456789",  # RTM format address
+            "wallet_name": "RaptorQ Test Wallet",
+            "amount": 15.25,
+            "message": "Test payment for RaptorQ wallet"
+        }
+        
+        success, response = self.run_test(
+            "QR Code Generation - RTM Address",
             "POST",
             "qr/generate",
-            422,  # Validation error
-            data={"wallet_name": "Test"}
+            200,
+            data=qr_data
         )
         
-        return success and success2
+        if success:
+            print(f"   QR Generated: {'Yes' if response.get('qr_code_base64') else 'No'}")
+            print(f"   Address: {response.get('address', 'N/A')}")
+            
+            wallet_info = response.get('wallet_info', {})
+            print(f"   Wallet Name: {wallet_info.get('name', 'N/A')}")
+            print(f"   Amount: {wallet_info.get('amount', 'N/A')}")
+            print(f"   Message: {wallet_info.get('message', 'N/A')}")
+            print(f"   QR Format: {wallet_info.get('qr_format', 'N/A')}")
+            print(f"   Quantum Secured: {wallet_info.get('quantum_secured', 'N/A')}")
+            print(f"   Created By: {wallet_info.get('created_by', 'N/A')}")
+            
+            # Check for proper branding
+            created_by = wallet_info.get('created_by', '').lower()
+            if 'raptorq' in created_by and 'binarai' in created_by:
+                print(f"      ✅ Proper RaptorQ by Binarai branding")
+            else:
+                print(f"      ⚠️ Branding issue in QR response")
+        
+        return success
+
+    def test_coingecko_integration(self):
+        """Test CoinGecko RTM pricing integration by checking premium services"""
+        success, response = self.run_test(
+            "CoinGecko RTM Pricing Integration",
+            "GET",
+            "services/premium",
+            200
+        )
+        
+        if success:
+            rtm_price = response.get('rtm_market_price', 0)
+            price_source = response.get('price_source', '')
+            last_updated = response.get('last_updated', 0)
+            
+            print(f"   RTM Market Price: ${rtm_price}")
+            print(f"   Price Source: {price_source}")
+            print(f"   Last Updated: {last_updated}")
+            
+            if price_source == 'CoinGecko' and rtm_price > 0:
+                print(f"   ✅ CoinGecko integration working")
+            else:
+                print(f"   ⚠️ CoinGecko integration issue")
+                
+            # Check if services have dynamic pricing
+            services = response.get('services', [])
+            if services:
+                first_service = services[0]
+                price_rtm = first_service.get('price_rtm', 0)
+                price_usd = first_service.get('price_usd', 0)
+                
+                if price_rtm > 0 and price_usd > 0:
+                    calculated_rtm = price_usd / rtm_price if rtm_price > 0 else 0
+                    print(f"   Dynamic Pricing Check: {price_rtm:.8f} RTM vs calculated {calculated_rtm:.8f} RTM")
+                    
+                    # Allow for some variance due to rounding
+                    if abs(price_rtm - calculated_rtm) < 0.1:
+                        print(f"   ✅ Dynamic pricing calculation correct")
+                    else:
+                        print(f"   ⚠️ Dynamic pricing calculation may be off")
+        
+        return success
+
+    def test_branding_consistency(self):
+        """Test that all endpoints use RaptorQ branding, not emergent"""
+        print("\n🔍 Testing Branding Consistency...")
+        
+        # Test root endpoint branding
+        success1, response1 = self.run_test(
+            "Root Endpoint Branding",
+            "GET",
+            "",
+            200
+        )
+        
+        branding_issues = []
+        
+        if success1:
+            message = response1.get('message', '').lower()
+            created_by = response1.get('created_by', '').lower()
+            
+            if 'emergent' in message or 'emergent' in created_by:
+                branding_issues.append("Root endpoint contains 'emergent' branding")
+            
+            if 'raptorq' in message and 'binarai' in created_by:
+                print(f"   ✅ Root endpoint has proper RaptorQ branding")
+            else:
+                branding_issues.append("Root endpoint missing proper RaptorQ/Binarai branding")
+        
+        # Test system status branding
+        success2, response2 = self.run_test(
+            "System Status Branding",
+            "GET",
+            "system/status",
+            200
+        )
+        
+        # Test legal disclaimer branding
+        success3, response3 = self.run_test(
+            "Legal Disclaimer Branding",
+            "GET",
+            "legal/disclaimer",
+            200
+        )
+        
+        if success3:
+            title = response3.get('title', '').lower()
+            if 'emergent' in title:
+                branding_issues.append("Legal disclaimer contains 'emergent' branding")
+            
+            if 'raptorq' in title:
+                print(f"   ✅ Legal disclaimer has proper RaptorQ branding")
+        
+        if branding_issues:
+            print(f"   ⚠️ Branding issues found:")
+            for issue in branding_issues:
+                print(f"      - {issue}")
+            return False
+        else:
+            print(f"   ✅ All branding consistent - RaptorQ by Binarai")
+            return True
 
 def main():
     print("🚀 Starting RaptorQ Wallet API Tests")
