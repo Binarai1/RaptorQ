@@ -264,8 +264,8 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
         <p className="text-gray-300 text-sm">{formData.description || 'Asset description'}</p>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-gray-400">Quantity:</span>
-            <span className="text-white ml-2">{formData.quantity.toLocaleString()}</span>
+            <span className="text-gray-400">Circulation:</span>
+            <span className="text-white ml-2">{formData.circulation.toLocaleString()}</span>
           </div>
           <div>
             <span className="text-gray-400">Decimals:</span>
