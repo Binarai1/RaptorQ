@@ -230,13 +230,13 @@ async def get_premium_services_with_pricing():
             "category": "ai_services",
             "duration_days": 30
         },
-        "pro_mode_annual": {
-            "name": "Pro Mode Annual",
-            "description": "Advanced smart node features for 365 days",
-            "price_rtm": dynamic_prices["pro_mode_annual"]["price_rtm"],
-            "price_usd": dynamic_prices["pro_mode_annual"]["price_usd"],
+        "quantum_smartnode": {
+            "name": "Quantum RTM Smartnode",
+            "description": "Deploy your own quantum-resistant RTM smartnode",
+            "price_rtm": dynamic_prices["quantum_smartnode"]["price_rtm"],
+            "price_usd": dynamic_prices["quantum_smartnode"]["price_usd"],
             "category": "pro_features",
-            "duration_days": 365
+            "duration_days": None
         },
         "premium_themes": {
             "name": "Premium Theme Pack",
@@ -254,13 +254,13 @@ async def get_premium_services_with_pricing():
             "category": "analytics",
             "duration_days": 90
         },
-        "priority_support": {
-            "name": "Priority Support",
-            "description": "24/7 priority customer support for 365 days",
-            "price_rtm": dynamic_prices["priority_support"]["price_rtm"],
-            "price_usd": dynamic_prices["priority_support"]["price_usd"],
-            "category": "support",
-            "duration_days": 365
+        "advertising_daily": {
+            "name": "Daily Banner Advertisement",
+            "description": "Premium banner placement in RaptorQ wallet for 24 hours",
+            "price_rtm": dynamic_prices["advertising_daily"]["price_rtm"],
+            "price_usd": dynamic_prices["advertising_daily"]["price_usd"],
+            "category": "advertising",
+            "duration_days": 1
         }
     }
     
