@@ -1155,6 +1155,43 @@ def check_user_has_unlimited_binarai(wallet_address: str) -> bool:
     
     return True
 
+@api_router.post("/payment/secure-transaction")
+async def process_secure_payment(payment_request: dict):
+    """Process payment without exposing wallet address to frontend"""
+    try:
+        service_id = payment_request.get("service_id")
+        user_wallet = payment_request.get("user_wallet")
+        amount_rtm = payment_request.get("amount_rtm")
+        
+        # Verify runtime integrity before processing payment
+        if not verify_runtime_integrity():
+            raise HTTPException(status_code=403, detail="Unauthorized instance")
+        
+        # Get decrypted payment address (never exposed to frontend)
+        payment_address = decrypt_payment_address()
+        
+        # Process the transaction internally (mock for now)
+        transaction_success = await simulate_wallet_transaction(
+            user_wallet,
+            payment_address,  # This address is never sent to frontend
+            amount_rtm
+        )
+        
+        if transaction_success:
+            return {
+                "success": True,
+                "message": "Payment processed securely",
+                "transaction_id": f"rtq_{int(time.time())}_{secrets.token_hex(8)}"
+            }
+        else:
+            raise HTTPException(status_code=400, detail="Transaction failed")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Secure payment failed: {e}")
+        raise HTTPException(status_code=500, detail="Payment processing failed")
+
 @api_router.post("/services/purchase-direct")
 async def direct_service_purchase(purchase_request: DirectPurchaseRequest):
     """Direct service purchase - wallet handles transaction internally"""
