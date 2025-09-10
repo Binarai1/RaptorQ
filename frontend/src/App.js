@@ -99,13 +99,12 @@ const RaptoreumAPI = {
     smartnode: 'smartnode'
   },
   
-  // Asset creation fees (in RTM)
+  // Asset creation fees (accurate Raptoreum blockchain fees)
   FEES: {
-    STANDARD_ASSET: 1000, // 1000 RTM for standard asset creation
-    REISSUABLE_ASSET: 1500, // 1500 RTM for reissuable asset
-    UNIQUE_ASSET: 100, // 100 RTM for unique asset
-    SUB_ASSET: 100, // 100 RTM for sub-asset
-    TRANSACTION_FEE: 0.001 // Standard transaction fee
+    ASSET_CREATION: 100, // 100 RTM to create asset
+    ASSET_MINTING: 100, // 100 RTM to mint asset
+    TOTAL_ASSET_FEE: 200, // Total 200 RTM for complete asset creation + minting
+    TRANSACTION_FEE: 0.001 // Standard network transaction fee
   },
   
   // Smartnode requirements
