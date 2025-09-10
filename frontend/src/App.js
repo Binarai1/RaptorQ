@@ -1643,6 +1643,14 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
         </DialogHeader>
         
         <div className="space-y-4">
+          <div className="p-4 bg-gradient-to-r from-purple-950/30 to-pink-950/30 rounded-lg border border-purple-800/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <Star className="h-4 w-4 text-purple-400" />
+              <span className="text-sm font-medium text-purple-300">BinarAi Powered</span>
+            </div>
+            <p className="text-xs text-gray-300">Create quantum-resistant NFTs with advanced AI technology</p>
+          </div>
+
           <div>
             <Label className="text-white">Asset Name</Label>
             <Input
