@@ -348,6 +348,27 @@ class BlockchainPruneRequest(BaseModel):
     aggressive: bool = False
     storage_limit_gb: Optional[int] = None
 
+class DirectPurchaseRequest(BaseModel):
+    service_id: str
+    user_wallet: str
+    confirmation: bool = True
+
+class AdvertisementRequest(BaseModel):
+    slot: str  # "wallet_bottom" or "asset_creation_bottom"
+    title: str
+    url: str
+    banner_image: str  # base64 encoded JPG
+    advertiser_wallet: str
+    days: int = 1
+
+class AdvertisementResponse(BaseModel):
+    ad_id: str
+    slot: str
+    expires_at: str
+    total_cost_rtm: float
+    total_cost_usd: float
+    status: str
+
 # Premium Service Models
 class PremiumService(BaseModel):
     service_id: str
