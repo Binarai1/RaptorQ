@@ -143,6 +143,129 @@ class QRCodeResponse(BaseModel):
     address: str
     wallet_info: Dict[str, Any]
 
+# Dynamic pricing configuration
+RTM_PRICE_CACHE = {
+    "price_usd": 0.0,
+    "last_updated": 0,
+    "cache_duration": 300  # 5 minutes
+}
+
+# Fixed USD prices for services
+USD_PRICES = {
+    "binarai_single_asset": 0.50,  # $0.50 per AI asset creation
+    "binarai_unlimited": 25.00,    # $25 for unlimited (30 days)
+    "pro_mode_annual": 100.00,     # $100 for pro mode (365 days)
+    "premium_themes": 10.00,       # $10 for theme pack
+    "advanced_analytics": 30.00,   # $30 for analytics (90 days)
+    "priority_support": 50.00      # $50 for priority support (365 days)
+}
+
+async def get_rtm_price_usd() -> float:
+    """Get current RTM price in USD from CoinGecko"""
+    try:
+        current_time = time.time()
+        
+        # Check cache first
+        if (current_time - RTM_PRICE_CACHE["last_updated"]) < RTM_PRICE_CACHE["cache_duration"]:
+            if RTM_PRICE_CACHE["price_usd"] > 0:
+                return RTM_PRICE_CACHE["price_usd"]
+        
+        # Fetch from CoinGecko API
+        url = "https://api.coingecko.com/api/v3/simple/price?ids=raptoreum&vs_currencies=usd"
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            price_usd = data.get("raptoreum", {}).get("usd", 0.0)
+            
+            if price_usd > 0:
+                # Update cache
+                RTM_PRICE_CACHE["price_usd"] = price_usd
+                RTM_PRICE_CACHE["last_updated"] = current_time
+                logger.info(f"RTM price updated: ${price_usd}")
+                return price_usd
+        
+        # If API fails, use fallback price
+        logger.warning("Failed to fetch RTM price, using fallback")
+        return 0.01  # Fallback price of $0.01
+        
+    except Exception as e:
+        logger.error(f"Error fetching RTM price: {e}")
+        return 0.01  # Fallback price
+
+def calculate_rtm_amount(usd_amount: float, rtm_price_usd: float) -> float:
+    """Calculate RTM amount for given USD amount"""
+    if rtm_price_usd <= 0:
+        rtm_price_usd = 0.01  # Fallback
+    
+    rtm_amount = usd_amount / rtm_price_usd
+    return round(rtm_amount, 8)  # Round to 8 decimal places
+
+async def get_dynamic_service_prices():
+    """Get current service prices in RTM based on USD prices"""
+    rtm_price = await get_rtm_price_usd()
+    
+    dynamic_prices = {}
+    for service_id, usd_price in USD_PRICES.items():
+        rtm_amount = calculate_rtm_amount(usd_price, rtm_price)
+        dynamic_prices[service_id] = {
+            "price_usd": usd_price,
+            "price_rtm": rtm_amount,
+            "rtm_rate": rtm_price
+        }
+    
+    return dynamic_prices
+
+# Update PREMIUM_SERVICES with dynamic pricing
+async def get_premium_services_with_pricing():
+    """Get premium services with current RTM pricing"""
+    dynamic_prices = await get_dynamic_service_prices()
+    
+    services = {
+        "binarai_unlimited": {
+            "name": "BinarAi Unlimited",
+            "description": f"Unlimited AI asset creation for 30 days (normally ${USD_PRICES['binarai_single_asset']:.2f} per asset)",
+            "price_rtm": dynamic_prices["binarai_unlimited"]["price_rtm"],
+            "price_usd": dynamic_prices["binarai_unlimited"]["price_usd"],
+            "category": "ai_services",
+            "duration_days": 30
+        },
+        "pro_mode_annual": {
+            "name": "Pro Mode Annual",
+            "description": "Advanced smart node features for 365 days",
+            "price_rtm": dynamic_prices["pro_mode_annual"]["price_rtm"],
+            "price_usd": dynamic_prices["pro_mode_annual"]["price_usd"],
+            "category": "pro_features",
+            "duration_days": 365
+        },
+        "premium_themes": {
+            "name": "Premium Theme Pack",
+            "description": "Exclusive quantum-themed wallet designs",
+            "price_rtm": dynamic_prices["premium_themes"]["price_rtm"],
+            "price_usd": dynamic_prices["premium_themes"]["price_usd"],
+            "category": "customization",
+            "duration_days": None
+        },
+        "advanced_analytics": {
+            "name": "Advanced Analytics",
+            "description": "Detailed transaction and asset analytics for 90 days",
+            "price_rtm": dynamic_prices["advanced_analytics"]["price_rtm"],
+            "price_usd": dynamic_prices["advanced_analytics"]["price_usd"],
+            "category": "analytics",
+            "duration_days": 90
+        },
+        "priority_support": {
+            "name": "Priority Support",
+            "description": "24/7 priority customer support for 365 days",
+            "price_rtm": dynamic_prices["priority_support"]["price_rtm"],
+            "price_usd": dynamic_prices["priority_support"]["price_usd"],
+            "category": "support",
+            "duration_days": 365
+        }
+    }
+    
+    return services, dynamic_prices["binarai_single_asset"]
+
 # Configuration for premium services
 PREMIUM_SERVICES = {
     "binarai_unlimited": {
