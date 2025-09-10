@@ -1138,7 +1138,7 @@ const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
                 ) : (
                   <>
                     <CreditCard className="mr-2 h-4 w-4" />
-                    Confirm Purchase
+                    Complete Purchase
                   </>
                 )}
               </Button>
