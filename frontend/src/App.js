@@ -1347,7 +1347,7 @@ const AboutDialog = ({ isOpen, onClose }) => (
       
       <div className="space-y-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold quantum-brand-text mb-2">QUANTXO Wallet</h2>
+          <h2 className="text-2xl font-bold quantum-brand-text mb-2">RaptorQ Wallet</h2>
           <p className="text-gray-400">The First Truly Quantum-Resistant UTXO Wallet</p>
           <Badge className="mt-2 bg-blue-900/30 text-blue-300 border-blue-700/50">
             Version 1.0.0
