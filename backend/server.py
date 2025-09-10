@@ -370,7 +370,7 @@ async def upload_to_ipfs(upload_data: IPFSUpload):
         
         # In production, upload to actual IPFS
         # async with aiohttp.ClientSession() as session:
-        #     files = {'file': (file_name, file_content)}
+        #     files = {'file': (upload_data.file_name, upload_data.file_content)}
         #     async with session.post(f"{IPFS_API_URL}/add", data=files) as response:
         #         result = await response.json()
         #         ipfs_hash = result['Hash']
