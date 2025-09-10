@@ -865,6 +865,7 @@ const Dashboard = ({ wallet, onLogout }) => {
   const [assets, setAssets] = useState(mockAssets);
   const [showMessaging, setShowMessaging] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showAICreator, setShowAICreator] = useState(false);
 
   const handleAssetClick = (asset) => {
     setSelectedAsset(asset);
