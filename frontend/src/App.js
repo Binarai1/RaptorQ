@@ -1710,7 +1710,7 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
             {isGenerating ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
+                BinarAi Generating...
               </>
             ) : (
               <>
