@@ -84,6 +84,59 @@ const isMobileDevice = () => {
          window.innerWidth <= 768;
 };
 
+// Performance optimization utilities
+const PerformanceOptimizer = {
+  // Debounce function for search and input
+  debounce: (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  },
+  
+  // Lazy loading for images
+  lazyLoadImage: (src, callback) => {
+    const img = new Image();
+    img.onload = () => callback(src);
+    img.src = src;
+  },
+  
+  // Virtual scrolling for large lists
+  getVisibleItems: (items, scrollTop, itemHeight, containerHeight) => {
+    const startIndex = Math.floor(scrollTop / itemHeight);
+    const endIndex = Math.min(
+      startIndex + Math.ceil(containerHeight / itemHeight) + 1,
+      items.length
+    );
+    return items.slice(startIndex, endIndex);
+  },
+  
+  // Cache management
+  cache: new Map(),
+  
+  getCached: (key) => PerformanceOptimizer.cache.get(key),
+  setCached: (key, value, ttl = 300000) => { // 5 minutes default TTL
+    const item = {
+      value,
+      expires: Date.now() + ttl
+    };
+    PerformanceOptimizer.cache.set(key, item);
+    
+    // Clean expired items
+    setTimeout(() => {
+      const cached = PerformanceOptimizer.cache.get(key);
+      if (cached && Date.now() > cached.expires) {
+        PerformanceOptimizer.cache.delete(key);
+      }
+    }, ttl);
+  }
+};
+
 // Blockchain pruning service for mobile
 const BlockchainPruningService = {
   isEnabled: () => localStorage.getItem('blockchain_pruning') !== 'false',
