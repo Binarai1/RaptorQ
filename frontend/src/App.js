@@ -762,6 +762,131 @@ const QRScanDialog = ({ isOpen, onClose, onScanResult }) => {
   );
 };
 
+const SendDialog = ({ isOpen, onClose, sendToAddress, setSendToAddress, sendAmount, setSendAmount, onSend, wallet }) => {
+  const [memo, setMemo] = useState('');
+  const [fee, setFee] = useState('0.001');
+
+  const handleSend = () => {
+    onSend();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-2">
+            <Send className="h-5 w-5 text-blue-400" />
+            <span>Send RTM</span>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <Zap className="h-4 w-4 text-blue-400" />
+              <span className="text-sm font-medium text-blue-300">InstaSend Transaction</span>
+            </div>
+            <p className="text-xs text-gray-300">Quantum-secured rapid transaction on Raptoreum UTXO</p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <Label className="text-white">Recipient Address</Label>
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="RTM Address"
+                  value={sendToAddress}
+                  onChange={(e) => setSendToAddress(e.target.value)}
+                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 font-mono text-xs"
+                />
+                <Button
+                  onClick={() => document.querySelector('[data-qr-scan]').click()}
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                  data-qr-scan
+                >
+                  <QrCode className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-white">Amount (RTM)</Label>
+              <Input
+                placeholder="0.00"
+                value={sendAmount}
+                onChange={(e) => setSendAmount(e.target.value)}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                type="number"
+                step="0.01"
+                min="0"
+              />
+            </div>
+
+            <div>
+              <Label className="text-white">Network Fee</Label>
+              <Select value={fee} onValueChange={setFee}>
+                <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600 text-white">
+                  <SelectItem value="0.001" className="text-white">Standard (0.001 RTM)</SelectItem>
+                  <SelectItem value="0.002" className="text-white">Fast (0.002 RTM)</SelectItem>
+                  <SelectItem value="0.005" className="text-white">InstaSend (0.005 RTM)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="text-white">Memo (Optional)</Label>
+              <Input
+                placeholder="Payment memo..."
+                value={memo}
+                onChange={(e) => setMemo(e.target.value)}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+              />
+            </div>
+          </div>
+
+          <div className="p-3 bg-gray-800/30 rounded-lg">
+            <div className="flex justify-between text-xs text-gray-300">
+              <span>Available Balance:</span>
+              <span>{wallet?.balance?.toFixed(8) || '0.00000000'} RTM</span>
+            </div>
+            <div className="flex justify-between text-xs text-gray-300">
+              <span>Transaction Fee:</span>
+              <span>{fee} RTM</span>
+            </div>
+            <div className="flex justify-between text-sm text-white font-semibold border-t border-gray-600 pt-1 mt-1">
+              <span>Total:</span>
+              <span>{(parseFloat(sendAmount || 0) + parseFloat(fee)).toFixed(8)} RTM</span>
+            </div>
+          </div>
+
+          <div className="flex space-x-2">
+            <Button 
+              onClick={onClose}
+              variant="outline"
+              className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSend}
+              disabled={!sendToAddress || !sendAmount}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Send RTM
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const AboutDialog = ({ isOpen, onClose }) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-2xl">
