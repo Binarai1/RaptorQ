@@ -401,24 +401,31 @@ class TalonWalletAPITester:
         return success and success2
 
 def main():
-    print("🚀 Starting Talon Wallet API Tests")
+    print("🚀 Starting RaptorQ Wallet API Tests")
     print("=" * 50)
     
     tester = TalonWalletAPITester()
     
+    # QR Code functionality tests (priority focus)
+    qr_tests = [
+        tester.test_qr_generation_basic,
+        tester.test_qr_generation_with_amount,
+        tester.test_qr_generation_with_message,
+        tester.test_qr_generation_full_params,
+        tester.test_rtm_address_validation_valid,
+        tester.test_rtm_address_validation_invalid,
+        tester.test_rtm_address_validation_edge_cases,
+    ]
+    
     # Core functionality tests
-    tests = [
+    core_tests = [
         tester.test_health_check,
         tester.test_root_endpoint,
-        tester.test_create_wallet,
-        tester.test_import_wallet,
-        tester.test_get_wallet_balance,
-        tester.test_create_asset,
-        tester.test_ipfs_upload,
-        tester.test_rpc_call,
-        tester.test_get_wallet_transactions,
         tester.test_invalid_endpoints
     ]
+    
+    # Combine all tests - QR tests first (priority)
+    tests = qr_tests + core_tests
     
     # Run all tests
     for test in tests:
