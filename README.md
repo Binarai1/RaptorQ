@@ -73,10 +73,33 @@ yarn install
 cd ../backend
 pip install -r requirements.txt
 
+# Configure your payment wallet (IMPORTANT)
+# Edit backend/server.py and replace:
+# PAYMENT_WALLET_ADDRESS = "RTM1YourActualWalletAddressHere"
+
 # Start the application
 yarn start  # Frontend (port 3000)
 python server.py  # Backend (port 8001)
 ```
+
+### 💰 Premium Services Configuration
+
+To receive payments for premium services, update your RTM wallet address in `/app/backend/server.py`:
+
+```python
+# Replace this line with your actual RTM wallet address
+PAYMENT_WALLET_ADDRESS = "RTM1YourActualRTMWalletAddressForPayments"
+```
+
+**Premium Services Available:**
+- **BinarAi Asset Creation**: $0.50 USD equivalent in RTM per asset (dynamic pricing)
+- **BinarAi Unlimited**: $25 USD equivalent in RTM (30 days unlimited)
+- **Pro Mode Annual**: $100 USD equivalent in RTM (365 days)
+- **Premium Themes**: $10 USD equivalent in RTM (one-time)
+- **Advanced Analytics**: $30 USD equivalent in RTM (90 days)
+- **Priority Support**: $50 USD equivalent in RTM (365 days)
+
+All pricing is automatically calculated based on real-time RTM market price from CoinGecko.
 
 ## 🔐 **Quantum Security Comparison**
 
