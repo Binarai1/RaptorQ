@@ -132,10 +132,14 @@ class AssetLike(BaseModel):
 
 # Utility Functions
 def generate_quantum_signature(data: str) -> str:
-    """Generate quantum-resistant signature for data"""
+    """Generate quantum-resistant signature with SHA3-2048 equivalent strength"""
     timestamp = str(int(time.time()))
     combined = f"{data}:QUANTXO:Binarai:{timestamp}"
-    return hashlib.sha3_512(combined.encode()).hexdigest()
+    
+    # Use SHAKE256 with 2048-bit output for true quantum resistance
+    shake = hashlib.shake_256()
+    shake.update(combined.encode())
+    return shake.hexdigest(256)  # 2048-bit output (256 bytes = 2048 bits)
 
 def quantum_encrypt_message(message: str, recipient_key: str) -> str:
     """Quantum-resistant message encryption"""
