@@ -147,6 +147,91 @@ class AssetLike(BaseModel):
     asset_id: str
     wallet_id: str
 
+# QR Code Generation Functions
+def create_quantum_logo() -> Image.Image:
+    """Create the quantum wallet logo for QR code overlay"""
+    # Create a 200x200 logo image
+    logo_size = 200
+    logo = Image.new('RGBA', (logo_size, logo_size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(logo)
+    
+    # Background circle
+    margin = 20
+    circle_bbox = [margin, margin, logo_size-margin, logo_size-margin]
+    draw.ellipse(circle_bbox, fill=(59, 130, 246, 255), outline=(139, 92, 246, 255), width=4)
+    
+    # Inner quantum symbol - triangles
+    center = logo_size // 2
+    triangle_size = 30
+    
+    # Top triangle
+    top_triangle = [
+        (center, center - triangle_size),
+        (center - triangle_size//2, center),
+        (center + triangle_size//2, center)
+    ]
+    draw.polygon(top_triangle, fill=(255, 255, 255, 255))
+    
+    # Bottom triangle  
+    bottom_triangle = [
+        (center, center + triangle_size),
+        (center - triangle_size//2, center),
+        (center + triangle_size//2, center)
+    ]
+    draw.polygon(bottom_triangle, fill=(255, 255, 255, 255))
+    
+    # Center circle
+    center_circle = [
+        center - 12, center - 12,
+        center + 12, center + 12
+    ]
+    draw.ellipse(center_circle, fill=(255, 255, 255, 255))
+    
+    return logo
+
+def generate_qr_with_logo(data: str, wallet_name: str = "RaptorQ Wallet") -> str:
+    """Generate QR code with quantum wallet logo in center"""
+    try:
+        # Create QR code instance
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,  # High error correction for logo overlay
+            box_size=10,
+            border=4,
+        )
+        
+        # Add data to QR code
+        qr.add_data(data)
+        qr.make(fit=True)
+        
+        # Create QR code image
+        qr_img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
+        
+        # Create logo
+        logo = create_quantum_logo()
+        
+        # Calculate logo size (about 10% of QR code size)
+        qr_width, qr_height = qr_img.size
+        logo_size = min(qr_width, qr_height) // 5
+        logo = logo.resize((logo_size, logo_size), Image.Resampling.LANCZOS)
+        
+        # Calculate position to center the logo
+        logo_pos = ((qr_width - logo_size) // 2, (qr_height - logo_size) // 2)
+        
+        # Paste logo on QR code
+        qr_img.paste(logo, logo_pos, logo)
+        
+        # Convert to base64
+        buffer = io.BytesIO()
+        qr_img.save(buffer, format='PNG')
+        qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+        
+        return qr_base64
+        
+    except Exception as e:
+        logger.error(f"QR code generation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate QR code: {str(e)}")
+
 # Utility Functions
 def generate_quantum_signature(data: str) -> str:
     """Generate quantum-resistant signature with SHA3-2048 equivalent strength"""
