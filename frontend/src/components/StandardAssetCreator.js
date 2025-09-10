@@ -117,8 +117,8 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
       newErrors.description = 'Description is required';
     }
 
-    if (formData.quantity <= 0) {
-      newErrors.quantity = 'Quantity must be greater than 0';
+    if (formData.circulation <= 0) {
+      newErrors.circulation = 'Circulation must be greater than 0';
     }
 
     if (formData.decimals < 0 || formData.decimals > 8) {
