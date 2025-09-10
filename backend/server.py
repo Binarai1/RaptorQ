@@ -1076,6 +1076,270 @@ def check_user_has_unlimited_binarai(wallet_address: str) -> bool:
     
     return True
 
+@api_router.post("/services/purchase-direct")
+async def direct_service_purchase(purchase_request: DirectPurchaseRequest):
+    """Direct service purchase - wallet handles transaction internally"""
+    try:
+        service_id = purchase_request.service_id
+        user_wallet = purchase_request.user_wallet
+        
+        # Get current services with pricing
+        services_dict, _ = await get_premium_services_with_pricing()
+        
+        if service_id not in services_dict:
+            raise HTTPException(status_code=404, detail="Service not found")
+        
+        service = services_dict[service_id]
+        
+        # Simulate wallet transaction (in production, this would integrate with wallet)
+        transaction_success = await simulate_wallet_transaction(
+            user_wallet, 
+            PAYMENT_WALLET_ADDRESS, 
+            service["price_rtm"]
+        )
+        
+        if transaction_success:
+            # Activate service immediately
+            await activate_user_service(user_wallet, service_id)
+            
+            return {
+                "success": True,
+                "message": f"{service['name']} activated successfully",
+                "service_id": service_id,
+                "amount_paid_rtm": service["price_rtm"],
+                "amount_paid_usd": service["price_usd"],
+                "activated_at": datetime.now(timezone.utc).isoformat()
+            }
+        else:
+            raise HTTPException(status_code=400, detail="Transaction failed - insufficient balance")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Direct purchase failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Purchase failed: {str(e)}")
+
+async def simulate_wallet_transaction(from_wallet: str, to_wallet: str, amount: float) -> bool:
+    """Simulate wallet transaction (replace with actual wallet integration)"""
+    # In production, this would:
+    # 1. Check wallet balance
+    # 2. Create and sign transaction
+    # 3. Broadcast to Raptoreum network
+    # 4. Return transaction hash
+    
+    # For demo, simulate 90% success rate
+    await asyncio.sleep(1)  # Simulate network delay
+    import random
+    return random.random() > 0.1
+
+@api_router.get("/advertising/slots")
+async def get_advertising_slots():
+    """Get current advertising slot status"""
+    try:
+        current_time = datetime.now(timezone.utc)
+        
+        # Check and update expired ads
+        for slot_name, slot_data in advertisement_slots.items():
+            if slot_data["active"] and slot_data["expires_at"]:
+                expires_at = datetime.fromisoformat(slot_data["expires_at"].replace('Z', '+00:00'))
+                if current_time > expires_at:
+                    # Ad expired, clear slot
+                    advertisement_slots[slot_name] = {
+                        "active": False,
+                        "advertiser_wallet": None,
+                        "banner_url": None,
+                        "banner_filename": None,
+                        "title": None,
+                        "url": None,
+                        "expires_at": None,
+                        "clicks": 0,
+                        "impressions": 0,
+                        "created_at": None
+                    }
+        
+        return {
+            "slots": advertisement_slots,
+            "daily_price_rtm": (await get_dynamic_service_prices())["advertising_daily"]["price_rtm"],
+            "daily_price_usd": USD_PRICES["advertising_daily"],
+            "rtm_market_price": await get_rtm_price_usd()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get advertising slots: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get slots: {str(e)}")
+
+@api_router.post("/advertising/purchase", response_model=AdvertisementResponse)
+async def purchase_advertising_slot(ad_request: AdvertisementRequest):
+    """Purchase advertising slot with direct wallet payment"""
+    try:
+        slot = ad_request.slot
+        
+        # Validate slot
+        if slot not in advertisement_slots:
+            raise HTTPException(status_code=400, detail="Invalid advertising slot")
+        
+        # Check if slot is available
+        if advertisement_slots[slot]["active"]:
+            expires_at = datetime.fromisoformat(advertisement_slots[slot]["expires_at"].replace('Z', '+00:00'))
+            if datetime.now(timezone.utc) < expires_at:
+                raise HTTPException(status_code=400, detail="Advertising slot is currently occupied")
+        
+        # Validate image (basic security check)
+        if not await validate_banner_image(ad_request.banner_image):
+            raise HTTPException(status_code=400, detail="Invalid or potentially malicious image")
+        
+        # Calculate pricing
+        dynamic_prices = await get_dynamic_service_prices()
+        daily_price = dynamic_prices["advertising_daily"]
+        total_cost_rtm = daily_price["price_rtm"] * ad_request.days
+        total_cost_usd = daily_price["price_usd"] * ad_request.days
+        
+        # Process payment
+        transaction_success = await simulate_wallet_transaction(
+            ad_request.advertiser_wallet,
+            PAYMENT_WALLET_ADDRESS,
+            total_cost_rtm
+        )
+        
+        if not transaction_success:
+            raise HTTPException(status_code=400, detail="Payment failed - insufficient balance")
+        
+        # Save banner image
+        banner_filename = f"ad_{slot}_{int(time.time())}.jpg"
+        banner_path = f"/app/uploads/banners/{banner_filename}"
+        
+        # Decode and save image
+        import base64
+        image_data = base64.b64decode(ad_request.banner_image)
+        os.makedirs(os.path.dirname(banner_path), exist_ok=True)
+        with open(banner_path, "wb") as f:
+            f.write(image_data)
+        
+        # Activate advertisement
+        current_time = datetime.now(timezone.utc)
+        expires_at = current_time + timedelta(days=ad_request.days)
+        ad_id = f"ad_{slot}_{int(time.time())}"
+        
+        advertisement_slots[slot] = {
+            "active": True,
+            "advertiser_wallet": ad_request.advertiser_wallet,
+            "banner_url": f"/api/banners/{banner_filename}",
+            "banner_filename": banner_filename,
+            "title": ad_request.title,
+            "url": ad_request.url,
+            "expires_at": expires_at.isoformat(),
+            "clicks": 0,
+            "impressions": 0,
+            "created_at": current_time.isoformat()
+        }
+        
+        return AdvertisementResponse(
+            ad_id=ad_id,
+            slot=slot,
+            expires_at=expires_at.isoformat(),
+            total_cost_rtm=total_cost_rtm,
+            total_cost_usd=total_cost_usd,
+            status="active"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Advertisement purchase failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Advertisement purchase failed: {str(e)}")
+
+async def validate_banner_image(base64_image: str) -> bool:
+    """Validate banner image for security"""
+    try:
+        import base64
+        from PIL import Image
+        import io
+        
+        # Decode base64
+        image_data = base64.b64decode(base64_image)
+        
+        # Check file size (max 2MB)
+        if len(image_data) > 2 * 1024 * 1024:
+            return False
+        
+        # Validate it's a valid image
+        image = Image.open(io.BytesIO(image_data))
+        
+        # Check format
+        if image.format != 'JPEG':
+            return False
+        
+        # Check dimensions (reasonable banner size)
+        width, height = image.size
+        if width > 800 or height > 200 or width < 200 or height < 50:
+            return False
+        
+        # Basic malicious content check (very simple)
+        # In production, use more sophisticated scanning
+        if len(image_data) < 1000:  # Too small to be a real banner
+            return False
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Image validation failed: {e}")
+        return False
+
+@api_router.post("/advertising/click/{slot}")
+async def track_ad_click(slot: str):
+    """Track advertisement click"""
+    try:
+        if slot in advertisement_slots and advertisement_slots[slot]["active"]:
+            advertisement_slots[slot]["clicks"] += 1
+            return {"success": True, "total_clicks": advertisement_slots[slot]["clicks"]}
+        else:
+            raise HTTPException(status_code=404, detail="Advertisement not found")
+    except Exception as e:
+        logger.error(f"Failed to track click: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track click")
+
+@api_router.post("/advertising/impression/{slot}")
+async def track_ad_impression(slot: str):
+    """Track advertisement impression"""
+    try:
+        if slot in advertisement_slots and advertisement_slots[slot]["active"]:
+            advertisement_slots[slot]["impressions"] += 1
+            return {"success": True, "total_impressions": advertisement_slots[slot]["impressions"]}
+        else:
+            raise HTTPException(status_code=404, detail="Advertisement not found")
+    except Exception as e:
+        logger.error(f"Failed to track impression: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track impression")
+
+@api_router.get("/advertising/analytics/{wallet_address}")
+async def get_advertiser_analytics(wallet_address: str):
+    """Get analytics for advertiser"""
+    try:
+        advertiser_ads = []
+        
+        for slot_name, slot_data in advertisement_slots.items():
+            if slot_data["active"] and slot_data["advertiser_wallet"] == wallet_address:
+                advertiser_ads.append({
+                    "slot": slot_name,
+                    "title": slot_data["title"],
+                    "url": slot_data["url"],
+                    "clicks": slot_data["clicks"],
+                    "impressions": slot_data["impressions"],
+                    "ctr": slot_data["clicks"] / max(slot_data["impressions"], 1) * 100,
+                    "expires_at": slot_data["expires_at"],
+                    "created_at": slot_data["created_at"]
+                })
+        
+        return {
+            "advertiser_wallet": wallet_address,
+            "active_ads": advertiser_ads,
+            "total_active": len(advertiser_ads)
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get advertiser analytics: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get analytics")
+
 @api_router.post("/services/purchase", response_model=ServicePurchaseResponse)
 async def initiate_service_purchase(purchase_request: ServicePurchaseRequest):
     """Initiate premium service purchase with dynamic RTM pricing"""
