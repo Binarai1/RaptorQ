@@ -1357,7 +1357,7 @@ const AboutDialog = ({ isOpen, onClose }) => (
         <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30">
           <h3 className="font-semibold text-blue-300 mb-2">Copyright & Credits</h3>
           <p className="text-sm text-gray-300">
-            © 2025 QUANTXO was created by <span className="font-semibold text-blue-300">Binarai</span> to empower 
+            © 2025 RaptorQ was created by <span className="font-semibold text-blue-300">Binarai</span> to empower 
             users with quantum-resistant blockchain technology. Built on Raptoreum's UTXO architecture 
             with post-quantum cryptographic security.
           </p>
