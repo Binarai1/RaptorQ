@@ -798,6 +798,276 @@ async def prune_blockchain_data(prune_request: BlockchainPruneRequest):
         logger.error(f"Blockchain pruning failed: {e}")
         raise HTTPException(status_code=500, detail=f"Pruning failed: {str(e)}")
 
+@api_router.get("/services/premium")
+async def get_premium_services():
+    """Get list of available premium services"""
+    try:
+        services = []
+        for service_id, service_data in PREMIUM_SERVICES.items():
+            services.append({
+                "service_id": service_id,
+                "name": service_data["name"],
+                "description": service_data["description"],
+                "price_rtm": service_data["price_rtm"],
+                "category": service_data["category"],
+                "duration_days": service_data["duration_days"],
+                "is_subscription": service_data["duration_days"] is not None
+            })
+        
+        return {
+            "services": services,
+            "payment_methods": ["RTM"],
+            "estimated_confirmation_time": "2-5 minutes",
+            "quantum_secured": True
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get premium services: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get services: {str(e)}")
+
+@api_router.post("/services/purchase", response_model=ServicePurchaseResponse)
+async def initiate_service_purchase(purchase_request: ServicePurchaseRequest):
+    """Initiate premium service purchase"""
+    try:
+        service_id = purchase_request.service_id
+        user_wallet = purchase_request.user_wallet
+        
+        # Validate service exists
+        if service_id not in PREMIUM_SERVICES:
+            raise HTTPException(status_code=404, detail="Service not found")
+        
+        service = PREMIUM_SERVICES[service_id]
+        
+        # Generate unique purchase ID
+        purchase_id = f"purchase_{int(time.time())}_{service_id}_{user_wallet[-8:]}"
+        
+        # Create purchase record
+        purchase_record = {
+            "purchase_id": purchase_id,
+            "service_id": service_id,
+            "user_wallet": user_wallet,
+            "price_rtm": service["price_rtm"],
+            "payment_address": PAYMENT_WALLET_ADDRESS,
+            "status": "pending_payment",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "expires_at": (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat(),
+            "transaction_hash": None,
+            "confirmed_at": None
+        }
+        
+        # Store purchase record
+        purchase_database[purchase_id] = purchase_record
+        
+        # Generate QR code for payment
+        qr_data = f"{PAYMENT_WALLET_ADDRESS}?amount={service['price_rtm']}&message=RaptorQ Service: {service['name']}&purchaseId={purchase_id}"
+        qr_base64 = generate_qr_with_logo(qr_data, "RaptorQ Payment")
+        
+        return ServicePurchaseResponse(
+            purchase_id=purchase_id,
+            service_name=service["name"],
+            price_rtm=service["price_rtm"],
+            payment_address=PAYMENT_WALLET_ADDRESS,
+            qr_code_data=qr_base64,
+            estimated_confirmation_time="2-5 minutes",
+            status="pending_payment"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to initiate purchase: {e}")
+        raise HTTPException(status_code=500, detail=f"Purchase initiation failed: {str(e)}")
+
+@api_router.post("/services/verify-payment")
+async def verify_service_payment(verification_request: PaymentVerificationRequest):
+    """Verify payment for premium service"""
+    try:
+        purchase_id = verification_request.purchase_id
+        transaction_hash = verification_request.transaction_hash
+        
+        # Get purchase record
+        if purchase_id not in purchase_database:
+            raise HTTPException(status_code=404, detail="Purchase not found")
+        
+        purchase = purchase_database[purchase_id]
+        
+        # Check if already confirmed
+        if purchase["status"] == "confirmed":
+            return {
+                "status": "already_confirmed",
+                "message": "Service already activated",
+                "service_active": True
+            }
+        
+        # Mock payment verification (in production, integrate with Raptoreum RPC)
+        # This would normally query the blockchain to verify the transaction
+        is_valid_payment = await mock_verify_rtm_payment(
+            transaction_hash, 
+            purchase["payment_address"], 
+            purchase["price_rtm"]
+        )
+        
+        if is_valid_payment:
+            # Update purchase status
+            purchase["status"] = "confirmed"
+            purchase["transaction_hash"] = transaction_hash
+            purchase["confirmed_at"] = datetime.now(timezone.utc).isoformat()
+            
+            # Activate service for user
+            await activate_user_service(purchase["user_wallet"], purchase["service_id"])
+            
+            return {
+                "status": "confirmed",
+                "message": f"Payment confirmed! {purchase['service_id']} activated",
+                "service_active": True,
+                "transaction_hash": transaction_hash,
+                "activated_at": purchase["confirmed_at"]
+            }
+        else:
+            return {
+                "status": "pending",
+                "message": "Payment not yet confirmed on blockchain",
+                "service_active": False,
+                "estimated_wait": "2-5 minutes"
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Payment verification failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Verification failed: {str(e)}")
+
+@api_router.get("/services/user/{wallet_address}")
+async def get_user_services(wallet_address: str):
+    """Get user's active premium services"""
+    try:
+        user_active_services = user_services.get(wallet_address, {})
+        
+        active_services = []
+        for service_id, service_data in user_active_services.items():
+            service_info = PREMIUM_SERVICES.get(service_id, {})
+            
+            active_services.append({
+                "service_id": service_id,
+                "name": service_info.get("name", "Unknown Service"),
+                "category": service_info.get("category", "unknown"),
+                "activated_at": service_data.get("activated_at"),
+                "expires_at": service_data.get("expires_at"),
+                "is_active": service_data.get("is_active", False),
+                "days_remaining": calculate_days_remaining(service_data.get("expires_at"))
+            })
+        
+        return {
+            "wallet_address": wallet_address,
+            "active_services": active_services,
+            "total_active": len(active_services)
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get user services: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get user services: {str(e)}")
+
+@api_router.get("/services/purchase-status/{purchase_id}")
+async def get_purchase_status(purchase_id: str):
+    """Get status of a specific purchase"""
+    try:
+        if purchase_id not in purchase_database:
+            raise HTTPException(status_code=404, detail="Purchase not found")
+        
+        purchase = purchase_database[purchase_id]
+        service = PREMIUM_SERVICES.get(purchase["service_id"], {})
+        
+        return {
+            "purchase_id": purchase_id,
+            "service_name": service.get("name", "Unknown"),
+            "status": purchase["status"],
+            "price_rtm": purchase["price_rtm"],
+            "created_at": purchase["created_at"],
+            "expires_at": purchase["expires_at"],
+            "transaction_hash": purchase.get("transaction_hash"),
+            "confirmed_at": purchase.get("confirmed_at"),
+            "time_remaining": calculate_time_remaining(purchase["expires_at"])
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get purchase status: {e}")
+        raise HTTPException(status_code=500, detail=f"Status check failed: {str(e)}")
+
+# Helper functions
+async def mock_verify_rtm_payment(tx_hash: str, address: str, amount: float) -> bool:
+    """Mock RTM payment verification (replace with actual RPC calls)"""
+    # In production, this would:
+    # 1. Query Raptoreum RPC node
+    # 2. Verify transaction exists
+    # 3. Check recipient address matches
+    # 4. Verify amount is correct
+    # 5. Check confirmation count
+    
+    # For demo purposes, simulate verification after 30 seconds
+    await asyncio.sleep(2)  # Simulate blockchain query delay
+    
+    # Mock validation (90% success rate for demo)
+    import random
+    return random.random() > 0.1
+
+async def activate_user_service(wallet_address: str, service_id: str):
+    """Activate premium service for user"""
+    if wallet_address not in user_services:
+        user_services[wallet_address] = {}
+    
+    service = PREMIUM_SERVICES[service_id]
+    activation_time = datetime.now(timezone.utc)
+    
+    service_record = {
+        "activated_at": activation_time.isoformat(),
+        "is_active": True
+    }
+    
+    # Calculate expiration if it's a subscription
+    if service["duration_days"]:
+        expires_at = activation_time + timedelta(days=service["duration_days"])
+        service_record["expires_at"] = expires_at.isoformat()
+    else:
+        service_record["expires_at"] = None  # One-time purchase
+    
+    user_services[wallet_address][service_id] = service_record
+    
+    logger.info(f"Service {service_id} activated for wallet {wallet_address}")
+
+def calculate_days_remaining(expires_at: str) -> int:
+    """Calculate days remaining for service"""
+    if not expires_at:
+        return -1  # One-time purchase, never expires
+    
+    try:
+        expire_date = datetime.fromisoformat(expires_at.replace('Z', '+00:00'))
+        now = datetime.now(timezone.utc)
+        
+        if expire_date > now:
+            return (expire_date - now).days
+        else:
+            return 0
+    except:
+        return 0
+
+def calculate_time_remaining(expires_at: str) -> str:
+    """Calculate time remaining for purchase expiration"""
+    try:
+        expire_date = datetime.fromisoformat(expires_at.replace('Z', '+00:00'))
+        now = datetime.now(timezone.utc)
+        
+        if expire_date > now:
+            remaining = expire_date - now
+            hours = remaining.seconds // 3600
+            minutes = (remaining.seconds % 3600) // 60
+            return f"{hours}h {minutes}m"
+        else:
+            return "Expired"
+    except:
+        return "Unknown"
+
 @api_router.get("/blockchain/pruning-status")
 async def get_pruning_status():
     """Get current blockchain pruning status"""
