@@ -1713,6 +1713,11 @@ const Dashboard = ({ wallet, onLogout }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // Show lock screen if wallet is locked
+  if (isLocked) {
+    return <LockScreen onUnlock={handleUnlock} wallet={wallet} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/10 animate-fade-in">
       <SystemStatus onUpdate={handleSystemUpdate} />
