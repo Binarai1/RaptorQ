@@ -305,8 +305,8 @@ PREMIUM_SERVICES = {
     }
 }
 
-# Your RTM wallet address for receiving payments (replace with your actual address)
-PAYMENT_WALLET_ADDRESS = "RTM1YourWalletAddressHere123456789"
+# Your RTM wallet address for receiving payments
+PAYMENT_WALLET_ADDRESS = "RBZdTD3BgHaEaHwxXY6MUBEhPRz8SxdKpy"
 
 # Purchase tracking
 purchase_database = {}
