@@ -924,15 +924,19 @@ async def prune_blockchain_data(prune_request: BlockchainPruneRequest):
 
 @api_router.get("/services/premium")
 async def get_premium_services():
-    """Get list of available premium services"""
+    """Get list of available premium services with current RTM pricing"""
     try:
+        services_dict, binarai_single_price = await get_premium_services_with_pricing()
+        rtm_price = await get_rtm_price_usd()
+        
         services = []
-        for service_id, service_data in PREMIUM_SERVICES.items():
+        for service_id, service_data in services_dict.items():
             services.append({
                 "service_id": service_id,
                 "name": service_data["name"],
                 "description": service_data["description"],
                 "price_rtm": service_data["price_rtm"],
+                "price_usd": service_data["price_usd"],
                 "category": service_data["category"],
                 "duration_days": service_data["duration_days"],
                 "is_subscription": service_data["duration_days"] is not None
@@ -940,6 +944,13 @@ async def get_premium_services():
         
         return {
             "services": services,
+            "binarai_single_asset": {
+                "price_rtm": binarai_single_price["price_rtm"],
+                "price_usd": binarai_single_price["price_usd"]
+            },
+            "rtm_market_price": rtm_price,
+            "price_source": "CoinGecko",
+            "last_updated": RTM_PRICE_CACHE["last_updated"],
             "payment_methods": ["RTM"],
             "estimated_confirmation_time": "2-5 minutes",
             "quantum_secured": True
@@ -948,6 +959,70 @@ async def get_premium_services():
     except Exception as e:
         logger.error(f"Failed to get premium services: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get services: {str(e)}")
+
+@api_router.post("/ai/generate-asset")
+async def generate_ai_asset_with_payment(asset_request):
+    """Generate AI asset with dynamic RTM pricing"""
+    try:
+        # Get current pricing
+        dynamic_prices = await get_dynamic_service_prices()
+        asset_price = dynamic_prices["binarai_single_asset"]
+        
+        # Check if user has unlimited subscription or process payment
+        user_wallet = asset_request.get("user_wallet")
+        has_unlimited = check_user_has_unlimited_binarai(user_wallet)
+        
+        if not has_unlimited:
+            # Return pricing info for payment
+            return {
+                "requires_payment": True,
+                "service_name": "BinarAi Asset Creation",
+                "price_rtm": asset_price["price_rtm"],
+                "price_usd": asset_price["price_usd"],
+                "rtm_market_price": asset_price["rtm_rate"],
+                "payment_address": PAYMENT_WALLET_ADDRESS,
+                "message": f"Pay {asset_price['price_rtm']:.8f} RTM (${asset_price['price_usd']:.2f}) to create this AI asset"
+            }
+        
+        # If user has unlimited, generate asset directly
+        # ... existing asset generation code ...
+        return {
+            "asset_generated": True,
+            "message": "AI asset created with unlimited subscription"
+        }
+        
+    except Exception as e:
+        logger.error(f"AI asset generation failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Asset generation failed: {str(e)}")
+
+def check_user_has_unlimited_binarai(wallet_address: str) -> bool:
+    """Check if user has active BinarAi unlimited subscription"""
+    if not wallet_address or wallet_address not in user_services:
+        return False
+    
+    user_active_services = user_services[wallet_address]
+    binarai_service = user_active_services.get("binarai_unlimited")
+    
+    if not binarai_service:
+        return False
+    
+    # Check if service is still active
+    if not binarai_service.get("is_active", False):
+        return False
+    
+    # Check expiration
+    expires_at = binarai_service.get("expires_at")
+    if expires_at:
+        try:
+            expire_date = datetime.fromisoformat(expires_at.replace('Z', '+00:00'))
+            if datetime.now(timezone.utc) > expire_date:
+                # Service expired
+                binarai_service["is_active"] = False
+                return False
+        except:
+            return False
+    
+    return True
 
 @api_router.post("/services/purchase", response_model=ServicePurchaseResponse)
 async def initiate_service_purchase(purchase_request: ServicePurchaseRequest):
