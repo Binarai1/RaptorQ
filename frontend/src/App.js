@@ -118,7 +118,7 @@ const QuantumLogo = ({ size = 40, className = "" }) => (
   </div>
 );
 
-// Mock data with enhanced features
+// Mock data with RaptorQ branding and enhanced features
 const mockAssets = [
   {
     id: '1',
@@ -129,7 +129,7 @@ const mockAssets = [
     likes: 24,
     isLiked: false,
     metadata: { 
-      description: 'First quantum-resistant NFT collection', 
+      description: 'First quantum-resistant NFT on Raptoreum UTXO', 
       rarity: 'Legendary',
       creator_social: {
         twitter: '@quantumartist',
@@ -137,7 +137,7 @@ const mockAssets = [
         website: 'quantumgenesis.com'
       },
       quantxo_signature: {
-        created_with: "QUANTXO by Binarai",
+        created_with: "RaptorQ by Binarai",
         quantum_resistant: true,
         utxo_blockchain: "Raptoreum",
         version: "1.0.0",
@@ -157,14 +157,14 @@ const mockAssets = [
     likes: 18,
     isLiked: true,
     metadata: { 
-      description: 'AI-generated quantum art series', 
+      description: 'AI-generated quantum art on Raptoreum UTXO', 
       artist: 'QuantumAI Studio',
       creator_social: {
         twitter: '@quantumai_studio',
         website: 'quantumai.art'
       },
       quantxo_signature: {
-        created_with: "QUANTXO by Binarai",
+        created_with: "RaptorQ by Binarai",
         quantum_resistant: true,
         utxo_blockchain: "Raptoreum",
         version: "1.0.0",
@@ -184,7 +184,7 @@ const mockAssets = [
     likes: 42,
     isLiked: false,
     metadata: { 
-      description: 'Quantum-encrypted music composition', 
+      description: 'Quantum-encrypted music on Raptoreum blockchain', 
       duration: '3:45',
       creator_social: {
         spotify: 'quantum-beats',
@@ -192,7 +192,7 @@ const mockAssets = [
         website: 'quantumbeats.io'
       },
       quantxo_signature: {
-        created_with: "QUANTXO by Binarai",
+        created_with: "RaptorQ by Binarai",
         quantum_resistant: true,
         utxo_blockchain: "Raptoreum",
         version: "1.0.0",
