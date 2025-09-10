@@ -1668,7 +1668,7 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
           </div>
 
           <div>
-            <Label className="text-white">AI Prompt</Label>
+            <Label className="text-white">BinarAi Prompt</Label>
             <Textarea
               placeholder="Describe your quantum-resistant NFT creation..."
               value={prompt}
