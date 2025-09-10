@@ -399,6 +399,50 @@ select:focus-visible {
   animation: quantumGlow 2s ease-in-out infinite;
 }
 
+/* Mobile responsive fixes */
+.mobile-safe-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.mobile-dialog {
+  max-width: 95vw;
+  max-height: 90vh;
+  margin: 2.5vh auto;
+  overflow-y: auto;
+}
+
+.mobile-dialog .DialogContent {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.mobile-settings-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+.mobile-status-window {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: auto;
+  max-width: calc(100vw - 2rem);
+  z-index: 1000;
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .quantum-asset-grid {
@@ -413,6 +457,32 @@ select:focus-visible {
   .quantum-logo {
     width: 40px !important;
     height: 40px !important;
+  }
+  
+  /* Mobile dialog overrides */
+  .DialogContent {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+  }
+  
+  /* Mobile safe positioning for floating elements */
+  .system-status-floating {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+  
+  .settings-floating {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 400px;
+    max-height: 80vh;
   }
 }
 
