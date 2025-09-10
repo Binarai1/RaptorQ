@@ -834,7 +834,7 @@ logger = logging.getLogger(__name__)
 # Startup event
 @app.on_event("startup")
 async def startup_event():
-    logger.info("QUANTXO Wallet API starting - Quantum resistance active")
+    logger.info("RaptorQ Wallet API starting - Quantum resistance active")
     logger.info("Created by Binarai - First truly quantum-resistant UTXO wallet")
     
     # Start self-healing monitor
@@ -845,7 +845,7 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    logger.info("QUANTXO Wallet API shutting down - Quantum security maintained")
+    logger.info("RaptorQ Wallet API shutting down - Quantum security maintained")
     client.close()
 
 if __name__ == "__main__":
