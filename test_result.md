@@ -164,15 +164,18 @@ frontend:
 
   - task: "2FA/3FA Authentication"
     implemented: true
-    working: "NA"
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implemented 2FA/3FA settings in SettingsDialog with toggle switches and validation"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED: 2FA/3FA authentication settings fully functional. Toggle switches present in Settings dialog. 2FA enables SMS + App verification, 3FA adds biometric authentication. Proper dependency logic implemented (3FA requires 2FA to be enabled first). Settings save and apply correctly."
 
   - task: "Custom Wallet Colors"
     implemented: true
