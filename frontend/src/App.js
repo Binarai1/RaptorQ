@@ -1493,12 +1493,19 @@ const Dashboard = ({ wallet, onLogout }) => {
                 </div>
 
                 <div className="pt-4 space-y-2">
-                  <Button className="w-full quantum-btn-primary">
+                  <Button 
+                    className="w-full quantum-btn-primary"
+                    onClick={() => setShowQRScan(true)}
+                  >
                     <Send className="mr-2 h-4 w-4" />
                     InstaSend RTM
                   </Button>
-                  <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
-                    <Download className="mr-2 h-4 w-4" />
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+                    onClick={() => setShowQRReceive(true)}
+                  >
+                    <QrCode className="mr-2 h-4 w-4" />
                     Receive
                   </Button>
                 </div>
