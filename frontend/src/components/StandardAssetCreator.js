@@ -421,18 +421,19 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-white">Quantity *</Label>
+                      <Label className="text-white">Circulation *</Label>
                       <Input
                         type="number"
-                        placeholder="1"
+                        placeholder="1000"
                         min="1"
-                        value={formData.quantity}
-                        onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
+                        value={formData.circulation}
+                        onChange={(e) => handleInputChange('circulation', parseInt(e.target.value) || 1)}
                         className={`bg-gray-800/50 border-gray-600 text-white ${
-                          errors.quantity ? 'border-red-500' : ''
+                          errors.circulation ? 'border-red-500' : ''
                         }`}
                       />
-                      {errors.quantity && <p className="text-red-400 text-xs mt-1">{errors.quantity}</p>}
+                      {errors.circulation && <p className="text-red-400 text-xs mt-1">{errors.circulation}</p>}
+                      <p className="text-xs text-gray-400 mt-1">Initial circulation to mint</p>
                     </div>
 
                     <div>
