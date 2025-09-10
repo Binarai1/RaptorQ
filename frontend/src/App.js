@@ -2546,6 +2546,15 @@ const Dashboard = ({ wallet, onLogout }) => {
               <Button
                 size="sm"
                 variant="ghost"
+                onClick={() => setShowPremiumServices(true)}
+                className="text-gray-400 hover:text-yellow-400"
+              >
+                <Star className="h-4 w-4" />
+              </Button>
+              
+              <Button
+                size="sm"
+                variant="ghost"
                 onClick={() => setShowSettings(true)}
                 className="text-gray-400 hover:text-white"
               >
