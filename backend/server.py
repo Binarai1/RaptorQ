@@ -37,7 +37,7 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app
 app = FastAPI(
-    title="QUANTXO Wallet API", 
+    title="RaptorQ Wallet API", 
     description="Quantum-Resistant Raptoreum Wallet by Binarai - First Truly Quantum-Resistant UTXO",
     version="1.0.0"
 )
