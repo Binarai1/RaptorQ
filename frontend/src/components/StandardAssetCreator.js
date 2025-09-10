@@ -26,12 +26,11 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
-// Raptoreum Asset Creation Fees (from blockchain analysis)
+// Raptoreum Asset Creation Fees (accurate blockchain fees)
 const RAPTOREUM_FEES = {
-  STANDARD_ASSET: 1000, // 1000 RTM for standard asset creation
-  REISSUABLE_ASSET: 1500, // 1500 RTM for reissuable asset
-  UNIQUE_ASSET: 100, // 100 RTM for unique asset
-  SUB_ASSET: 100, // 100 RTM for sub-asset
+  ASSET_CREATION: 100, // 100 RTM to create asset
+  ASSET_MINTING: 100, // 100 RTM to mint asset (combined in one process)
+  TOTAL_ASSET_FEE: 200, // Total 200 RTM for complete asset creation + minting
   TRANSACTION_FEE: 0.001, // Standard network transaction fee
   IPFS_UPLOAD: 1 // 1 RTM for IPFS storage
 };
