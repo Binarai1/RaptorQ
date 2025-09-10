@@ -1026,16 +1026,19 @@ def check_user_has_unlimited_binarai(wallet_address: str) -> bool:
 
 @api_router.post("/services/purchase", response_model=ServicePurchaseResponse)
 async def initiate_service_purchase(purchase_request: ServicePurchaseRequest):
-    """Initiate premium service purchase"""
+    """Initiate premium service purchase with dynamic RTM pricing"""
     try:
         service_id = purchase_request.service_id
         user_wallet = purchase_request.user_wallet
         
+        # Get current services with pricing
+        services_dict, _ = await get_premium_services_with_pricing()
+        
         # Validate service exists
-        if service_id not in PREMIUM_SERVICES:
+        if service_id not in services_dict:
             raise HTTPException(status_code=404, detail="Service not found")
         
-        service = PREMIUM_SERVICES[service_id]
+        service = services_dict[service_id]
         
         # Generate unique purchase ID
         purchase_id = f"purchase_{int(time.time())}_{service_id}_{user_wallet[-8:]}"
@@ -1046,6 +1049,7 @@ async def initiate_service_purchase(purchase_request: ServicePurchaseRequest):
             "service_id": service_id,
             "user_wallet": user_wallet,
             "price_rtm": service["price_rtm"],
+            "price_usd": service["price_usd"],
             "payment_address": PAYMENT_WALLET_ADDRESS,
             "status": "pending_payment",
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -1058,7 +1062,7 @@ async def initiate_service_purchase(purchase_request: ServicePurchaseRequest):
         purchase_database[purchase_id] = purchase_record
         
         # Generate QR code for payment
-        qr_data = f"{PAYMENT_WALLET_ADDRESS}?amount={service['price_rtm']}&message=RaptorQ Service: {service['name']}&purchaseId={purchase_id}"
+        qr_data = f"{PAYMENT_WALLET_ADDRESS}?amount={service['price_rtm']:.8f}&message=RaptorQ Service: {service['name']}&purchaseId={purchase_id}"
         qr_base64 = generate_qr_with_logo(qr_data, "RaptorQ Payment")
         
         return ServicePurchaseResponse(
