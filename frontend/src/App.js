@@ -196,6 +196,8 @@ const mockAssets = [
         quantum_resistant: true,
         utxo_blockchain: "Raptoreum",
         version: "1.0.0",
+        security_level: "SHA3-2048_equivalent",
+        quantum_strength: "1024_bit_quantum_security",
         timestamp: new Date().toISOString()
       }
     },
