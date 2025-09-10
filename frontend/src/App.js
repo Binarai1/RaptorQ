@@ -2128,7 +2128,7 @@ const Dashboard = ({ wallet, onLogout }) => {
             <div className="flex items-center space-x-4">
               <QuantumLogo size={48} className="quantum-pulse" />
               <div>
-                <h1 className="text-xl font-bold quantum-brand-text">QUANTXO Wallet</h1>
+                <h1 className="text-xl font-bold quantum-brand-text">RaptorQ Wallet</h1>
                 <p className="text-sm text-gray-400">{wallet.name}</p>
                 <Badge className="mt-1 bg-blue-900/30 text-blue-300 border-blue-700/50 text-xs">
                   by Binarai
