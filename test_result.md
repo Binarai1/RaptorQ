@@ -159,9 +159,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "QR Code Receive Functionality"
-    - "QR Code Send/Scan Functionality"
-    - "QR Code Generation API"
+    - "All QR functionality tested and working"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
