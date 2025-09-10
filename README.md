@@ -109,6 +109,24 @@ python server.py  # Backend (port 8001)
 - **Desktop Performance**: 20% improvement with smart caching
 - **Pro Mode**: Advanced smart node configuration
 
+## 📖 **Documentation**
+
+### 🎯 **Quick Access**
+- **[Get Started Fast](./docs/RAPTORQ_LITEPAPER.md#-getting-started)** - 5-minute setup guide
+- **[Why Quantum Matters](./docs/RAPTORQ_QUANTUM_STUDY.md#the-quantum-threat)** - Understand the threat
+- **[vs Other Wallets](./docs/RAPTORQ_COMPARISON.md#comparison-matrix)** - See how we compare
+- **[Developer APIs](./docs/RAPTORQ_DEVELOPER_GUIDE.md#quick-start-guide)** - Start integrating now
+
+### 📚 **Complete Documentation Suite**
+
+| Document | What You'll Learn | Best For |
+|----------|-------------------|----------|
+| **[📄 Technical Whitepaper](./docs/RAPTORQ_WHITEPAPER.md)** | • Quantum cryptography implementation<br>• Mathematical security proofs<br>• Architecture deep-dive<br>• Performance benchmarks | Security researchers, blockchain developers, technical decision makers |
+| **[📋 Litepaper](./docs/RAPTORQ_LITEPAPER.md)** | • Simple quantum threat explanation<br>• Feature overview<br>• Getting started guide<br>• FAQ for common questions | New users, investors, non-technical stakeholders |
+| **[🔬 Quantum Security Study](./docs/RAPTORQ_QUANTUM_STUDY.md)** | • Mathematical proof of quantum resistance<br>• Threat timeline analysis<br>• Security comparison with current wallets<br>• Energy requirements for attacks | Security auditors, cryptographers, compliance teams |
+| **[⚖️ Competitive Analysis](./docs/RAPTORQ_COMPARISON.md)** | • Feature-by-feature comparison<br>• Performance benchmarks<br>• Cost analysis<br>• Migration strategies | Product managers, users choosing wallets, enterprises |
+| **[👩‍💻 Developer Integration Guide](./docs/RAPTORQ_DEVELOPER_GUIDE.md)** | • Step-by-step integration tutorials<br>• Complete API reference<br>• Code examples for all platforms<br>• Security best practices | Web developers, mobile developers, DevOps teams |
+
 ## 🏗️ **Architecture**
 
 ```
