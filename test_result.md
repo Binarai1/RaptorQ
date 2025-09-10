@@ -147,9 +147,77 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "Implemented camera-based QR scanning with Html5QrcodeScanner, send dialog with validation"
-        - working: true
-          agent: "testing"
-          comment: "✅ PASSED: QR Send/Scan functionality fully working. Tested QRScanDialog component - camera scanner interface loads (shows expected camera permission message in test environment), manual address input works perfectly, send dialog opens with populated address, all form fields functional (amount, memo, fee selection), transaction validation working. Complete send flow operational."
+  - task: "Auto-Lock Functionality"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to implement wallet auto-lock after idle timeout with PIN/password unlock"
+
+  - task: "2FA/3FA Authentication"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to implement multi-factor authentication (2FA/3FA) for enhanced security"
+
+  - task: "Custom Wallet Colors"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to implement settings to allow users to customize wallet color themes"
+
+  - task: "Pro Mode Smart Nodes"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to implement Pro Mode switch for easy smart node setup"
+
+  - task: "Mobile Blockchain Pruning"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to implement blockchain data pruning for mobile devices to prevent large storage requirements"
+
+  - task: "BinarAi Image Creation"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to ensure AI image creation feature is branded as 'BinarAi image creation'"
 
 metadata:
   created_by: "main_agent"
