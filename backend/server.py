@@ -308,6 +308,37 @@ PREMIUM_SERVICES = {
 # Your RTM wallet address for receiving payments
 PAYMENT_WALLET_ADDRESS = "RBZdTD3BgHaEaHwxXY6MUBEhPRz8SxdKpy"
 
+# Advertisement tracking
+advertisement_slots = {
+    "wallet_bottom": {
+        "active": False,
+        "advertiser_wallet": None,
+        "banner_url": None,
+        "banner_filename": None,
+        "title": None,
+        "url": None,
+        "expires_at": None,
+        "clicks": 0,
+        "impressions": 0,
+        "created_at": None
+    },
+    "asset_creation_bottom": {
+        "active": False,
+        "advertiser_wallet": None,
+        "banner_url": None,
+        "banner_filename": None,
+        "title": None,
+        "url": None,
+        "expires_at": None,
+        "clicks": 0,
+        "impressions": 0,
+        "created_at": None
+    }
+}
+
+# Advertisement bookings for future dates
+advertisement_bookings = {}  # {date: {slot: booking_info}}
+
 # Purchase tracking
 purchase_database = {}
 user_services = {}  # Track user's active services
