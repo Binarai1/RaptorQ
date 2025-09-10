@@ -1617,7 +1617,7 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
       });
       
       setGeneratedAsset(response.data);
-      toast({ title: "Success", description: "Quantum-secure asset generated!" });
+      toast({ title: "Success", description: "BinarAi quantum-secure asset generated!" });
     } catch (error) {
       toast({ title: "Error", description: "Failed to generate asset", variant: "destructive" });
     } finally {
