@@ -1892,8 +1892,8 @@ const Dashboard = ({ wallet, onLogout }) => {
   const resetLockTimer = useCallback(() => {
     setLastActivity(Date.now());
     
-    if (lockTimeout) {
-      clearTimeout(lockTimeout);
+    if (lockTimeoutRef.current) {
+      clearTimeout(lockTimeoutRef.current);
     }
     
     const newTimeout = setTimeout(() => {
@@ -1905,15 +1905,15 @@ const Dashboard = ({ wallet, onLogout }) => {
       });
     }, AUTO_LOCK_TIME);
     
-    setLockTimeout(newTimeout);
-  }, [lockTimeout]);
+    lockTimeoutRef.current = newTimeout;
+  }, []);
 
   const handleUnlock = () => {
     setIsLocked(false);
     setLastActivity(Date.now());
     
-    if (lockTimeout) {
-      clearTimeout(lockTimeout);
+    if (lockTimeoutRef.current) {
+      clearTimeout(lockTimeoutRef.current);
     }
     
     const newTimeout = setTimeout(() => {
@@ -1925,7 +1925,7 @@ const Dashboard = ({ wallet, onLogout }) => {
       });
     }, AUTO_LOCK_TIME);
     
-    setLockTimeout(newTimeout);
+    lockTimeoutRef.current = newTimeout;
     
     toast({ 
       title: "Wallet Unlocked", 
@@ -1939,8 +1939,8 @@ const Dashboard = ({ wallet, onLogout }) => {
       if (!isLocked) {
         setLastActivity(Date.now());
         
-        if (lockTimeout) {
-          clearTimeout(lockTimeout);
+        if (lockTimeoutRef.current) {
+          clearTimeout(lockTimeoutRef.current);
         }
         
         const newTimeout = setTimeout(() => {
@@ -1952,7 +1952,7 @@ const Dashboard = ({ wallet, onLogout }) => {
           });
         }, AUTO_LOCK_TIME);
         
-        setLockTimeout(newTimeout);
+        lockTimeoutRef.current = newTimeout;
       }
     };
 
@@ -1971,11 +1971,11 @@ const Dashboard = ({ wallet, onLogout }) => {
       document.removeEventListener('scroll', handleActivity);
       document.removeEventListener('touchstart', handleActivity);
       
-      if (lockTimeout) {
-        clearTimeout(lockTimeout);
+      if (lockTimeoutRef.current) {
+        clearTimeout(lockTimeoutRef.current);
       }
     };
-  }, [isLocked, lockTimeout]);
+  }, [isLocked]);
 
   const handleAssetClick = (asset) => {
     setSelectedAsset(asset);
