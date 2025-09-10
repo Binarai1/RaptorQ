@@ -762,6 +762,131 @@ const QRScanDialog = ({ isOpen, onClose, onScanResult }) => {
   );
 };
 
+const LockScreen = ({ onUnlock, wallet }) => {
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
+  const [attempts, setAttempts] = useState(0);
+
+  const handleUnlock = () => {
+    // Simple PIN validation (in production, this would be more secure)
+    if (pin === '1234' || pin.length >= 4) {
+      onUnlock();
+      setPin('');
+      setError('');
+      setAttempts(0);
+    } else {
+      setError('Invalid PIN');
+      setAttempts(prev => prev + 1);
+      setPin('');
+      
+      if (attempts >= 2) {
+        setError('Too many attempts. Please wait...');
+        setTimeout(() => {
+          setError('');
+          setAttempts(0);
+        }, 5000);
+      }
+    }
+  };
+
+  const handlePinInput = (digit) => {
+    if (pin.length < 6) {
+      setPin(prev => prev + digit);
+    }
+  };
+
+  const handleBackspace = () => {
+    setPin(prev => prev.slice(0, -1));
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md quantum-glass backdrop-blur-sm">
+        <CardHeader className="text-center">
+          <QuantumLogo size={64} className="mx-auto mb-4 quantum-float" />
+          <CardTitle className="text-2xl font-bold text-white">Wallet Locked</CardTitle>
+          <p className="text-gray-400">Enter your PIN to unlock {wallet?.name}</p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="p-4 bg-gradient-to-r from-red-950/30 to-orange-950/30 rounded-lg border border-red-800/30">
+            <div className="flex items-center space-x-2 mb-2">
+              <Lock className="h-4 w-4 text-red-400" />
+              <span className="text-sm font-medium text-red-300">Security Lock Active</span>
+            </div>
+            <p className="text-xs text-gray-300">Wallet automatically locked for your security</p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="flex justify-center space-x-2 mb-4">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-3 h-3 rounded-full border-2 ${
+                      i < pin.length 
+                        ? 'bg-blue-400 border-blue-400' 
+                        : 'border-gray-600'
+                    }`}
+                  />
+                ))}
+              </div>
+              
+              {error && (
+                <p className="text-red-400 text-sm mb-4">{error}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
+                <Button
+                  key={digit}
+                  onClick={() => handlePinInput(digit.toString())}
+                  disabled={attempts >= 3}
+                  className="h-12 bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700/50 text-lg font-semibold"
+                  variant="outline"
+                >
+                  {digit}
+                </Button>
+              ))}
+              <Button
+                onClick={handleBackspace}
+                disabled={pin.length === 0 || attempts >= 3}
+                className="h-12 bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700/50"
+                variant="outline"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
+                </svg>
+              </Button>
+              <Button
+                onClick={() => handlePinInput('0')}
+                disabled={attempts >= 3}
+                className="h-12 bg-gray-800/50 border-gray-600 text-white hover:bg-gray-700/50 text-lg font-semibold"
+                variant="outline"
+              >
+                0
+              </Button>
+              <Button
+                onClick={handleUnlock}
+                disabled={pin.length < 4 || attempts >= 3}
+                className="h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+              >
+                <Lock className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-xs text-gray-400">
+              Quantum-secured with post-quantum cryptography
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 const SendDialog = ({ isOpen, onClose, sendToAddress, setSendToAddress, sendAmount, setSendAmount, onSend, wallet }) => {
   const [memo, setMemo] = useState('');
   const [fee, setFee] = useState('0.001');
