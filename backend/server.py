@@ -607,31 +607,31 @@ async def get_platform_guides():
 async def get_legal_disclaimer():
     """Get comprehensive legal disclaimer"""
     return {
-        "title": "QUANTXO Wallet Legal Disclaimer",
+        "title": "RaptorQ Wallet Legal Disclaimer",
         "version": "1.0.0",
         "last_updated": "2025-01-01",
         "disclaimer": {
-            "software_warranty": "QUANTXO Wallet is provided 'AS IS' without warranty of any kind, express or implied. Binarai disclaims all warranties including but not limited to merchantability, fitness for a particular purpose, and non-infringement.",
+            "software_warranty": "RaptorQ Wallet is provided 'AS IS' without warranty of any kind, express or implied. Binarai disclaims all warranties including but not limited to merchantability, fitness for a particular purpose, and non-infringement.",
             
             "user_responsibility": "Users assume full responsibility for the security of their private keys, seed phrases, and digital assets. Binarai is not liable for any loss of funds due to user error, device failure, or security breaches.",
             
             "cryptocurrency_risks": "Cryptocurrency investments carry inherent risks including but not limited to market volatility, regulatory changes, and technical failures. Past performance does not guarantee future results.",
             
-            "quantum_resistance": "While QUANTXO implements post-quantum cryptographic standards, the evolving nature of quantum computing technology means absolute security cannot be guaranteed indefinitely.",
+            "quantum_resistance": "While RaptorQ implements post-quantum cryptographic standards, the evolving nature of quantum computing technology means absolute security cannot be guaranteed indefinitely.",
             
-            "third_party_services": "QUANTXO may integrate with third-party services including AI providers, blockchain networks, and IPFS systems. Binarai is not responsible for the availability, security, or performance of these external services.",
+            "third_party_services": "RaptorQ may integrate with third-party services including AI providers, blockchain networks, and IPFS systems. Binarai is not responsible for the availability, security, or performance of these external services.",
             
             "regulatory_compliance": "Users are responsible for compliance with all applicable laws and regulations in their jurisdiction regarding cryptocurrency use, taxation, and reporting.",
             
             "liability_limitation": "In no event shall Binarai be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.",
             
-            "indemnification": "Users agree to indemnify and hold harmless Binarai from any claims, damages, or expenses arising out of their use of QUANTXO Wallet.",
+            "indemnification": "Users agree to indemnify and hold harmless Binarai from any claims, damages, or expenses arising out of their use of RaptorQ Wallet.",
             
-            "modification_rights": "Binarai reserves the right to modify, suspend, or discontinue QUANTXO Wallet at any time without prior notice.",
+            "modification_rights": "Binarai reserves the right to modify, suspend, or discontinue RaptorQ Wallet at any time without prior notice.",
             
             "jurisdiction": "This disclaimer shall be governed by and construed in accordance with the laws of the jurisdiction where Binarai is incorporated."
         },
-        "acceptance": "By using QUANTXO Wallet, you acknowledge that you have read, understood, and agree to be bound by this disclaimer.",
+        "acceptance": "By using RaptorQ Wallet, you acknowledge that you have read, understood, and agree to be bound by this disclaimer.",
         "contact": "legal@binarai.com"
     }
 
