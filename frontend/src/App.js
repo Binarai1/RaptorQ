@@ -722,14 +722,59 @@ const Dashboard = ({ wallet, onLogout }) => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto p-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* Mobile-Safe Tab Navigation */}
+          {/* Theme-Colored Tab Navigation */}
           <div className="mb-6 overflow-x-auto">
             <TabsList className="flex w-full bg-gray-800/50 p-1 rounded-lg min-w-max">
-              <TabsTrigger value="wallet" className="flex-1 whitespace-nowrap">Wallet</TabsTrigger>
-              <TabsTrigger value="assets" className="flex-1 whitespace-nowrap">Assets</TabsTrigger>
-              <TabsTrigger value="history" className="flex-1 whitespace-nowrap">History</TabsTrigger>
-              <TabsTrigger value="nodes" className="flex-1 whitespace-nowrap">Nodes</TabsTrigger>
-              <TabsTrigger value="sync" className="flex-1 whitespace-nowrap">Sync</TabsTrigger>
+              <TabsTrigger 
+                value="wallet" 
+                className="flex-1 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=inactive]:text-blue-400 hover:text-blue-300 transition-all duration-200"
+                style={{
+                  '--theme-color': 'var(--color-primary)',
+                  color: activeTab === 'wallet' ? 'white' : 'var(--color-primary)'
+                }}
+              >
+                Wallet
+              </TabsTrigger>
+              <TabsTrigger 
+                value="assets" 
+                className="flex-1 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=inactive]:text-blue-400 hover:text-blue-300 transition-all duration-200"
+                style={{
+                  '--theme-color': 'var(--color-primary)',
+                  color: activeTab === 'assets' ? 'white' : 'var(--color-primary)'
+                }}
+              >
+                Assets
+              </TabsTrigger>
+              <TabsTrigger 
+                value="history" 
+                className="flex-1 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=inactive]:text-blue-400 hover:text-blue-300 transition-all duration-200"
+                style={{
+                  '--theme-color': 'var(--color-primary)',
+                  color: activeTab === 'history' ? 'white' : 'var(--color-primary)'
+                }}
+              >
+                History
+              </TabsTrigger>
+              <TabsTrigger 
+                value="nodes" 
+                className="flex-1 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=inactive]:text-blue-400 hover:text-blue-300 transition-all duration-200"
+                style={{
+                  '--theme-color': 'var(--color-primary)',
+                  color: activeTab === 'nodes' ? 'white' : 'var(--color-primary)'
+                }}
+              >
+                Nodes
+              </TabsTrigger>
+              <TabsTrigger 
+                value="sync" 
+                className="flex-1 whitespace-nowrap data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=inactive]:text-blue-400 hover:text-blue-300 transition-all duration-200"
+                style={{
+                  '--theme-color': 'var(--color-primary)',
+                  color: activeTab === 'sync' ? 'white' : 'var(--color-primary)'
+                }}
+              >
+                Sync
+              </TabsTrigger>
             </TabsList>
           </div>
 
