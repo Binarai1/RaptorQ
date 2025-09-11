@@ -1779,6 +1779,7 @@ function App() {
 
   const handleLogout = () => {
     setWallet(null);
+    clearSession();
   };
 
   return (
