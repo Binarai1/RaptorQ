@@ -239,7 +239,7 @@ const BlockchainSync = ({ wallet, isVisible = true }) => {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {getSyncStatusIcon()}
-              <span>Blockchain Synchronization</span>
+              <span className="text-white">Raptoreum UTXO</span>
               <Badge className={`${
                 syncStatus.isSync ? 'bg-blue-900/30 text-blue-300' : 'bg-green-900/30 text-green-300'
               }`}>
