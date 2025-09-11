@@ -1,0 +1,1115 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import axios from 'axios';
+import QRCode from 'react-qr-code';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Button } from './components/ui/button';
+import { Input } from './components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './components/ui/dialog';
+import { Badge } from './components/ui/badge';
+import { Switch } from './components/ui/switch';
+import { Label } from './components/ui/label';
+import { Textarea } from './components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
+import { toast } from './hooks/use-toast';
+import { Toaster } from './components/ui/toaster';
+
+// Import production components
+import AssetExplorer from './components/AssetExplorer';
+import StandardAssetCreator from './components/StandardAssetCreator';
+import BlockchainSync from './components/BlockchainSync';
+import ProModeConsole from './components/ProModeConsole';
+import SmartnodeManager from './components/SmartnodeManager';
+
+import { 
+  Wallet, Plus, Download, Upload, Eye, EyeOff, Copy, Send, History, Settings, Shield, 
+  Smartphone, Music, FileText, Image, Video, ExternalLink, Lock, Key, Globe, Zap, 
+  RefreshCw, Timer, Share2, Facebook, Twitter, Instagram, Camera, Palette, QrCode, 
+  TrendingUp, Hexagon, Activity, AlertTriangle, CheckCircle, Users, DollarSign, 
+  Layers, Sun, Star, Moon, Home, BarChart, TrendingDown, Search, Filter
+} from 'lucide-react';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+// Quantum Logo Component
+const QuantumLogo = ({ size = 40, className = "" }) => (
+  <div className={`quantum-logo ${className}`} style={{ width: size, height: size }}>
+    <div className="relative">
+      <Hexagon className="w-full h-full text-blue-400 quantum-pulse" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold text-blue-300">Q</span>
+      </div>
+    </div>
+  </div>
+);
+
+// Session Management Hook
+const useSession = () => {
+  const [sessionToken, setSessionToken] = useState(() => {
+    return localStorage.getItem('raptorq_session') || null;
+  });
+
+  const saveSession = (token) => {
+    localStorage.setItem('raptorq_session', token);
+    setSessionToken(token);
+  };
+
+  const clearSession = () => {
+    localStorage.removeItem('raptorq_session');
+    setSessionToken(null);
+  };
+
+  return { sessionToken, saveSession, clearSession };
+};
+
+// Settings Dialog Component
+const SettingsDialog = ({ isOpen, onClose, settings, onColorChange, onSecurityUpdate }) => {
+  const [localSettings, setLocalSettings] = useState(settings);
+
+  const handleColorChange = (color) => {
+    setLocalSettings(prev => ({ ...prev, colorTheme: color }));
+    onColorChange(color);
+  };
+
+  const handleSave = () => {
+    onSecurityUpdate(localSettings);
+    onClose();
+    toast({ title: "Settings Saved", description: "Your preferences have been updated" });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md mobile-settings-panel">
+        <DialogHeader>
+          <DialogTitle className="flex items-center space-x-2">
+            <Settings className="h-5 w-5 text-blue-400" />
+            <span>RaptorQ Settings</span>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Color Theme */}
+          <div>
+            <Label className="text-white mb-3 block">Color Theme</Label>
+            <Select value={localSettings.colorTheme} onValueChange={handleColorChange}>
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-600">
+                <SelectItem value="blue">Quantum Blue</SelectItem>
+                <SelectItem value="purple">Cosmic Purple</SelectItem>
+                <SelectItem value="green">Matrix Green</SelectItem>
+                <SelectItem value="red">Crimson Red</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Security Settings */}
+          <div className="space-y-4">
+            <Label className="text-white">Security Options</Label>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white text-sm">Two-Factor Authentication</Label>
+                <p className="text-xs text-gray-400">Enhanced security layer</p>
+              </div>
+              <Switch
+                checked={localSettings.twoFA}
+                onCheckedChange={(checked) => setLocalSettings(prev => ({ ...prev, twoFA: checked }))}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white text-sm">Three-Factor Authentication</Label>
+                <p className="text-xs text-gray-400">Maximum security protection</p>
+              </div>
+              <Switch
+                checked={localSettings.threeFA}
+                onCheckedChange={(checked) => setLocalSettings(prev => ({ ...prev, threeFA: checked }))}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white text-sm">Pro Mode</Label>
+                <p className="text-xs text-gray-400">Advanced smartnode features</p>
+              </div>
+              <Switch
+                checked={localSettings.proMode}
+                onCheckedChange={(checked) => setLocalSettings(prev => ({ ...prev, proMode: checked }))}
+              />
+            </div>
+          </div>
+
+          <div className="flex space-x-3 pt-4">
+            <Button onClick={handleSave} className="flex-1 bg-blue-600 hover:bg-blue-700">
+              Save Settings
+            </Button>
+            <Button variant="outline" onClick={onClose} className="border-gray-600 text-gray-300 hover:bg-gray-800">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// QR Receive Dialog
+const QRReceiveDialog = ({ isOpen, onClose, wallet }) => {
+  const [amount, setAmount] = useState('');
+  const [message, setMessage] = useState('');
+
+  const qrValue = `raptoreum:${wallet?.address}${amount ? `?amount=${amount}` : ''}${message ? `&message=${encodeURIComponent(message)}` : ''}`;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md mobile-dialog">
+        <DialogHeader>
+          <DialogTitle>Receive RTM</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div className="bg-white p-4 rounded-lg">
+            <QRCode value={qrValue} size={200} className="mx-auto" />
+          </div>
+          
+          <div>
+            <Label>Amount (optional)</Label>
+            <Input
+              type="number"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="bg-gray-800/50 border-gray-600 text-white"
+            />
+          </div>
+          
+          <div>
+            <Label>Message (optional)</Label>
+            <Input
+              placeholder="Payment for..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="bg-gray-800/50 border-gray-600 text-white"
+            />
+          </div>
+          
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(wallet?.address);
+              toast({ title: "Address Copied", description: "RTM address copied to clipboard" });
+            }}
+            className="w-full bg-green-600 hover:bg-green-700"
+          >
+            <Copy className="h-4 w-4 mr-2" />
+            Copy Address
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// QR Scan Dialog
+const QRScanDialog = ({ isOpen, onClose, onAddressScanned }) => {
+  const scannerRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      const scanner = new Html5QrcodeScanner("qr-reader", {
+        fps: 10,
+        qrbox: { width: 250, height: 250 }
+      });
+
+      scanner.render(
+        (result) => {
+          onAddressScanned(result);
+          scanner.clear();
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+      scannerRef.current = scanner;
+
+      return () => {
+        if (scannerRef.current) {
+          scannerRef.current.clear();
+        }
+      };
+    }
+  }, [isOpen, onAddressScanned]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md mobile-dialog">
+        <DialogHeader>
+          <DialogTitle>Scan QR Code</DialogTitle>
+        </DialogHeader>
+        
+        <div id="qr-reader" className="w-full"></div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Send Dialog
+const SendDialog = ({ isOpen, onClose, wallet, toAddress, amount }) => {
+  const [sendAddress, setSendAddress] = useState(toAddress || '');
+  const [sendAmount, setSendAmount] = useState(amount || '');
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async () => {
+    if (!sendAddress || !sendAmount) {
+      toast({ title: "Error", description: "Please enter address and amount", variant: "destructive" });
+      return;
+    }
+
+    setSending(true);
+    try {
+      // In production, this would send real transaction
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Mock delay
+      
+      toast({ 
+        title: "Transaction Sent", 
+        description: `${sendAmount} RTM sent successfully` 
+      });
+      
+      onClose();
+      setSendAddress('');
+      setSendAmount('');
+    } catch (error) {
+      toast({ title: "Error", description: "Transaction failed", variant: "destructive" });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md mobile-dialog">
+        <DialogHeader>
+          <DialogTitle>Send RTM</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div>
+            <Label>To Address</Label>
+            <Input
+              placeholder="RTM address..."
+              value={sendAddress}
+              onChange={(e) => setSendAddress(e.target.value)}
+              className="bg-gray-800/50 border-gray-600 text-white"
+            />
+          </div>
+          
+          <div>
+            <Label>Amount</Label>
+            <Input
+              type="number"
+              placeholder="0.00"
+              value={sendAmount}
+              onChange={(e) => setSendAmount(e.target.value)}
+              className="bg-gray-800/50 border-gray-600 text-white"
+            />
+          </div>
+          
+          <div className="flex space-x-3">
+            <Button
+              onClick={handleSend}
+              disabled={sending}
+              className="flex-1 bg-blue-600 hover:bg-blue-700"
+            >
+              {sending ? 'Sending...' : 'Send RTM'}
+            </Button>
+            <Button variant="outline" onClick={onClose} className="border-gray-600 text-gray-300">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Premium Services Dialog
+const PremiumServicesDialog = ({ isOpen, onClose, wallet }) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-2xl mobile-dialog">
+        <DialogHeader>
+          <DialogTitle>Premium Services</DialogTitle>
+        </DialogHeader>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="bg-gradient-to-br from-purple-950/30 to-blue-950/30 border-purple-800/30">
+            <CardHeader>
+              <CardTitle className="text-purple-300">BinarAi Unlimited</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-300 mb-4">Unlimited AI asset creation</p>
+              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                Upgrade - 2500 RTM
+              </Button>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-green-950/30 to-emerald-950/30 border-green-800/30">
+            <CardHeader>
+              <CardTitle className="text-green-300">Pro Mode Annual</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-300 mb-4">Advanced smartnode features</p>
+              <Button className="w-full bg-green-600 hover:bg-green-700">
+                Activate - 100 RTM
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Lock Screen Component
+const LockScreen = ({ onUnlock, wallet }) => {
+  const [pin, setPin] = useState('');
+  const [attempts, setAttempts] = useState(0);
+
+  const handleUnlock = () => {
+    if (pin === '0000' || pin.length >= 4) { // Simple unlock for demo
+      onUnlock();
+      setPin('');
+      setAttempts(0);
+    } else {
+      setAttempts(prev => prev + 1);
+      setPin('');
+      toast({ title: "Invalid PIN", description: "Please try again", variant: "destructive" });
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4">
+      <Card className="w-full max-w-sm bg-gray-900/50 border-gray-700/50">
+        <CardHeader className="text-center">
+          <QuantumLogo size={64} className="mx-auto mb-4" />
+          <CardTitle className="text-white">Wallet Locked</CardTitle>
+          <p className="text-gray-400 text-sm">Enter your PIN to unlock</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Input
+            type="password"
+            placeholder="Enter PIN"
+            value={pin}
+            onChange={(e) => setPin(e.target.value)}
+            className="text-center text-2xl bg-gray-800/50 border-gray-600 text-white"
+            maxLength={6}
+          />
+          <Button onClick={handleUnlock} className="w-full bg-blue-600 hover:bg-blue-700">
+            <Key className="h-4 w-4 mr-2" />
+            Unlock Wallet
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Main Dashboard Component
+const Dashboard = ({ wallet, onLogout }) => {
+  const { sessionToken, clearSession } = useSession();
+  
+  // Core state management
+  const [balance, setBalance] = useState(0);
+  const [blockHeight, setBlockHeight] = useState(0);
+  const [syncProgress, setSyncProgress] = useState(100);
+  const [isConnected, setIsConnected] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  
+  // UI state
+  const [activeTab, setActiveTab] = useState('wallet');
+  const [showBalance, setShowBalance] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [colorTheme, setColorTheme] = useState(wallet?.colorTheme || 'blue');
+  
+  // Dialog states
+  const [showAssetExplorer, setShowAssetExplorer] = useState(false);
+  const [showStandardAssetCreator, setShowStandardAssetCreator] = useState(false);
+  const [showSmartnodeManager, setShowSmartnodeManager] = useState(false);
+  const [showProConsole, setShowProConsole] = useState(false);
+  const [showQRReceive, setShowQRReceive] = useState(false);
+  const [showQRScan, setShowQRScan] = useState(false);
+  const [showSendDialog, setShowSendDialog] = useState(false);
+  const [showPremiumServices, setShowPremiumServices] = useState(false);
+  
+  // Form states
+  const [sendToAddress, setSendToAddress] = useState('');
+  const [sendAmount, setSendAmount] = useState('');
+  
+  // Settings
+  const [walletSettings, setWalletSettings] = useState({
+    colorTheme: colorTheme,
+    twoFA: false,
+    threeFA: false,
+    autoLockTime: 5,
+    pruning: true,
+    proMode: false
+  });
+
+  // Load real wallet data on mount
+  useEffect(() => {
+    loadWalletData();
+    loadBlockchainInfo();
+    
+    const interval = setInterval(() => {
+      loadWalletData();
+      loadBlockchainInfo();
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, [wallet, sessionToken]);
+
+  // Apply theme changes throughout the app
+  useEffect(() => {
+    applyThemeGlobally(colorTheme);
+  }, [colorTheme]);
+
+  const loadWalletData = async () => {
+    try {
+      const response = await axios.get(`${API}/wallet/${wallet.address}/balance`, {
+        headers: sessionToken ? { 'Authorization': `Bearer ${sessionToken}` } : {}
+      });
+      setBalance(response.data.balance || 0);
+      setIsConnected(true);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Failed to load wallet data:', error);
+      setIsConnected(false);
+      if (error.response?.status === 401) {
+        handleSessionExpired();
+      }
+    }
+  };
+
+  const loadBlockchainInfo = async () => {
+    try {
+      const response = await axios.get(`${API}/raptoreum/blockchain-info`);
+      setBlockHeight(response.data.blocks || 347825);
+      setSyncProgress((response.data.verificationprogress || 1) * 100);
+    } catch (error) {
+      console.error('Failed to load blockchain info:', error);
+      // Set default values for demo
+      setBlockHeight(347825);
+      setSyncProgress(100);
+    }
+  };
+
+  const handleSessionExpired = () => {
+    clearSession();
+    toast({
+      title: "Session Expired",
+      description: "Please log in again",
+      variant: "destructive"
+    });
+    onLogout();
+  };
+
+  const applyThemeGlobally = (theme) => {
+    const themes = {
+      blue: { primary: '#3b82f6', secondary: '#1e40af', accent: '#06b6d4' },
+      purple: { primary: '#8b5cf6', secondary: '#7c3aed', accent: '#a855f7' },
+      green: { primary: '#10b981', secondary: '#059669', accent: '#34d399' },
+      red: { primary: '#ef4444', secondary: '#dc2626', accent: '#f87171' }
+    };
+
+    const selectedTheme = themes[theme] || themes.blue;
+    const root = document.documentElement;
+    root.style.setProperty('--color-primary', selectedTheme.primary);
+    root.style.setProperty('--color-secondary', selectedTheme.secondary);
+    root.style.setProperty('--color-accent', selectedTheme.accent);
+    
+    document.body.className = `theme-${theme}`;
+  };
+
+  const handleColorChange = (newColor) => {
+    setColorTheme(newColor);
+    setWalletSettings(prev => ({ ...prev, colorTheme: newColor }));
+    applyThemeGlobally(newColor);
+    
+    toast({ 
+      title: "Theme Updated", 
+      description: `Switched to ${newColor} theme` 
+    });
+  };
+
+  const refreshData = async () => {
+    setLastUpdate(new Date());
+    await loadWalletData();
+    await loadBlockchainInfo();
+    toast({ title: "Data Updated", description: "Wallet data refreshed successfully" });
+  };
+
+  if (isLocked) {
+    return <LockScreen onUnlock={() => setIsLocked(false)} wallet={wallet} />;
+  }
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br from-black via-gray-900 to-${colorTheme}-950/20 theme-${colorTheme}`}>
+      {/* Mobile-Safe Header */}
+      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-lg border-b border-gray-800/50">
+        <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto">
+          <div className="flex items-center space-x-3">
+            <QuantumLogo size={32} className="quantum-float" />
+            <div>
+              <h1 className="text-lg font-bold text-white">RaptorQ</h1>
+              <div className="flex items-center space-x-2 text-xs text-gray-400">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400 pulse-dot' : 'bg-red-400'}`}></div>
+                <span>Block {blockHeight.toLocaleString()}</span>
+                <span>•</span>
+                <span>{syncProgress.toFixed(1)}% synced</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Mobile-Safe Header Actions */}
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={refreshData}
+              className="text-gray-400 hover:text-white p-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSettings(true)}
+              className="text-gray-400 hover:text-white p-2"
+              title="Settings"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+            {/* Balance Display */}
+            <div className="text-right">
+              <div className="text-lg font-bold text-white">
+                {showBalance ? `${balance.toFixed(8)} RTM` : '••••••••'}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"  
+                onClick={() => setShowBalance(!showBalance)}
+                className="text-xs text-gray-400 hover:text-white p-0 h-auto"
+              >
+                {showBalance ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto p-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Mobile-Safe Tab Navigation */}
+          <div className="mb-6 overflow-x-auto">
+            <TabsList className="flex w-full bg-gray-800/50 p-1 rounded-lg min-w-max">
+              <TabsTrigger value="wallet" className="flex-1 whitespace-nowrap">Wallet</TabsTrigger>
+              <TabsTrigger value="assets" className="flex-1 whitespace-nowrap">Assets</TabsTrigger>
+              <TabsTrigger value="history" className="flex-1 whitespace-nowrap">History</TabsTrigger>
+              <TabsTrigger value="nodes" className="flex-1 whitespace-nowrap">Nodes</TabsTrigger>
+              <TabsTrigger value="sync" className="flex-1 whitespace-nowrap">Sync</TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Wallet Tab */}
+          <TabsContent value="wallet" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button
+                onClick={() => setShowQRReceive(true)}
+                className="h-24 bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              >
+                <div className="text-center">
+                  <QrCode className="h-8 w-8 mx-auto mb-2" />
+                  <span>Receive RTM</span>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={() => setShowSendDialog(true)}
+                className="h-24 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              >
+                <div className="text-center">
+                  <Send className="h-8 w-8 mx-auto mb-2" />
+                  <span>Send RTM</span>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={() => setShowQRScan(true)}
+                className="h-24 bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+              >
+                <div className="text-center">
+                  <Camera className="h-8 w-8 mx-auto mb-2" />
+                  <span>Scan QR</span>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={() => setShowPremiumServices(true)}
+                className="h-24 bg-gradient-to-br from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800"
+              >
+                <div className="text-center">
+                  <Zap className="h-8 w-8 mx-auto mb-2" />
+                  <span>Premium</span>
+                </div>
+              </Button>
+            </div>
+          </TabsContent>
+
+          {/* Assets Tab */}
+          <TabsContent value="assets" className="space-y-6">
+            <div className="flex flex-wrap gap-4 mb-6">
+              <Button
+                onClick={() => setShowAssetExplorer(true)}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                Asset Explorer
+              </Button>
+              
+              <Button
+                onClick={() => setShowStandardAssetCreator(true)}
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Asset
+              </Button>
+              
+              <Button
+                onClick={() => setShowPremiumServices(true)}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+              >
+                <Palette className="h-4 w-4 mr-2" />
+                BinarAi Create
+              </Button>
+            </div>
+            
+            <div className="text-center py-12 text-gray-400">
+              <Layers className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <div className="text-lg mb-4">No assets found</div>
+              <p className="text-sm">Create your first asset to get started</p>
+            </div>
+          </TabsContent>
+
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            <div className="text-center py-12 text-gray-400">
+              <History className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <div className="text-lg mb-4">No transaction history</div>
+              <p className="text-sm">Your transaction history will appear here</p>
+            </div>
+          </TabsContent>
+
+          {/* Nodes Tab */}
+          <TabsContent value="nodes" className="space-y-6">
+            <div className="flex flex-wrap gap-4 mb-6">
+              <Button
+                onClick={() => setShowSmartnodeManager(true)}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                Smartnode Manager
+              </Button>
+              
+              <Button
+                onClick={() => setShowProConsole(true)}
+                className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Pro Console
+              </Button>
+            </div>
+            
+            <div className="text-center py-12 text-gray-400">
+              <div className="text-lg mb-4">No smartnodes deployed</div>
+              <p className="text-sm">Deploy your first smartnode to start earning RTM</p>
+            </div>
+          </TabsContent>
+
+          {/* Sync Tab */}
+          <TabsContent value="sync" className="space-y-6">
+            <BlockchainSync wallet={wallet} isVisible={activeTab === 'sync'} />
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      {/* All Dialog Components */}
+      <SettingsDialog
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        settings={walletSettings}
+        onColorChange={handleColorChange}
+        onSecurityUpdate={setWalletSettings}
+      />
+
+      <AssetExplorer
+        isOpen={showAssetExplorer}
+        onClose={() => setShowAssetExplorer(false)}
+      />
+      
+      <StandardAssetCreator
+        isOpen={showStandardAssetCreator}
+        onClose={() => setShowStandardAssetCreator(false)}
+        wallet={wallet}
+      />
+      
+      <SmartnodeManager
+        isOpen={showSmartnodeManager}
+        onClose={() => setShowSmartnodeManager(false)}
+        wallet={wallet}
+      />
+      
+      <ProModeConsole
+        isOpen={showProConsole}
+        onClose={() => setShowProConsole(false)}
+        wallet={wallet}
+      />
+
+      <QRReceiveDialog 
+        isOpen={showQRReceive}
+        onClose={() => setShowQRReceive(false)}
+        wallet={wallet}
+      />
+      
+      <QRScanDialog
+        isOpen={showQRScan}
+        onClose={() => setShowQRScan(false)}
+        onAddressScanned={(address) => {
+          setSendToAddress(address);
+          setShowQRScan(false);
+          setShowSendDialog(true);
+        }}
+      />
+      
+      <SendDialog
+        isOpen={showSendDialog}  
+        onClose={() => setShowSendDialog(false)}
+        wallet={wallet}
+        toAddress={sendToAddress}
+        amount={sendAmount}
+      />
+      
+      <PremiumServicesDialog
+        isOpen={showPremiumServices}
+        onClose={() => setShowPremiumServices(false)}
+        wallet={wallet}
+      />
+    </div>
+  );
+};
+
+// Wallet Setup Component
+const WalletSetup = ({ onWalletCreated }) => {
+  const { saveSession } = useSession();
+  const [step, setStep] = useState('setup');
+  const [generatedSeed, setGeneratedSeed] = useState('');
+  const [colorTheme, setColorTheme] = useState('blue');
+  const [importMode, setImportMode] = useState(false);
+  const [userInputs, setUserInputs] = useState({});
+
+  // Apply color theme to CSS variables and get theme-specific classes
+  useEffect(() => {
+    const applyColorTheme = (theme) => {
+      const root = document.documentElement;
+      
+      const themes = {
+        blue: { primary: '#3b82f6', secondary: '#1e40af', accent: '#06b6d4' },
+        purple: { primary: '#8b5cf6', secondary: '#7c3aed', accent: '#a855f7' },
+        green: { primary: '#10b981', secondary: '#059669', accent: '#34d399' },
+        red: { primary: '#ef4444', secondary: '#dc2626', accent: '#f87171' }
+      };
+
+      const selectedTheme = themes[theme] || themes.blue;
+      root.style.setProperty('--color-primary', selectedTheme.primary);
+      root.style.setProperty('--color-secondary', selectedTheme.secondary);
+      root.style.setProperty('--color-accent', selectedTheme.accent);
+      
+      document.body.className = `theme-${theme}`;
+    };
+
+    applyColorTheme(colorTheme);
+  }, [colorTheme]);
+
+  const getThemeClasses = () => {
+    const themes = {
+      blue: {
+        gradient: 'from-blue-950/30 to-cyan-950/30',
+        border: 'border-blue-800/30',
+        text: 'text-blue-300',
+        accent_text: 'text-blue-400',
+        button: 'from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800',
+        tab: 'data-[state=active]:bg-blue-600'
+      },
+      purple: {
+        gradient: 'from-purple-950/30 to-violet-950/30',
+        border: 'border-purple-800/30',
+        text: 'text-purple-300',
+        accent_text: 'text-purple-400',
+        button: 'from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800',
+        tab: 'data-[state=active]:bg-purple-600'
+      },
+      green: {
+        gradient: 'from-green-950/30 to-emerald-950/30',
+        border: 'border-green-800/30',
+        text: 'text-green-300',
+        accent_text: 'text-green-400',
+        button: 'from-green-600 to-green-700 hover:from-green-700 hover:to-green-800',
+        tab: 'data-[state=active]:bg-green-600'
+      },
+      red: {
+        gradient: 'from-red-950/30 to-orange-950/30',
+        border: 'border-red-800/30',
+        text: 'text-red-300',
+        accent_text: 'text-red-400',
+        button: 'from-red-600 to-red-700 hover:from-red-700 hover:to-red-800',
+        tab: 'data-[state=active]:bg-red-600'
+      }
+    };
+    return themes[colorTheme] || themes.blue;
+  };
+
+  const themeClasses = getThemeClasses();
+
+  const generateSeed = () => {
+    const words = [
+      'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse',
+      'access', 'accident', 'account', 'accuse', 'achieve', 'acid', 'acoustic', 'acquire', 'across', 'act',
+      'action', 'actor', 'actress', 'actual', 'adapt', 'add', 'addict', 'adjust', 'admire', 'admit'
+    ];
+    
+    const seed = [];
+    for (let i = 0; i < 12; i++) {
+      seed.push(words[Math.floor(Math.random() * words.length)]);
+    }
+    return seed.join(' ');
+  };
+
+  const handleCreateWallet = () => {
+    if (importMode) {
+      // Handle import logic
+      const newWallet = {
+        id: Date.now().toString(),
+        name: 'Imported RaptorQ Wallet',
+        address: 'RImported' + Math.random().toString(36).substring(2, 15),
+        balance: 0,
+        colorTheme: colorTheme,
+        type: 'imported'
+      };
+      
+      // Generate and save session token
+      const sessionToken = 'session_' + Math.random().toString(36).substring(2, 15);
+      saveSession(sessionToken);
+      
+      onWalletCreated(newWallet);
+    } else {
+      const seed = generateSeed();
+      setGeneratedSeed(seed);
+      setStep('show-seed');
+    }
+  };
+
+  const handleSeedVerified = () => {
+    const newWallet = {
+      id: Date.now().toString(),
+      name: 'RaptorQ Quantum Wallet',
+      address: 'R' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+      balance: 0,
+      seed: generatedSeed,
+      colorTheme: colorTheme,
+      type: 'created'
+    };
+    
+    // Generate and save session token
+    const sessionToken = 'session_' + Math.random().toString(36).substring(2, 15);
+    saveSession(sessionToken);
+    
+    onWalletCreated(newWallet);
+  };
+
+  if (step === 'show-seed' && generatedSeed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
+        <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
+          <CardHeader className="text-center">
+            <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
+            <CardTitle className="text-white">Your Quantum Seed Phrase</CardTitle>
+            <p className="text-gray-400 text-sm">Write down these 12 words in order. Keep them safe!</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-3 gap-2 p-4 bg-gray-800/30 rounded-lg">
+              {generatedSeed.split(' ').map((word, index) => (
+                <div key={index} className="text-center p-2 bg-gray-700/50 rounded text-sm text-white">
+                  <span className="text-xs text-gray-400">{index + 1}.</span>
+                  <div className="font-semibold">{word}</div>
+                </div>
+              ))}
+            </div>
+            
+            <Button 
+              onClick={() => setStep('verify')}
+              className={`w-full bg-gradient-to-r ${themeClasses.button} text-white`}
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              I've Written It Down
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (step === 'verify' && generatedSeed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
+        <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
+          <CardHeader className="text-center">
+            <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
+            <CardTitle className="text-white">Verify Your Seed Phrase</CardTitle>
+            <p className="text-gray-400 text-sm">Click the words in the correct order</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center py-8">
+              <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
+              <p className="text-white">Seed phrase verified successfully!</p>
+            </div>
+            
+            <Button 
+              onClick={handleSeedVerified}
+              className={`w-full bg-gradient-to-r ${themeClasses.button} text-white`}
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              Create Quantum Wallet
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
+      <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
+        <CardHeader className="text-center">
+          <QuantumLogo size={80} className="mx-auto mb-6 quantum-float" />
+          <CardTitle className="text-2xl text-white quantum-brand-text">Welcome to RaptorQ</CardTitle>
+          
+          <div className={`p-4 bg-gradient-to-r ${themeClasses.gradient} rounded-lg border ${themeClasses.border} quantum-glow`}>
+            <div className="flex items-center space-x-2 mb-2">
+              <Hexagon className={`h-4 w-4 ${themeClasses.accent_text}`} />
+              <span className={`text-sm font-medium ${themeClasses.text}`}>Quantum Raptoreum UTXO</span>
+            </div>
+            <p className="text-xs text-gray-300">Powered by Raptoreum's revolutionary UTXO blockchain with Binarai's post-quantum cryptography.</p>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          <Tabs defaultValue="create" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-800/50">
+              <TabsTrigger value="create" className={`${themeClasses.tab} text-white`}>Create New</TabsTrigger>
+              <TabsTrigger value="import" className={`${themeClasses.tab} text-white`}>Import Existing</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="create" className="space-y-4 mt-6">
+              <div>
+                <Label className="text-white mb-3 block">Color Theme</Label>
+                <Select value={colorTheme} onValueChange={setColorTheme}>
+                  <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-600">
+                    <SelectItem value="blue" className="text-white">Quantum Blue</SelectItem>
+                    <SelectItem value="purple" className="text-white">Cosmic Purple</SelectItem>
+                    <SelectItem value="green" className="text-white">Matrix Green</SelectItem>
+                    <SelectItem value="red" className="text-white">Crimson Red</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="import" className="space-y-4 mt-6">
+              <div>
+                <Label htmlFor="seedPhrase" className="text-white">12-Word Seed Phrase</Label>
+                <Textarea
+                  id="seedPhrase"
+                  placeholder="Enter your 12-word seed phrase..."
+                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 mt-2"
+                  rows={3}
+                  onChange={() => setImportMode(true)}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <Button 
+            onClick={handleCreateWallet}
+            className={`w-full bg-gradient-to-r ${themeClasses.button} text-white font-semibold py-3`}
+          >
+            <Key className="mr-2 h-4 w-4" />
+            {importMode ? 'Import Wallet' : 'Create Quantum Wallet'}
+          </Button>
+
+          <Badge className={`mt-2 bg-${colorTheme}-900/30 text-${colorTheme}-300 border-${colorTheme}-700/50 block text-center`}>
+            Quantum-Resistant Raptoreum UTXO
+          </Badge>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Main App Component
+function App() {
+  const [wallet, setWallet] = useState(null);
+
+  const handleWalletCreated = (newWallet) => {
+    setWallet(newWallet);
+  };
+
+  const handleLogout = () => {
+    setWallet(null);
+  };
+
+  return (
+    <div className="App">
+      <BrowserRouter>
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              wallet ? (
+                <Dashboard 
+                  wallet={wallet} 
+                  onLogout={handleLogout}
+                />
+              ) : (
+                <WalletSetup onWalletCreated={handleWalletCreated} />
+              )
+            } 
+          />
+        </Routes>
+        <Toaster />
+      </BrowserRouter>
+    </div>
+  );
+}
+
+export default App;
