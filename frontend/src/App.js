@@ -1849,7 +1849,7 @@ const WalletSetup = ({ onWalletCreated }) => {
   const [importMode, setImportMode] = useState(false);
   const [colorTheme, setColorTheme] = useState('blue');
 
-  // Apply color theme to CSS variables
+  // Apply color theme to CSS variables and get theme-specific classes
   useEffect(() => {
     const applyColorTheme = (theme) => {
       const root = document.documentElement;
@@ -1858,22 +1858,38 @@ const WalletSetup = ({ onWalletCreated }) => {
         blue: {
           primary: '#3b82f6',
           secondary: '#1e40af',
-          accent: '#06b6d4'
+          accent: '#06b6d4',
+          gradient: 'from-blue-950/30 to-cyan-950/30',
+          border: 'border-blue-800/30',
+          text: 'text-blue-300',
+          accent_text: 'text-blue-400'
         },
         purple: {
           primary: '#8b5cf6',
           secondary: '#7c3aed',
-          accent: '#a855f7'
+          accent: '#a855f7',
+          gradient: 'from-purple-950/30 to-violet-950/30',
+          border: 'border-purple-800/30',
+          text: 'text-purple-300',
+          accent_text: 'text-purple-400'
         },
         green: {
           primary: '#10b981',
           secondary: '#059669',
-          accent: '#34d399'
+          accent: '#34d399',
+          gradient: 'from-green-950/30 to-emerald-950/30',
+          border: 'border-green-800/30',
+          text: 'text-green-300',
+          accent_text: 'text-green-400'
         },
         red: {
           primary: '#ef4444',
           secondary: '#dc2626',
-          accent: '#f87171'
+          accent: '#f87171',
+          gradient: 'from-red-950/30 to-orange-950/30',
+          border: 'border-red-800/30',
+          text: 'text-red-300',
+          accent_text: 'text-red-400'
         }
       };
 
@@ -1881,10 +1897,54 @@ const WalletSetup = ({ onWalletCreated }) => {
       root.style.setProperty('--color-primary', selectedTheme.primary);
       root.style.setProperty('--color-secondary', selectedTheme.secondary);
       root.style.setProperty('--color-accent', selectedTheme.accent);
+      
+      // Store theme classes for component use
+      window.currentTheme = selectedTheme;
     };
 
     applyColorTheme(colorTheme);
   }, [colorTheme]);
+
+  // Get current theme classes
+  const getThemeClasses = () => {
+    const themes = {
+      blue: {
+        gradient: 'from-blue-950/30 to-cyan-950/30',
+        border: 'border-blue-800/30',
+        text: 'text-blue-300',
+        accent_text: 'text-blue-400',
+        button: 'from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800',
+        tab: 'data-[state=active]:bg-blue-600'
+      },
+      purple: {
+        gradient: 'from-purple-950/30 to-violet-950/30',
+        border: 'border-purple-800/30',
+        text: 'text-purple-300',
+        accent_text: 'text-purple-400',
+        button: 'from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800',
+        tab: 'data-[state=active]:bg-purple-600'
+      },
+      green: {
+        gradient: 'from-green-950/30 to-emerald-950/30',
+        border: 'border-green-800/30',
+        text: 'text-green-300',
+        accent_text: 'text-green-400',
+        button: 'from-green-600 to-green-700 hover:from-green-700 hover:to-green-800',
+        tab: 'data-[state=active]:bg-green-600'
+      },
+      red: {
+        gradient: 'from-red-950/30 to-orange-950/30',
+        border: 'border-red-800/30',
+        text: 'text-red-300',
+        accent_text: 'text-red-400',
+        button: 'from-red-600 to-red-700 hover:from-red-700 hover:to-red-800',
+        tab: 'data-[state=active]:bg-red-600'
+      }
+    };
+    return themes[colorTheme] || themes.blue;
+  };
+
+  const themeClasses = getThemeClasses();
   const [step, setStep] = useState('create');
   const [generatedSeed, setGeneratedSeed] = useState('');
   const [showSeedPhrase, setShowSeedPhrase] = useState(false);
