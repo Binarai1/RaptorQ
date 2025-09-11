@@ -2152,10 +2152,10 @@ const WalletSetup = ({ onWalletCreated }) => {
                 </Select>
               </div>
               
-              <div className="p-4 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30 quantum-glow">
+              <div className={`p-4 bg-gradient-to-r ${themeClasses.gradient} rounded-lg border ${themeClasses.border} quantum-glow`}>
                 <div className="flex items-center space-x-2 mb-2">
-                  <Hexagon className="h-4 w-4 text-blue-400" />
-                  <span className="text-sm font-medium text-blue-300">Quantum Raptoreum UTXO</span>
+                  <Hexagon className={`h-4 w-4 ${themeClasses.accent_text}`} />
+                  <span className={`text-sm font-medium ${themeClasses.text}`}>Quantum Raptoreum UTXO</span>
                 </div>
                 <p className="text-xs text-gray-300">Powered by Raptoreum's revolutionary UTXO blockchain with Binarai's post-quantum cryptography.</p>
               </div>
