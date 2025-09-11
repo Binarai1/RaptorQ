@@ -544,6 +544,7 @@ const Dashboard = ({ wallet, onLogout }) => {
   const [showStandardAssetCreator, setShowStandardAssetCreator] = useState(false);
   const [showSmartnodeManager, setShowSmartnodeManager] = useState(false);
   const [showProConsole, setShowProConsole] = useState(false);
+  const [showGlobalMap, setShowGlobalMap] = useState(false);
   const [showQRReceive, setShowQRReceive] = useState(false);
   const [showQRScan, setShowQRScan] = useState(false);
   const [showSendDialog, setShowSendDialog] = useState(false);
