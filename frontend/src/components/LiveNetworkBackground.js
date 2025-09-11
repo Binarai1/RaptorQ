@@ -163,23 +163,12 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
   const drawWorld = (ctx, canvas) => {
     const { width, height } = canvas;
     
-    // Clear canvas with deep space background (brighter)
+    // Clear canvas with clean deep space background
     const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
     gradient.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
     gradient.addColorStop(1, 'rgba(0, 0, 0, 0.98)');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
-    
-    // Add subtle stars
-    for (let i = 0; i < 100; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const brightness = Math.random();
-      ctx.beginPath();
-      ctx.arc(x, y, brightness * 1, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.6})`;
-      ctx.fill();
-    }
     
     // Draw continent outlines with rotation effect
     ctx.save();
