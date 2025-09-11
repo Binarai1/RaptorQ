@@ -2114,7 +2114,7 @@ const WalletSetup = ({ onWalletCreated }) => {
           <QuantumLogo size={64} className="mx-auto mb-4 quantum-float" />
           <CardTitle className="text-2xl font-bold quantum-brand-text">RaptorQ Wallet</CardTitle>
           <p className="text-gray-400">Quantum Raptoreum Revolutionizing UTXO</p>
-          <Badge className="mt-2 bg-blue-900/30 text-blue-300 border-blue-700/50">
+          <Badge className={`mt-2 ${themeClasses.gradient.replace('from-', 'bg-').replace('/30', '/30').split(' ')[0]} ${themeClasses.text} ${themeClasses.border}`}>
             Quantum-Resistant Raptoreum UTXO
           </Badge>
         </CardHeader>
