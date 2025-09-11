@@ -110,7 +110,7 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     }
   };
 
-  const createTransactionBird = () => {
+  const createTransactionBird = (type = 'rtm') => {
     const fromCountries = Object.keys(countryStats).filter(k => countryStats[k].nodes > 0);
     const fromCountry = fromCountries[Math.floor(Math.random() * fromCountries.length)];
     const toCountry = fromCountries[Math.floor(Math.random() * fromCountries.length)];
@@ -120,8 +120,29 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     const from = countryStats[fromCountry];
     const to = countryStats[toCountry];
     
+    // Different properties based on transaction type
+    const typeConfig = {
+      rtm: {
+        color: 'rgba(34, 211, 238, 1)', // Cyan for RTM
+        size: Math.random() * 0.4 + 0.3,
+        speed: Math.random() * 0.012 + 0.008,
+        emoji: '💎',
+        glow: 'rgba(34, 211, 238, 0.8)'
+      },
+      asset: {
+        color: 'rgba(251, 191, 36, 1)', // Golden for assets
+        size: Math.random() * 0.5 + 0.4,
+        speed: Math.random() * 0.010 + 0.006,
+        emoji: '🔰',
+        glow: 'rgba(251, 191, 36, 0.9)'
+      }
+    };
+    
+    const config = typeConfig[type] || typeConfig.rtm;
+    
     return {
-      id: `tx_${Date.now()}_${Math.random()}`,
+      id: `${type}_${Date.now()}_${Math.random()}`,
+      type,
       fromX: from.x,
       fromY: from.y,
       toX: to.x,
@@ -130,9 +151,12 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
       currentY: from.y,
       progress: 0,
       life: 1.0,
-      size: Math.random() * 0.3 + 0.2, // Tiny birds 0.2-0.5
-      speed: Math.random() * 0.008 + 0.005, // Slower flight
-      glowIntensity: Math.random() * 0.8 + 0.2
+      size: config.size,
+      speed: config.speed,
+      color: config.color,
+      emoji: config.emoji,
+      glow: config.glow,
+      glowIntensity: Math.random() * 0.9 + 0.6 // Brighter
     };
   };
 
