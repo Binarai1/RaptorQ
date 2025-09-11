@@ -140,17 +140,14 @@ const BlockchainSync = ({
     try {
       if (isPaused) {
         await axios.post('/api/raptoreum/resume-sync');
-        setAutoSync(true);
         setIsPaused(false);
       } else {
         await axios.post('/api/raptoreum/pause-sync');
-        setAutoSync(false);
         setIsPaused(true);
       }
     } catch (error) {
       console.error('Failed to pause/resume sync:', error);
       setIsPaused(!isPaused);
-      setAutoSync(!autoSync);
     }
   };
 
