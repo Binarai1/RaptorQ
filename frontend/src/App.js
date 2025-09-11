@@ -1822,7 +1822,7 @@ const AboutDialog = ({ isOpen, onClose }) => (
               future results. Always conduct your own research before making investment decisions.
             </p>
             <p>
-              By using QUANTXO, you agree to our Terms of Service and Privacy Policy. This software 
+              By using RaptorQ, you agree to our Terms of Service and Privacy Policy. This software 
               is designed for educational and experimental purposes in quantum-resistant blockchain technology.
             </p>
           </div>
