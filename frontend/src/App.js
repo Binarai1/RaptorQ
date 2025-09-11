@@ -594,13 +594,24 @@ const Dashboard = ({ wallet, onLogout }) => {
   const loadBlockchainInfo = async () => {
     try {
       const response = await axios.get(`${API}/raptoreum/blockchain-info`);
-      setBlockHeight(response.data.blocks || 347825);
-      setSyncProgress((response.data.verificationprogress || 1) * 100);
+      const blockData = response.data;
+      
+      // Use real block height from daemon/network
+      setBlockHeight(blockData.blocks || 0);
+      
+      // Use real sync progress from daemon
+      const realSyncProgress = blockData.sync_progress_percent || ((blockData.verificationprogress || 0) * 100);
+      setSyncProgress(realSyncProgress);
+      
+      // Set connection status based on real sync state
+      setIsConnected(blockData.connections > 0 && realSyncProgress > 50);
+      
     } catch (error) {
       console.error('Failed to load blockchain info:', error);
-      // Set default values for demo
-      setBlockHeight(347825);
-      setSyncProgress(100);
+      // For production wallet, show disconnected state if API fails
+      setBlockHeight(0);
+      setSyncProgress(0);
+      setIsConnected(false);
     }
   };
 
