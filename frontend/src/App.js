@@ -1268,8 +1268,11 @@ const WalletSetup = ({ onWalletCreated }) => {
   // Login step for returning users
   if (step === 'login' && existingWallet) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
-        <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in relative">
+        {/* Live Network Background */}
+        <LiveNetworkBackground isActive={true} />
+        
+        <Card className="w-full max-w-md quantum-glass backdrop-blur-md animate-fade-in-scale relative z-10 shadow-2xl border-green-400/20">
           <CardHeader className="text-center">
             <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
             <CardTitle className="text-white">Welcome Back to RaptorQ</CardTitle>
