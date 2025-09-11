@@ -1778,15 +1778,11 @@ async def get_raptoreum_daemon_status():
         # Simulate realistic daemon sync status from last shutdown point
         # Daemon was last synced to a specific block and is now catching up
         
-        # Calculate realistic mainnet block progression
-        genesis_time = datetime(2021, 2, 26, tzinfo=timezone.utc)  # Raptoreum mainnet launch
-        time_since_genesis = (current_time - genesis_time).total_seconds()
-        
-        # Realistic current mainnet block (grows over time)
-        current_mainnet_block = int(2850000 + (time_since_genesis % 100000) / 60)  # Slow realistic growth
+        # Get real current Raptoreum network block height
+        current_mainnet_block = await get_real_raptoreum_block_height()
         
         # Simulate daemon that was shut down and is now syncing from previous point
-        last_known_block = current_mainnet_block - 15000  # 15K blocks behind (realistic for restart)
+        last_known_block = current_mainnet_block - 8500  # 8.5K blocks behind (realistic for restart)
         
         # Calculate sync progress - daemon catching up from last known point
         sync_start_time = current_time - timedelta(minutes=45)  # Started syncing 45 min ago
