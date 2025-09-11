@@ -2855,9 +2855,9 @@ const Dashboard = ({ wallet, onLogout }) => {
                   <p className="text-sm text-gray-400 mb-2">Quantum Signature</p>
                   <div className="p-3 bg-gradient-to-r from-blue-950/30 to-cyan-950/30 rounded-lg border border-blue-800/30">
                     <div className="text-xs space-y-1">
-                      <p><span className="text-blue-300">Created with:</span> {selectedAsset.metadata.quantxo_signature.created_with}</p>
+                      <p><span className="text-blue-300">Created with:</span> {selectedAsset.metadata.raptorq_signature.created_with}</p>
                       <p><span className="text-blue-300">Quantum Resistant:</span> ✓</p>
-                      <p><span className="text-blue-300">Blockchain:</span> {selectedAsset.metadata.quantxo_signature.utxo_blockchain}</p>
+                      <p><span className="text-blue-300">Blockchain:</span> {selectedAsset.metadata.raptorq_signature.utxo_blockchain}</p>
                     </div>
                   </div>
                 </div>
