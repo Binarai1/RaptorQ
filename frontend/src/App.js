@@ -1814,7 +1814,7 @@ const AboutDialog = ({ isOpen, onClose }) => (
           <h3 className="font-semibold text-yellow-300 mb-2">Legal Disclaimer</h3>
           <div className="text-xs text-gray-300 space-y-2">
             <p>
-              QUANTXO Wallet is provided "as is" without warranty of any kind. Users assume full 
+              RaptorQ Wallet is provided "as is" without warranty of any kind. Users assume full 
               responsibility for the security of their private keys and digital assets.
             </p>
             <p>
