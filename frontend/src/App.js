@@ -1661,7 +1661,7 @@ const WalletSetup = ({ onWalletCreated }) => {
       {/* Live Network Background */}
       <LiveNetworkBackground isActive={true} />
       
-      <Card className="w-full max-w-md quantum-glass backdrop-blur-md animate-fade-in-scale relative z-10 shadow-2xl border-green-400/20">
+      <Card className="w-full max-w-md backdrop-blur-sm animate-fade-in-scale relative z-10 shadow-2xl border-green-400/40 bg-gray-900/25">
         <CardHeader className="text-center">
           <QuantumLogo size={80} className="mx-auto mb-6 quantum-float" />
           <CardTitle className="text-2xl text-white quantum-brand-text">Welcome to RaptorQ</CardTitle>
