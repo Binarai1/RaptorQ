@@ -2511,7 +2511,7 @@ const Dashboard = ({ wallet, onLogout }) => {
       metadata: {
         description: newAsset.description || 'AI-generated quantum asset',
         raptorq_signature: {
-          created_with: "QUANTXO by Binarai",
+          created_with: "RaptorQ by Binarai",
           quantum_resistant: true,
           utxo_blockchain: "Raptoreum",
           version: "1.0.0",
