@@ -16,6 +16,14 @@ import { Textarea } from './components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
 import { toast } from './hooks/use-toast';
 import { Toaster } from './components/ui/toaster';
+
+// Import production components
+import AssetExplorer from './components/AssetExplorer';
+import StandardAssetCreator from './components/StandardAssetCreator';
+import BlockchainSync from './components/BlockchainSync';
+import ProModeConsole from './components/ProModeConsole';
+import SmartnodeManager from './components/SmartnodeManager';
+
 import { 
   Wallet, 
   Plus, 
