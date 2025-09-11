@@ -2199,7 +2199,7 @@ const WalletSetup = ({ onWalletCreated }) => {
 
           <Button 
             onClick={handleCreateWallet}
-            className="w-full quantum-btn-primary font-semibold py-3"
+            className={`w-full bg-gradient-to-r ${themeClasses.button} text-white font-semibold py-3`}
           >
             <Key className="mr-2 h-4 w-4" />
             {importMode ? 'Import Wallet' : 'Create Quantum Wallet'}
