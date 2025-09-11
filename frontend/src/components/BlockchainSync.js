@@ -69,52 +69,67 @@ const BlockchainSync = ({ wallet, isVisible = true }) => {
 
   const updateSyncStatus = async () => {
     try {
-      // In production, this would call Raptoreum RPC getblockchaininfo
-      const response = await axios.get('/api/raptoreum/blockchain-info');
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/raptoreum/blockchain-info`);
       const data = response.data;
-
-      const currentTime = Date.now();
-      const timeDiff = (currentTime - lastUpdateRef.current) / 1000; // seconds
-      const blockDiff = data.blocks - lastBlockRef.current;
-      const syncSpeed = blockDiff / timeDiff; // blocks per second
-
-      // Calculate ETA
-      const blocksLeft = data.headers - data.blocks;
-      const eta = syncSpeed > 0 ? (blocksLeft / syncSpeed) : 0;
-
+      
+      const currentBlock = parseInt(data.blocks) || 0;
+      const highestBlock = parseInt(data.headers) || currentBlock;
+      const blocksLeft = Math.max(0, highestBlock - currentBlock);
+      const progress = data.sync_progress_percent || ((data.verificationprogress || 1) * 100);
+      const verificationProgress = (data.verificationprogress || 1) * 100;
+      
+      // Calculate sync speed (blocks per minute)
+      const now = Date.now();
+      const timeDiff = (now - lastUpdateRef.current) / 1000 / 60; // minutes
+      const blockDiff = currentBlock - lastBlockRef.current;
+      const syncSpeed = timeDiff > 0 ? blockDiff / timeDiff : 0;
+      
+      // Get estimated sync time from backend
+      const etaString = data.estimated_sync_time || "Calculating...";
+      let eta = 0;
+      if (etaString.includes('minutes')) {
+        eta = parseFloat(etaString.match(/(\d+)/)?.[1] || 0);
+      }
+      
       const newStatus = {
-        isSync: data.blocks < data.headers,
-        currentBlock: data.blocks,
-        highestBlock: data.headers,
-        blocksLeft: blocksLeft,
-        progress: data.headers > 0 ? (data.blocks / data.headers) * 100 : 0,
-        connectionCount: data.connections || 8,
+        isSync: data.is_syncing || false,
+        currentBlock,
+        highestBlock,
+        blocksLeft,
+        progress: Math.min(100, Math.max(progress, verificationProgress)),
+        connectionCount: data.connections || 0,
         networkHashrate: data.networkhashps || 0,
         difficulty: data.difficulty || 0,
-        syncSpeed: syncSpeed > 0 ? syncSpeed : 0,
+        syncSpeed: Math.max(0, syncSpeed),
         eta: eta,
-        chainSize: data.size_on_disk || 0,
-        verificationProgress: data.verificationprogress || 1
+        chainSize: data.node_info?.local_blockchain_size_gb || (data.size_on_disk / (1024 * 1024 * 1024)),
+        verificationProgress,
+        publicNodes: data.public_nodes_connected || [],
+        daemonVersion: data.raptoreum_specific?.daemon_version || "Unknown",
+        protocolVersion: data.raptoreum_specific?.protocol_version || 0
       };
-
+      
       setSyncStatus(newStatus);
-
-      // Update history for speed calculation
-      lastBlockRef.current = data.blocks;
-      lastUpdateRef.current = currentTime;
-
-      // Add to sync history (keep last 30 entries)
+      
+      // Update references for next calculation
+      if (blockDiff > 0) {
+        lastBlockRef.current = currentBlock;
+        lastUpdateRef.current = now;
+      }
+      
+      // Add to sync history
       setSyncHistory(prev => {
         const newHistory = [...prev, {
-          timestamp: currentTime,
-          block: data.blocks,
-          speed: syncSpeed
-        }].slice(-30);
-        return newHistory;
+          timestamp: now,
+          block: currentBlock,
+          progress: newStatus.progress
+        }];
+        // Keep only last 50 entries
+        return newHistory.slice(-50);
       });
-
+      
     } catch (error) {
-      console.error('Failed to update sync status:', error);
+      console.error('Failed to load sync status:', error);
       // Mock data for development
       updateMockSyncStatus();
     }
