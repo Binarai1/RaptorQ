@@ -1017,7 +1017,16 @@ const Dashboard = ({ wallet, onLogout }) => {
 
           {/* Sync Tab */}
           <TabsContent value="sync" className="space-y-6">
-            <BlockchainSync wallet={wallet} isVisible={activeTab === 'sync'} />
+            <BlockchainSync 
+              isVisible={true} // Always visible in sync tab
+              autoSync={true} // Always auto-sync for production wallet
+              syncProgress={syncProgress}
+              blockHeight={blockHeight}
+              isConnected={isConnected}
+              daemonSyncing={daemonSyncing}
+              networkStats={networkStats}
+              showSyncAnimation={daemonSyncing || syncProgress < 99.9}
+            />
           </TabsContent>
         </Tabs>
       </main>
