@@ -2121,8 +2121,8 @@ const WalletSetup = ({ onWalletCreated }) => {
         <CardContent className="space-y-6">
           <Tabs value={importMode ? "import" : "create"} onValueChange={(v) => setImportMode(v === "import")}>
             <TabsList className="grid w-full grid-cols-2 bg-gray-800/50">
-              <TabsTrigger value="create" className="data-[state=active]:bg-blue-600 text-white">Create New</TabsTrigger>
-              <TabsTrigger value="import" className="data-[state=active]:bg-blue-600 text-white">Import Existing</TabsTrigger>
+              <TabsTrigger value="create" className={`${themeClasses.tab} text-white`}>Create New</TabsTrigger>
+              <TabsTrigger value="import" className={`${themeClasses.tab} text-white`}>Import Existing</TabsTrigger>
             </TabsList>
             
             <TabsContent value="create" className="space-y-4">
