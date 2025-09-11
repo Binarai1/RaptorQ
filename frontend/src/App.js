@@ -1038,6 +1038,12 @@ const Dashboard = ({ wallet, onLogout }) => {
       {/* Note: Sync animation bar moved to sync tab progress area */}
 
       {/* All Dialog Components */}
+      
+      {/* Global Smartnode Map */}
+      <GlobalSmartnodeMap
+        isOpen={showGlobalMap}
+        onClose={() => setShowGlobalMap(false)}
+      />
       <SettingsDialog
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
