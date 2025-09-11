@@ -943,6 +943,64 @@ const WalletSetup = ({ onWalletCreated }) => {
 
   const themeClasses = getThemeClasses();
 
+  // Login step for returning users
+  if (step === 'login' && existingWallet) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
+        <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
+          <CardHeader className="text-center">
+            <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
+            <CardTitle className="text-white">Welcome Back to RaptorQ</CardTitle>
+            <p className="text-gray-400 text-sm">Enter your password to access your wallet</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label className="text-white">Wallet Password</Label>
+              <Input
+                type="password"
+                placeholder="Enter your wallet password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError('');
+                }}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                onKeyPress={(e) => e.key === 'Enter' && handlePasswordLogin()}
+              />
+              {passwordError && (
+                <p className="text-red-400 text-xs mt-1">{passwordError}</p>
+              )}
+            </div>
+
+            <div className="flex space-x-3 pt-4">
+              <Button
+                onClick={handlePasswordLogin}
+                disabled={!password}
+                className={`flex-1 ${themeClasses.button}`}
+              >
+                <Key className="h-4 w-4 mr-2" />
+                Unlock Wallet
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  localStorage.removeItem('raptorq_wallet_encrypted');
+                  setExistingWallet(null);
+                  setStep('setup');
+                  setPassword('');
+                  setPasswordError('');
+                }}
+                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                New Wallet
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const generateSeed = () => {
     const words = [
       'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse',
