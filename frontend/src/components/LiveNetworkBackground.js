@@ -377,7 +377,7 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
         
         // Higher orbit for assets
         const orbitRadius = earthRadius * 1.5;
-        const angle = (bird.progress * Math.PI * 1.5) + (bird.id.hashCode() * 0.2);
+        const angle = (bird.progress * Math.PI * 1.5) + (simpleHash(bird.id) * 0.2);
         const x = earthCenterX + Math.cos(angle) * orbitRadius;
         const y = earthCenterY + Math.sin(angle) * orbitRadius * 0.7;
         
