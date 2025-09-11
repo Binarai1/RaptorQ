@@ -32,6 +32,8 @@
 .theme-text-primary {
   color: var(--color-primary);
 }
+
+body {
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
