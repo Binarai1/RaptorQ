@@ -1279,9 +1279,14 @@ const WalletSetup = ({ onWalletCreated }) => {
           onMinimize={() => setShowNetworkViz(false)}
         />
         
-        <Card className={`w-full max-w-md quantum-glass backdrop-blur-md animate-fade-in-scale relative shadow-2xl border-green-400/20 transition-all duration-500 ${
-          showNetworkViz ? 'z-0 scale-75 opacity-30' : 'z-10'
-        }`}>
+        <Card className={`w-full max-w-md backdrop-blur-sm animate-fade-in-scale relative shadow-2xl border-green-400/30 transition-all duration-500 ${
+          showNetworkViz ? 'z-0 scale-75 opacity-20' : 'z-10 bg-gray-900/20 border-green-400/40'
+        }`} 
+        style={{
+          background: showNetworkViz 
+            ? 'rgba(17, 24, 39, 0.15)' 
+            : 'rgba(17, 24, 39, 0.25)'
+        }}>
           <CardHeader className="text-center">
             <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
             <CardTitle className="text-white">Welcome Back to RaptorQ</CardTitle>
