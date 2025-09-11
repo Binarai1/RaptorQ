@@ -720,6 +720,23 @@ const Dashboard = ({ wallet, onLogout }) => {
               >
                 {showBalance ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
               </Button>
+              
+              {/* Lock Wallet Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  toast({
+                    title: "Wallet Locked",
+                    description: "Enter your password to unlock"
+                  });
+                  onLogout(); // This will lock the wallet and return to login screen
+                }}
+                className="text-xs text-gray-400 hover:text-red-400 p-1 h-auto"
+                title="Lock Wallet"
+              >
+                <Lock className="h-3 w-3" />
+              </Button>
             </div>
           </div>
         </div>
