@@ -54,7 +54,7 @@ const SMARTNODE_CONFIG = {
   }
 };
 
-const SmartnodeManager = ({ isOpen, onClose, wallet }) => {
+const SmartnodeManager = ({ isOpen, onClose, wallet, embedded = false }) => {
   const [smartnodes, setSmartnodes] = useState([]);
   const [allSmartnodes, setAllSmartnodes] = useState([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
