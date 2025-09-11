@@ -262,7 +262,7 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     });
   };
 
-  const drawCountryNodes = (ctx, canvas) => {
+  const drawSmartnodes = (ctx, canvas) => {
     if (!filters.smartnodes) return;
     
     const { width, height } = canvas;
@@ -270,58 +270,64 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     Object.entries(countryStats).forEach(([countryCode, country]) => {
       if (country.nodes === 0) return;
       
-      // Apply rotation to coordinates
+      // Apply smooth rotation to coordinates
       const baseX = width * (country.x / 100);
       const baseY = height * (country.y / 100);
       
-      // Rotate around center of screen
+      // Rotate around center with smooth interpolation
       const centerX = width / 2;
       const centerY = height / 2;
-      const rotatedX = centerX + (baseX - centerX) * Math.cos(earthRotation * 0.2) - (baseY - centerY) * Math.sin(earthRotation * 0.2);
-      const rotatedY = centerY + (baseX - centerX) * Math.sin(earthRotation * 0.2) + (baseY - centerY) * Math.cos(earthRotation * 0.2);
+      const rotationFactor = earthRotation * 0.1; // Much slower rotation
+      const rotatedX = centerX + (baseX - centerX) * Math.cos(rotationFactor) - (baseY - centerY) * Math.sin(rotationFactor);
+      const rotatedY = centerY + (baseX - centerX) * Math.sin(rotationFactor) + (baseY - centerY) * Math.cos(rotationFactor);
       
       const nodeCount = country.nodes;
-      const intensity = Math.min(nodeCount / 50, 1); // Max intensity at 50+ nodes
+      const intensity = Math.min(nodeCount / 50, 1);
       
-      // Country glow (brighter)
-      ctx.beginPath();
-      const glowGradient = ctx.createRadialGradient(rotatedX, rotatedY, 0, rotatedX, rotatedY, 40);
-      glowGradient.addColorStop(0, `rgba(16, 255, 129, ${intensity * 0.8})`); // Brighter
-      glowGradient.addColorStop(0.5, `rgba(16, 185, 129, ${intensity * 0.6})`);
-      glowGradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+      // Static country glow (no flickering)
+      ctx.save();
+      ctx.globalAlpha = 0.8;
+      const glowGradient = ctx.createRadialGradient(rotatedX, rotatedY, 0, rotatedX, rotatedY, 30);
+      glowGradient.addColorStop(0, `rgba(0, 255, 127, ${intensity * 0.9})`);
+      glowGradient.addColorStop(0.7, `rgba(0, 255, 127, ${intensity * 0.4})`);
+      glowGradient.addColorStop(1, 'rgba(0, 255, 127, 0)');
       ctx.fillStyle = glowGradient;
-      ctx.arc(rotatedX, rotatedY, 35, 0, 2 * Math.PI);
+      ctx.beginPath();
+      ctx.arc(rotatedX, rotatedY, 25, 0, 2 * Math.PI);
       ctx.fill();
+      ctx.restore();
       
-      // Smartnode cluster
-      for (let i = 0; i < Math.min(nodeCount, 20); i++) {
-        const angle = (i / nodeCount) * 2 * Math.PI + Date.now() * 0.001;
-        const radius = 8 + Math.random() * 12;
+      // Static smartnode indicators (no random positions)
+      const maxNodes = Math.min(nodeCount, 8); // Reduced for performance
+      for (let i = 0; i < maxNodes; i++) {
+        const angle = (i / maxNodes) * 2 * Math.PI;
+        const radius = 12 + (i % 3) * 4; // Static radius pattern
         const nodeX = rotatedX + Math.cos(angle) * radius;
         const nodeY = rotatedY + Math.sin(angle) * radius;
         
-        // Brighter smartnode birds
+        // Clean smartnode indicators
         ctx.save();
         ctx.translate(nodeX, nodeY);
-        ctx.scale(0.5, 0.5);
-        ctx.fillStyle = `rgba(16, 255, 129, ${0.9 + Math.random() * 0.1})`;
-        ctx.shadowColor = 'rgba(16, 255, 129, 0.8)';
-        ctx.shadowBlur = 6;
-        ctx.font = '16px Arial';
+        ctx.scale(0.4, 0.4);
+        ctx.fillStyle = 'rgba(0, 255, 127, 0.95)';
+        ctx.font = 'bold 18px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('🐦', 0, 0);
+        ctx.shadowColor = 'rgba(0, 255, 127, 0.8)';
+        ctx.shadowBlur = 4;
+        ctx.fillText('⚡', 0, 0);
         ctx.restore();
       }
       
-      // Country label for major nodes (brighter)
-      if (nodeCount > 10) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.font = 'bold 11px monospace';
+      // Clean country labels
+      if (nodeCount > 5) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
-        ctx.shadowColor = 'rgba(16, 255, 129, 0.6)';
-        ctx.shadowBlur = 3;
-        ctx.fillText(nodeCount.toString(), rotatedX, rotatedY - 30);
-        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 2;
+        ctx.fillText(nodeCount.toString(), rotatedX, rotatedY - 35);
+        ctx.restore();
       }
     });
   };
