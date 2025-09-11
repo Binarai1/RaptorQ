@@ -34,7 +34,10 @@ const BlockchainSync = ({ wallet, isVisible = true }) => {
     syncSpeed: 0,
     eta: 0,
     chainSize: 0,
-    verificationProgress: 0
+    verificationProgress: 0,
+    publicNodes: [],
+    daemonVersion: "Unknown",
+    protocolVersion: 0
   });
 
   const [syncHistory, setSyncHistory] = useState([]);
