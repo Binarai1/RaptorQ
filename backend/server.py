@@ -161,7 +161,7 @@ RTM_PRICE_CACHE = {
 # Fixed USD prices for services
 USD_PRICES = {
     "binarai_single_asset": 0.50,  # $0.50 per AI asset creation
-    "binarai_unlimited": 25.00,    # $25 for unlimited (30 days)
+    "binarai_unlimited": 100.00,   # $100 for unlimited BinarAi asset creation (as requested)
     "quantum_smartnode": 1.00,     # $1 for quantum RTM smartnode deployment
     "premium_themes": 0.10,        # $0.10 for theme pack
     "advanced_analytics": 30.00,   # $30 for analytics (90 days)
