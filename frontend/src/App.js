@@ -2496,7 +2496,7 @@ const Dashboard = ({ wallet, onLogout }) => {
   };
 
   const handleSystemUpdate = (updateData) => {
-    toast({ title: "System Updated", description: "QUANTXO updated successfully with latest blockchain improvements" });
+    toast({ title: "System Updated", description: "RaptorQ updated successfully with latest blockchain improvements" });
   };
 
   const handleAssetCreated = (newAsset) => {
