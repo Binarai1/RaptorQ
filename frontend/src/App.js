@@ -878,7 +878,7 @@ const Dashboard = ({ wallet, onLogout }) => {
               <AssetExplorer 
                 isOpen={true} 
                 onClose={() => {}} 
-                wallet={currentWallet}
+                wallet={wallet}
                 fillMode={true}
                 showHeader={false}
               />
