@@ -2394,27 +2394,37 @@ const AIAssetCreator = ({ onAssetCreated, isOpen, onClose }) => {
 };
 
 const Dashboard = ({ wallet, onLogout }) => {
-  const [selectedAsset, setSelectedAsset] = useState(null);
-  const [showBalance, setShowBalance] = useState(false);
-  const [proMode, setProMode] = useState(false);
-  const [activeTab, setActiveTab] = useState('assets');
-  const [balance, setBalance] = useState(wallet.balance);
-  const [assets, setAssets] = useState(mockAssets);
-  const [showMessaging, setShowMessaging] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
-  const [showAICreator, setShowAICreator] = useState(false);
+  // Core state management
+  const [balance, setBalance] = useState(0); // Start with 0, load real balance
+  const [blockHeight, setBlockHeight] = useState(0);
+  const [syncProgress, setSyncProgress] = useState(100);
+  const [isConnected, setIsConnected] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  
+  // UI state
+  const [activeTab, setActiveTab] = useState('wallet');
+  const [showBalance, setShowBalance] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [colorTheme, setColorTheme] = useState(wallet?.colorTheme || 'blue');
+  
+  // Dialog states
+  const [showAssetExplorer, setShowAssetExplorer] = useState(false);
+  const [showStandardAssetCreator, setShowStandardAssetCreator] = useState(false);
+  const [showSmartnodeManager, setShowSmartnodeManager] = useState(false);
+  const [showProConsole, setShowProConsole] = useState(false);
   const [showQRReceive, setShowQRReceive] = useState(false);
   const [showQRScan, setShowQRScan] = useState(false);
+  const [showSendDialog, setShowSendDialog] = useState(false);
+  const [showPremiumServices, setShowPremiumServices] = useState(false);
+  
+  // Form states
   const [sendToAddress, setSendToAddress] = useState('');
   const [sendAmount, setSendAmount] = useState('');
-  const [showSendDialog, setShowSendDialog] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
-  const lockTimeoutRef = useRef(null);
-  const [lastActivity, setLastActivity] = useState(Date.now());
-  const [showSettings, setShowSettings] = useState(false);
-  const [showPremiumServices, setShowPremiumServices] = useState(false);
+  
+  // Pro mode settings
   const [walletSettings, setWalletSettings] = useState({
-    colorTheme: wallet?.colorTheme || 'blue',
+    colorTheme: colorTheme,
     twoFA: false,
     threeFA: false,
     autoLockTime: 5,
@@ -2422,15 +2432,394 @@ const Dashboard = ({ wallet, onLogout }) => {
     proMode: false
   });
 
+  // Session management with proper token handling
+  const [sessionToken, setSessionToken] = useState(() => {
+    return localStorage.getItem('raptorq_session') || null;
+  });
+
+  // Load real wallet data on mount
+  useEffect(() => {
+    if (wallet && sessionToken) {
+      loadWalletData();
+      loadBlockchainInfo();
+      
+      // Start real-time updates
+      const interval = setInterval(() => {
+        loadWalletData();
+        loadBlockchainInfo();
+      }, 30000); // Update every 30 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [wallet, sessionToken]);
+
+  // Apply theme changes throughout the app
+  useEffect(() => {
+    applyThemeGlobally(colorTheme);
+  }, [colorTheme]);
+
+  const loadWalletData = async () => {
+    try {
+      const response = await axios.get(`${API}/wallet/${wallet.address}/balance`, {
+        headers: { 'Authorization': `Bearer ${sessionToken}` }
+      });
+      setBalance(response.data.balance || 0);
+      setIsConnected(true);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Failed to load wallet data:', error);
+      setIsConnected(false);
+      // If unauthorized, clear session
+      if (error.response?.status === 401) {
+        handleSessionExpired();
+      }
+    }
+  };
+
+  const loadBlockchainInfo = async () => {
+    try {
+      const response = await axios.get(`${API}/raptoreum/blockchain-info`);
+      setBlockHeight(response.data.blocks || 0);
+      setSyncProgress(response.data.verificationprogress * 100 || 100);
+    } catch (error) {
+      console.error('Failed to load blockchain info:', error);
+    }
+  };
+
+  const handleSessionExpired = () => {
+    localStorage.removeItem('raptorq_session');
+    setSessionToken(null);
+    toast({
+      title: "Session Expired",
+      description: "Please log in again",
+      variant: "destructive"
+    });
+    onLogout();
+  };
+
+  const applyThemeGlobally = (theme) => {
+    const themes = {
+      blue: {
+        primary: '#3b82f6',
+        secondary: '#1e40af',
+        accent: '#06b6d4'
+      },
+      purple: {
+        primary: '#8b5cf6',
+        secondary: '#7c3aed',
+        accent: '#a855f7'
+      },
+      green: {
+        primary: '#10b981',
+        secondary: '#059669',
+        accent: '#34d399'
+      },
+      red: {
+        primary: '#ef4444',
+        secondary: '#dc2626',
+        accent: '#f87171'
+      }
+    };
+
+    const selectedTheme = themes[theme] || themes.blue;
+    const root = document.documentElement;
+    root.style.setProperty('--color-primary', selectedTheme.primary);
+    root.style.setProperty('--color-secondary', selectedTheme.secondary);
+    root.style.setProperty('--color-accent', selectedTheme.accent);
+    
+    // Update body classes for global theme
+    document.body.className = `theme-${theme}`;
+  };
+
   const handleColorChange = (newColor) => {
+    setColorTheme(newColor);
     setWalletSettings(prev => ({ ...prev, colorTheme: newColor }));
-    // Apply color theme to CSS variables
-    document.documentElement.style.setProperty('--primary-color', newColor);
+    applyThemeGlobally(newColor);
+    
+    // Save to backend
+    try {
+      axios.post(`${API}/wallet/${wallet.address}/settings`, {
+        colorTheme: newColor
+      }, {
+        headers: { 'Authorization': `Bearer ${sessionToken}` }
+      });
+    } catch (error) {
+      console.error('Failed to save theme:', error);
+    }
+    
     toast({ 
       title: "Theme Updated", 
       description: `Switched to ${newColor} theme` 
     });
   };
+
+  const refreshData = async () => {
+    setLastUpdate(new Date());
+    await loadWalletData();
+    await loadBlockchainInfo();
+    toast({ title: "Data Updated", description: "Wallet data refreshed successfully" });
+  };
+
+  if (isLocked) {
+    return <LockScreen onUnlock={() => setIsLocked(false)} wallet={wallet} />;
+  }
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br from-black via-gray-900 to-${colorTheme}-950/20 theme-${colorTheme}`}>
+      {/* Mobile-Safe Header */}
+      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-lg border-b border-gray-800/50">
+        <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto">
+          <div className="flex items-center space-x-3">
+            <QuantumLogo size={32} className="quantum-float" />
+            <div>
+              <h1 className="text-lg font-bold text-white">RaptorQ</h1>
+              <div className="flex items-center space-x-2 text-xs text-gray-400">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                <span>Block {blockHeight.toLocaleString()}</span>
+                <span>•</span>
+                <span>{syncProgress.toFixed(1)}% synced</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Mobile-Safe Header Actions */}
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={refreshData}
+              className="text-gray-400 hover:text-white p-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSettings(true)}
+              className="text-gray-400 hover:text-white p-2"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+            {/* Balance Display */}
+            <div className="text-right">
+              <div className="text-lg font-bold text-white">
+                {showBalance ? `${balance.toFixed(8)} RTM` : '••••••••'}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"  
+                onClick={() => setShowBalance(!showBalance)}
+                className="text-xs text-gray-400 hover:text-white p-0 h-auto"
+              >
+                {showBalance ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto p-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Mobile-Safe Tab Navigation */}
+          <div className="mb-6 overflow-x-auto">
+            <TabsList className="flex w-full bg-gray-800/50 p-1 rounded-lg min-w-max">
+              <TabsTrigger value="wallet" className="flex-1 whitespace-nowrap">Wallet</TabsTrigger>
+              <TabsTrigger value="assets" className="flex-1 whitespace-nowrap">Assets</TabsTrigger>
+              <TabsTrigger value="history" className="flex-1 whitespace-nowrap">History</TabsTrigger>
+              <TabsTrigger value="nodes" className="flex-1 whitespace-nowrap">Nodes</TabsTrigger>
+              <TabsTrigger value="sync" className="flex-1 whitespace-nowrap">Sync</TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Wallet Tab */}
+          <TabsContent value="wallet" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button
+                onClick={() => setShowQRReceive(true)}
+                className="h-24 bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              >
+                <div className="text-center">
+                  <QrCode className="h-8 w-8 mx-auto mb-2" />
+                  <span>Receive RTM</span>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={() => setShowSendDialog(true)}
+                className="h-24 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              >
+                <div className="text-center">
+                  <Send className="h-8 w-8 mx-auto mb-2" />
+                  <span>Send RTM</span>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={() => setShowQRScan(true)}
+                className="h-24 bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+              >
+                <div className="text-center">
+                  <Camera className="h-8 w-8 mx-auto mb-2" />
+                  <span>Scan QR</span>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={() => setShowPremiumServices(true)}
+                className="h-24 bg-gradient-to-br from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800"
+              >
+                <div className="text-center">
+                  <Zap className="h-8 w-8 mx-auto mb-2" />
+                  <span>Premium</span>
+                </div>
+              </Button>
+            </div>
+          </TabsContent>
+
+          {/* Assets Tab */}
+          <TabsContent value="assets" className="space-y-6">
+            <div className="flex flex-wrap gap-4 mb-6">
+              <Button
+                onClick={() => setShowAssetExplorer(true)}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                Asset Explorer
+              </Button>
+              
+              <Button
+                onClick={() => setShowStandardAssetCreator(true)}
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Asset
+              </Button>
+              
+              <Button
+                onClick={() => setShowAICreator(true)}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+              >
+                <Palette className="h-4 w-4 mr-2" />
+                BinarAi Create
+              </Button>
+            </div>
+            
+            <div className="text-center py-12 text-gray-400">
+              <div className="text-lg mb-4">No assets found</div>
+              <p className="text-sm">Create your first asset to get started</p>
+            </div>
+          </TabsContent>
+
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            <div className="text-center py-12 text-gray-400">
+              <History className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <div className="text-lg mb-4">No transaction history</div>
+              <p className="text-sm">Your transaction history will appear here</p>
+            </div>
+          </TabsContent>
+
+          {/* Nodes Tab */}
+          <TabsContent value="nodes" className="space-y-6">
+            <div className="flex flex-wrap gap-4 mb-6">
+              <Button
+                onClick={() => setShowSmartnodeManager(true)}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                Smartnode Manager
+              </Button>
+              
+              <Button
+                onClick={() => setShowProConsole(true)}
+                className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Pro Console
+              </Button>
+            </div>
+            
+            <div className="text-center py-12 text-gray-400">
+              <div className="text-lg mb-4">No smartnodes deployed</div>
+              <p className="text-sm">Deploy your first smartnode to start earning RTM</p>
+            </div>
+          </TabsContent>
+
+          {/* Sync Tab */}
+          <TabsContent value="sync" className="space-y-6">
+            <BlockchainSync wallet={wallet} isVisible={activeTab === 'sync'} />
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      {/* Settings Dialog - Mobile Safe */}
+      <SettingsDialog
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        settings={walletSettings}
+        onColorChange={handleColorChange}
+        onSecurityUpdate={setWalletSettings}
+        className="mobile-settings-panel"
+      />
+
+      {/* All Production Components */}
+      <AssetExplorer
+        isOpen={showAssetExplorer}
+        onClose={() => setShowAssetExplorer(false)}
+      />
+      
+      <StandardAssetCreator
+        isOpen={showStandardAssetCreator}
+        onClose={() => setShowStandardAssetCreator(false)}
+        wallet={wallet}
+      />
+      
+      <SmartnodeManager
+        isOpen={showSmartnodeManager}
+        onClose={() => setShowSmartnodeManager(false)}
+        wallet={wallet}
+      />
+      
+      <ProModeConsole
+        isOpen={showProConsole}
+        onClose={() => setShowProConsole(false)}
+        wallet={wallet}
+      />
+
+      {/* QR Dialogs */}
+      <QRReceiveDialog 
+        isOpen={showQRReceive}
+        onClose={() => setShowQRReceive(false)}
+        wallet={wallet}
+      />
+      
+      <QRScanDialog
+        isOpen={showQRScan}
+        onClose={() => setShowQRScan(false)}
+        onAddressScanned={(address) => {
+          setSendToAddress(address);
+          setShowQRScan(false);
+          setShowSendDialog(true);
+        }}
+      />
+      
+      <SendDialog
+        isOpen={showSendDialog}  
+        onClose={() => setShowSendDialog(false)}
+        wallet={wallet}
+        toAddress={sendToAddress}
+        amount={sendAmount}
+      />
+      
+      <PremiumServicesDialog
+        isOpen={showPremiumServices}
+        onClose={() => setShowPremiumServices(false)}
+        wallet={wallet}
+      />
+    </div>
+  );
+};
 
   const handleSecurityUpdate = (securitySettings) => {
     setWalletSettings(prev => ({ ...prev, ...securitySettings }));
