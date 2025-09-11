@@ -332,72 +332,59 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     });
   };
 
-  const drawTransactionBirds = (ctx, canvas) => {
+  const drawTransactions = (ctx, canvas) => {
     const { width, height } = canvas;
     
-    // Draw RTM transactions
+    // Simplified RTM transaction drawing
     if (filters.rtmTransactions) {
       rtmBirds.current.forEach(bird => {
-        if (bird.life <= 0) return;
+        if (bird.life <= 0.2) return;
         
         const x = width * (bird.currentX / 100);
         const y = height * (bird.currentY / 100);
         
+        // Simple, efficient glow
         ctx.save();
-        ctx.globalAlpha = bird.life * 0.8;
-        
-        // Glowing trail (brighter)
-        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 12);
-        trailGradient.addColorStop(0, bird.glow);
-        trailGradient.addColorStop(1, 'transparent');
-        ctx.fillStyle = trailGradient;
+        ctx.globalAlpha = bird.life;
+        ctx.fillStyle = 'rgba(0, 191, 255, 0.8)'; // Clean cyan
+        ctx.shadowColor = 'rgba(0, 191, 255, 0.9)';
+        ctx.shadowBlur = 8;
         ctx.beginPath();
-        ctx.arc(x, y, 10, 0, 2 * Math.PI);
+        ctx.arc(x, y, 6, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Transaction bird
-        ctx.translate(x, y);
-        ctx.scale(bird.size, bird.size);
-        ctx.shadowColor = bird.glow;
-        ctx.shadowBlur = 10;
-        ctx.font = 'bold 14px Arial';
+        // Clean transaction indicator
+        ctx.shadowBlur = 6;
+        ctx.font = 'bold 12px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(bird.emoji, 0, 0);
-        
+        ctx.fillText('💎', x, y + 3);
         ctx.restore();
       });
     }
     
-    // Draw Asset transactions
+    // Simplified Asset transaction drawing  
     if (filters.assetTransactions) {
       assetBirds.current.forEach(bird => {
-        if (bird.life <= 0) return;
+        if (bird.life <= 0.2) return;
         
         const x = width * (bird.currentX / 100);
         const y = height * (bird.currentY / 100);
         
+        // Simple, efficient glow
         ctx.save();
-        ctx.globalAlpha = bird.life * 0.9;
-        
-        // Asset trail (brighter)
-        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 15);
-        trailGradient.addColorStop(0, bird.glow);
-        trailGradient.addColorStop(1, 'transparent');
-        ctx.fillStyle = trailGradient;
+        ctx.globalAlpha = bird.life;
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.9)'; // Clean gold
+        ctx.shadowColor = 'rgba(255, 215, 0, 0.9)';
+        ctx.shadowBlur = 10;
         ctx.beginPath();
-        ctx.arc(x, y, 12, 0, 2 * Math.PI);
+        ctx.arc(x, y, 7, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Asset bird
-        ctx.translate(x, y);
-        ctx.rotate(bird.progress * Math.PI * 2);
-        ctx.scale(bird.size, bird.size);
-        ctx.shadowColor = bird.glow;
-        ctx.shadowBlur = 12;
-        ctx.font = 'bold 16px Arial';
+        // Clean asset indicator
+        ctx.shadowBlur = 8;
+        ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(bird.emoji, 0, 0);
-        
+        ctx.fillText('🔰', x, y + 4);
         ctx.restore();
       });
     }
