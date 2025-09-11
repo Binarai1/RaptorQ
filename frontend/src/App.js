@@ -1139,6 +1139,11 @@ const WalletSetup = ({ onWalletCreated }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [existingWallet, setExistingWallet] = useState(null);
+  
+  // Daemon sync state for setup screen
+  const [setupBlockHeight, setSetupBlockHeight] = useState(0);
+  const [setupSyncProgress, setSetupSyncProgress] = useState(0);
+  const [setupIsConnected, setSetupIsConnected] = useState(false);
 
   // Check for existing wallet on component mount
   useEffect(() => {
