@@ -1386,6 +1386,15 @@ const WalletSetup = ({ onWalletCreated }) => {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Live Network Visualization Button */}
+        <Button
+          onClick={() => setShowNetworkViz(!showNetworkViz)}
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-cyan-400 hover:from-green-600 hover:to-cyan-500 text-black font-medium px-4 py-2 rounded-full shadow-xl z-20 animate-pulse"
+        >
+          <Globe className="h-4 w-4 mr-2" />
+          {showNetworkViz ? 'Hide Network' : 'Show Live Network Visualisation'}
+        </Button>
       </div>
     );
   }
