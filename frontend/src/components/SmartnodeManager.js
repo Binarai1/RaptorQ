@@ -86,19 +86,34 @@ const SmartnodeManager = ({ isOpen, onClose, wallet, embedded = false }) => {
   const loadSmartnodes = async () => {
     setLoading(true);
     try {
-      // Load user's smartnodes
-      const ownedResponse = await axios.get(`/api/raptoreum/smartnodes/owned/${wallet?.address}`);
-      setSmartnodes(ownedResponse.data.smartnodes || []);
-
-      // Load all network smartnodes
-      const allResponse = await axios.get('/api/raptoreum/smartnodes/all');
-      setAllSmartnodes(allResponse.data.smartnodes || []);
-
+      // Load owned smartnodes (user's personal nodes)
+      const ownedResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/raptoreum/smartnodes/owned/${wallet?.address}`);
+      const ownedNodes = ownedResponse.data.smartnodes || [];
+      
+      // Load real network smartnodes from Raptoreum blockchain
+      console.log('Loading real Raptoreum network smartnodes...');
+      const allResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/raptoreum/smartnodes/all`);
+      const networkNodes = allResponse.data.smartnodes || [];
+      
+      // Filter and process real network data
+      const realNetworkNodes = networkNodes.filter(node => 
+        node.payee && 
+        node.payee.startsWith('R') && 
+        node.status && 
+        node.ip && 
+        node.port
+      );
+      
+      console.log(`Loaded ${realNetworkNodes.length} real network smartnodes`);
+      
+      setSmartnodes(ownedNodes);
+      setAllSmartnodes(realNetworkNodes);
+      
     } catch (error) {
-      console.error('Failed to load smartnodes:', error);
-      // Mock data for development
-      setSmartnodes(mockOwnedSmartnodes);
-      setAllSmartnodes(mockAllSmartnodes);
+      console.error('Failed to load real smartnode data:', error);
+      // For production wallet, show empty state when API fails
+      setSmartnodes([]);
+      setAllSmartnodes([]);
     } finally {
       setLoading(false);
     }
