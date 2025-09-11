@@ -391,24 +391,26 @@ if not verify_runtime_integrity():
 
 # Purchase tracking
 advertisement_slots = {
-    "wallet_bottom": {
-        "active": False,
-        "advertiser_wallet": None,
-        "banner_url": None,
-        "banner_filename": None,
-        "title": None,
-        "url": None,
-        "expires_at": None,
+    "header_banner": {
+        "active": True,
+        "advertiser_wallet": "RRaptorQAdvertiser123456789012345678",
+        "banner_url": "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400&h=200&fit=crop",
+        "banner_filename": "quantum_ad_banner.jpg",
+        "title": "Quantum-Powered RTM Services",
+        "description": "Discover the future of cryptocurrency with quantum-resistant technology",
+        "url": "https://raptoreum.com",
+        "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
         "clicks": 0,
         "impressions": 0,
-        "created_at": None
+        "created_at": datetime.now(timezone.utc).isoformat()
     },
-    "asset_creation_bottom": {
+    "sidebar_banner": {
         "active": False,
         "advertiser_wallet": None,
         "banner_url": None,
         "banner_filename": None,
         "title": None,
+        "description": None,
         "url": None,
         "expires_at": None,
         "clicks": 0,
