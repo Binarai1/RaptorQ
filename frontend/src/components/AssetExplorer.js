@@ -694,23 +694,25 @@ const AssetExplorer = ({ isOpen, onClose, wallet, fillMode = false, showHeader =
     }
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Raptoreum Asset Explorer</h2>
-          <p className="text-gray-400 mt-1">Explore assets created on the Raptoreum blockchain</p>
+  const ContentComponent = () => (
+    <>
+      {/* Header - conditionally rendered */}
+      {showHeader && (
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-white">Raptoreum Asset Explorer</h2>
+            <p className="text-gray-400 mt-1">Explore assets created on the Raptoreum blockchain</p>
+          </div>
+          <Button
+            onClick={loadAssets}
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {loading ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+            Refresh
+          </Button>
         </div>
-        <Button
-          onClick={loadAssets}
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          {loading ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
-          Refresh
-        </Button>
-      </div>
+      )}
 
       {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
