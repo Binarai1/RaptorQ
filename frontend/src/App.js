@@ -1272,27 +1272,28 @@ const WalletSetup = ({ onWalletCreated }) => {
             <CardTitle className="text-white">Welcome Back to RaptorQ</CardTitle>
             <p className="text-gray-400 text-sm">Enter your password to access your wallet</p>
             
-            {/* Daemon Sync Status at Login Screen */}
-            <div className="mt-4 p-3 bg-gray-800/30 rounded-lg">
-              <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
-                <span>Daemon Status</span>
+            {/* Live Daemon Sync Status at Login Screen */}
+            <div className="mt-4 p-3 bg-gray-800/30 rounded-lg border border-green-500/20">
+              <div className="flex items-center justify-between text-xs text-gray-300 mb-2">
+                <span className="font-medium">Live Daemon Sync</span>
                 <div className="flex items-center space-x-1">
-                  <div className={`w-2 h-2 rounded-full ${setupIsConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                  <span>{setupIsConnected ? 'Connected' : 'Connecting'}</span>
+                  <div className={`w-2 h-2 rounded-full ${setupIsConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
+                  <span className="text-white">{setupIsConnected ? 'Connected' : 'Connecting'}</span>
                 </div>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-2 mb-1 relative overflow-hidden">
+              
+              <div className="w-full bg-gray-700 rounded-full h-3 mb-2 relative overflow-hidden">
                 <div 
-                  className="bg-gradient-to-r from-blue-500 to-cyan-400 h-2 rounded-full transition-all duration-1000"
+                  className="bg-gradient-to-r from-blue-500 to-cyan-400 h-3 rounded-full transition-all duration-1000"
                   style={{ width: `${setupSyncProgress}%` }}
                 ></div>
                 
-                {/* Sync animation effects for password screen */}
-                {setupSyncProgress < 99.9 && (
+                {/* Live sync animation effects for password screen */}
+                {setupSyncProgress < 99.9 && setupIsConnected && (
                   <>
                     {/* Flowing neon green gradient */}
                     <div 
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-60 rounded-full"
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-70 rounded-full"
                       style={{
                         background: `linear-gradient(90deg, 
                           transparent 0%, 
@@ -1300,15 +1301,15 @@ const WalletSetup = ({ onWalletCreated }) => {
                           #34d399 50%, 
                           #6ee7b7 80%, 
                           transparent 100%)`,
-                        animation: 'flowSync 3s ease-in-out infinite',
-                        filter: 'blur(0.3px) drop-shadow(0 0 6px #10b981)'
+                        animation: 'flowSync 2.5s ease-in-out infinite',
+                        filter: 'blur(0.3px) drop-shadow(0 0 8px #10b981)'
                       }}
                     />
-                    {/* Super-speed Falcon */}
+                    {/* Super-speed Falcon for live sync */}
                     <div 
-                      className="absolute top-1/2 transform -translate-y-1/2 text-xs"
+                      className="absolute top-1/2 transform -translate-y-1/2 text-sm"
                       style={{
-                        animation: 'falconFly 2s ease-in-out infinite, falconGlow 1s ease-in-out infinite',
+                        animation: 'falconFly 1.8s ease-in-out infinite, falconGlow 1s ease-in-out infinite',
                         color: '#10b981'
                       }}
                     >
@@ -1317,9 +1318,18 @@ const WalletSetup = ({ onWalletCreated }) => {
                   </>
                 )}
               </div>
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>Block {setupBlockHeight.toLocaleString()}</span>
-                <span>{setupSyncProgress.toFixed(1)}% synced</span>
+              
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs text-gray-400">
+                  <span>Block {setupBlockHeight.toLocaleString()}</span>
+                  <span className="text-green-400 font-medium">{setupSyncProgress.toFixed(1)}% synced</span>
+                </div>
+                <div className="text-xs text-center text-gray-500">
+                  {setupSyncProgress < 99.9 
+                    ? `Syncing from last point • ${setupIsConnected ? 'Live updates' : 'Connecting...'}` 
+                    : 'Daemon fully synced • Ready'
+                  }
+                </div>
               </div>
             </div>
           </CardHeader>
