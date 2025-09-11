@@ -488,21 +488,89 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
   if (!isActive) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0">
+    <div className={`fixed inset-0 z-0 ${isFullscreen ? 'pointer-events-auto bg-black' : 'pointer-events-none'}`}>
       <canvas
         ref={canvasRef}
-        className="w-full h-full opacity-60"
+        className="w-full h-full"
         style={{
-          filter: 'blur(0.5px)',
-          mixBlendMode: 'screen'
+          opacity: isFullscreen ? 1 : 0.7,
+          filter: isFullscreen ? 'none' : 'blur(0.3px)',
+          mixBlendMode: isFullscreen ? 'normal' : 'screen'
         }}
       />
       
-      {/* Network stats overlay */}
-      <div className="absolute bottom-4 right-4 text-xs text-green-400/60 font-mono">
-        <div>Live Network: 1,266 Smartnodes</div>
-        <div>Active Transactions: {transactionBirds.current.length}</div>
-      </div>
+      {/* Fullscreen Controls */}
+      {isFullscreen && (
+        <>
+          {/* Filter Controls */}
+          <div className="absolute top-6 left-6 bg-black/80 backdrop-blur-md p-4 rounded-lg border border-green-400/30">
+            <h3 className="text-white font-bold mb-3 flex items-center">
+              <Globe className="h-4 w-4 mr-2 text-green-400" />
+              Quantum Network Filters
+            </h3>
+            <div className="space-y-2">
+              <label className="flex items-center space-x-2 text-sm text-white">
+                <input
+                  type="checkbox"
+                  checked={filters.assetTransactions}
+                  onChange={(e) => setFilters(prev => ({...prev, assetTransactions: e.target.checked}))}
+                  className="rounded bg-gray-800 border-green-400"
+                />
+                <span>Asset Transactions</span>
+                <span className="text-yellow-400 text-xs">({assetBirds.current.length} active)</span>
+              </label>
+              <label className="flex items-center space-x-2 text-sm text-white">
+                <input
+                  type="checkbox"
+                  checked={filters.rtmTransactions}
+                  onChange={(e) => setFilters(prev => ({...prev, rtmTransactions: e.target.checked}))}
+                  className="rounded bg-gray-800 border-cyan-400"
+                />
+                <span>RTM Transactions</span>
+                <span className="text-cyan-400 text-xs">({rtmBirds.current.length} active)</span>
+              </label>
+              <label className="flex items-center space-x-2 text-sm text-white">
+                <input
+                  type="checkbox"
+                  checked={filters.smartnodes}
+                  onChange={(e) => setFilters(prev => ({...prev, smartnodes: e.target.checked}))}
+                  className="rounded bg-gray-800 border-green-400"
+                />
+                <span>Smartnode Clusters</span>
+                <span className="text-green-400 text-xs">(1,266 nodes)</span>
+              </label>
+            </div>
+          </div>
+          
+          {/* Close button */}
+          <button
+            onClick={onMinimize}
+            className="absolute top-6 right-6 bg-red-600/80 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium"
+          >
+            Minimize View
+          </button>
+          
+          {/* Enhanced Network Stats */}
+          <div className="absolute bottom-6 right-6 bg-black/80 backdrop-blur-md p-4 rounded-lg border border-green-400/30">
+            <div className="text-green-400 font-mono text-sm space-y-1">
+              <div className="text-white font-bold mb-2">Live Quantum Network</div>
+              <div>⚡ Smartnodes: 1,266 active</div>
+              <div>💎 RTM Transactions: {rtmBirds.current.length}</div>
+              <div>🔰 Asset Transactions: {assetBirds.current.length}</div>
+              <div>🌍 Earth Rotation: {(earthRotation * 180 / Math.PI % 360).toFixed(1)}°</div>
+              <div className="text-cyan-400 text-xs mt-2">Viewing from quantum space station</div>
+            </div>
+          </div>
+        </>
+      )}
+      
+      {/* Background mode stats */}
+      {!isFullscreen && (
+        <div className="absolute bottom-4 right-4 text-xs text-green-400/60 font-mono">
+          <div>Live Network: 1,266 Smartnodes</div>
+          <div>Transactions: {rtmBirds.current.length + assetBirds.current.length}</div>
+        </div>
+      )}
     </div>
   );
 };
