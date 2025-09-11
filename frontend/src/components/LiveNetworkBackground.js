@@ -50,7 +50,7 @@ const ipToCountry = (ip) => {
   return 'US';
 };
 
-const LiveNetworkBackground = ({ isActive = true }) => {
+const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimize }) => {
   const [networkData, setNetworkData] = useState({ smartnodes: [], transactions: [] });
   const [countryStats, setCountryStats] = useState(countries);
   const canvasRef = useRef(null);
