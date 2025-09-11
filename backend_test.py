@@ -1136,49 +1136,67 @@ class RaptorQWalletTester:
             return True
 
 def main():
-    print("🚀 Starting RaptorQ Wallet Backend API Tests")
-    print("=" * 60)
-    print("🎯 Focus: System Status, QR Generation, Premium Services, Blockchain Pruning, Legal & Asset Management")
-    print("=" * 60)
+    print("🚀 FINAL PRODUCTION TESTING - RaptorQ Wallet Backend API")
+    print("=" * 80)
+    print("🎯 CRITICAL BACKEND TESTS: Raptoreum Integration, Asset Creation, Smartnodes, Security & Branding")
+    print("=" * 80)
     
     tester = RaptorQWalletTester()
     
-    # Priority tests based on review request
-    priority_tests = [
+    # CRITICAL RAPTOREUM BLOCKCHAIN INTEGRATION TESTS
+    raptoreum_tests = [
+        tester.test_raptoreum_blockchain_info,
+        tester.test_raptoreum_create_asset,
+        tester.test_raptoreum_rpc_console,
+        tester.test_raptoreum_smartnodes_owned,
+        tester.test_raptoreum_smartnodes_all,
+        tester.test_raptoreum_smartnode_creation,
+        tester.test_raptoreum_smartnode_collateral_management,
+    ]
+    
+    # ASSET CREATION SYSTEM TESTS (200 RTM fees)
+    asset_tests = [
+        tester.test_asset_creation,
+        tester.test_quantum_signature_generation,
+    ]
+    
+    # SESSION & SECURITY TESTS
+    security_tests = [
+        tester.test_session_wallet_balance,
         tester.test_system_status,
+    ]
+    
+    # QR CODE & PREMIUM SERVICES TESTS
+    service_tests = [
         tester.test_qr_generation_rtm_address,
         tester.test_premium_services,
         tester.test_coingecko_integration,
-        tester.test_blockchain_prune_mobile,
-        tester.test_blockchain_prune_desktop,
-        tester.test_legal_disclaimer,
-        tester.test_platform_guides,
-        tester.test_asset_creation,
-        tester.test_branding_consistency,
     ]
     
-    # Additional QR Code tests (comprehensive testing)
-    qr_tests = [
+    # RAPTORQ BRANDING VERIFICATION
+    branding_tests = [
+        tester.test_branding_consistency,
+        tester.test_legal_disclaimer,
+    ]
+    
+    # ADDITIONAL COMPREHENSIVE TESTS
+    additional_tests = [
+        tester.test_root_endpoint,
+        tester.test_platform_guides,
+        tester.test_blockchain_prune_mobile,
+        tester.test_blockchain_prune_desktop,
         tester.test_qr_generation_basic,
         tester.test_qr_generation_with_amount,
         tester.test_qr_generation_with_message,
         tester.test_qr_generation_full_params,
     ]
     
-    # Additional blockchain pruning tests
-    pruning_tests = [
-        tester.test_blockchain_prune_custom_storage,
-        tester.test_blockchain_pruning_status,
-        tester.test_blockchain_prune_edge_cases,
-    ]
+    # Combine all tests in priority order
+    tests = raptoreum_tests + asset_tests + security_tests + service_tests + branding_tests + additional_tests
     
-    # Core functionality tests
-    core_tests = [
-        tester.test_root_endpoint,
-    ]
-    
-    # Combine all tests - Priority tests first
-    tests = priority_tests + qr_tests + pruning_tests + core_tests
+    print(f"📋 Total Tests to Execute: {len(tests)}")
+    print("🔥 Starting FINAL PRODUCTION TESTING...")
+    print()
     
     # Run all tests
     for test in tests:
@@ -1188,14 +1206,15 @@ def main():
             print(f"❌ Test failed with exception: {str(e)}")
     
     # Print final results
-    print("\n" + "=" * 60)
-    print(f"📊 Test Results: {tester.tests_passed}/{tester.tests_run} tests passed")
+    print("\n" + "=" * 80)
+    print(f"📊 FINAL PRODUCTION TEST RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
     
     if tester.tests_passed == tester.tests_run:
-        print("🎉 All tests passed!")
+        print("🎉 ALL PRODUCTION TESTS PASSED - READY FOR GITHUB DEPLOYMENT!")
         return 0
     else:
-        print(f"⚠️  {tester.tests_run - tester.tests_passed} tests failed")
+        failed_tests = tester.tests_run - tester.tests_passed
+        print(f"⚠️  {failed_tests} tests failed - PRODUCTION DEPLOYMENT BLOCKED")
         return 1
 
 if __name__ == "__main__":
