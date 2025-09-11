@@ -439,7 +439,7 @@ const SystemStatus = ({ onUpdate }) => {
   const handleUpdate = async () => {
     try {
       const response = await axios.post(`${API}/system/update`);
-      toast({ title: "Update Started", description: "QUANTXO is updating to the latest version..." });
+      toast({ title: "Update Started", description: "RaptorQ is updating to the latest version..." });
       onUpdate?.(response.data);
     } catch (error) {
       toast({ title: "Update Failed", description: "Failed to start update process", variant: "destructive" });
