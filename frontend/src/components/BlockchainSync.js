@@ -57,28 +57,7 @@ const BlockchainSync = ({
   const lastBlockRef = useRef(0);
   const lastUpdateRef = useRef(Date.now());
 
-  useEffect(() => {
-    if (isVisible && autoSync) {
-      startSyncMonitoring();
-    } else {
-      stopSyncMonitoring();
-    }
-
-    return () => stopSyncMonitoring();
-  }, [isVisible, autoSync]);
-
-  const startSyncMonitoring = () => {
-    // Update every 2 seconds for real-time sync monitoring
-    intervalRef.current = setInterval(updateSyncStatus, 2000);
-    updateSyncStatus(); // Initial update
-  };
-
-  const stopSyncMonitoring = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  };
+  // No longer need monitoring since data comes from props
 
   // Use passed props instead of making API calls (data comes from parent)
   useEffect(() => {
