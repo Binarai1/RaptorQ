@@ -961,6 +961,11 @@ const WalletSetup = ({ onWalletCreated }) => {
   };
 
   const handleSeedVerified = () => {
+    // First show seed verification before creating wallet
+    setStep('verify-seed');
+  };
+
+  const handleSeedConfirmed = () => {
     const newWallet = {
       id: Date.now().toString(),
       name: 'RaptorQ Quantum Wallet',
