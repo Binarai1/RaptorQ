@@ -431,11 +431,11 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     // Update Earth rotation (slow)
     setEarthRotation(prev => prev + 0.002);
     
-    // Draw space view
-    drawSpaceView(ctx, canvas);
-    drawSmartnodesOnEarth(ctx, canvas);
-    drawQuantumTransactions(ctx, canvas);
-    updateQuantumTransactions();
+    // Draw world view with rotation
+    drawWorld(ctx, canvas);
+    drawCountryNodes(ctx, canvas);
+    drawTransactionBirds(ctx, canvas);
+    updateTransactionBirds();
     
     animationRef.current = requestAnimationFrame(animate);
   };
