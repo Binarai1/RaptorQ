@@ -52,8 +52,6 @@ const BlockchainSync = ({
 
   const [syncHistory, setSyncHistory] = useState([]);
   const [isPaused, setIsPaused] = useState(false);
-  const [autoSync, setAutoSync] = useState(true);
-  const intervalRef = useRef(null);
   const lastBlockRef = useRef(0);
   const lastUpdateRef = useRef(Date.now());
 
