@@ -466,11 +466,14 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
     
-    // Draw everything
-    drawWorld(ctx, canvas);
-    drawCountryNodes(ctx, canvas);
-    drawTransactionBirds(ctx, canvas);
-    updateTransactionBirds();
+    // Update Earth rotation (slow)
+    setEarthRotation(prev => prev + 0.002);
+    
+    // Draw space view
+    drawSpaceView(ctx, canvas);
+    drawSmartnodesOnEarth(ctx, canvas);
+    drawQuantumTransactions(ctx, canvas);
+    updateQuantumTransactions();
     
     animationRef.current = requestAnimationFrame(animate);
   };
