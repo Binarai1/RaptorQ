@@ -284,41 +284,34 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     });
   };
 
-  const drawQuantumTransactions = (ctx, canvas) => {
+  const drawTransactionBirds = (ctx, canvas) => {
     const { width, height } = canvas;
-    const earthCenterX = width / 2;
-    const earthCenterY = height / 2;
-    const earthRadius = Math.min(width, height) * 0.35;
     
     // Draw RTM transactions
     if (filters.rtmTransactions) {
       rtmBirds.current.forEach(bird => {
         if (bird.life <= 0) return;
         
-        // 3D orbit around Earth
-        const orbitRadius = earthRadius * 1.3;
-        const angle = (bird.progress * Math.PI * 2) + (simpleHash(bird.id) * 0.1);
-        const x = earthCenterX + Math.cos(angle) * orbitRadius;
-        const y = earthCenterY + Math.sin(angle) * orbitRadius * 0.6; // Elliptical orbit
+        const x = width * (bird.currentX / 100);
+        const y = height * (bird.currentY / 100);
         
         ctx.save();
-        ctx.globalAlpha = bird.life;
+        ctx.globalAlpha = bird.life * 0.8;
         
-        // Quantum trail with enhanced glow
-        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 15);
+        // Glowing trail (brighter)
+        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 12);
         trailGradient.addColorStop(0, bird.glow);
-        trailGradient.addColorStop(0.5, bird.glow.replace('1)', '0.4)'));
         trailGradient.addColorStop(1, 'transparent');
         ctx.fillStyle = trailGradient;
         ctx.beginPath();
-        ctx.arc(x, y, 12, 0, 2 * Math.PI);
+        ctx.arc(x, y, 10, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Transaction particle
+        // Transaction bird
         ctx.translate(x, y);
         ctx.scale(bird.size, bird.size);
         ctx.shadowColor = bird.glow;
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 10;
         ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
         ctx.fillText(bird.emoji, 0, 0);
@@ -332,31 +325,27 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
       assetBirds.current.forEach(bird => {
         if (bird.life <= 0) return;
         
-        // Higher orbit for assets
-        const orbitRadius = earthRadius * 1.5;
-        const angle = (bird.progress * Math.PI * 1.5) + (simpleHash(bird.id) * 0.2);
-        const x = earthCenterX + Math.cos(angle) * orbitRadius;
-        const y = earthCenterY + Math.sin(angle) * orbitRadius * 0.7;
+        const x = width * (bird.currentX / 100);
+        const y = height * (bird.currentY / 100);
         
         ctx.save();
-        ctx.globalAlpha = bird.life;
+        ctx.globalAlpha = bird.life * 0.9;
         
-        // Asset quantum signature trail
-        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 18);
+        // Asset trail (brighter)
+        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 15);
         trailGradient.addColorStop(0, bird.glow);
-        trailGradient.addColorStop(0.3, bird.glow.replace('1)', '0.6)'));
         trailGradient.addColorStop(1, 'transparent');
         ctx.fillStyle = trailGradient;
         ctx.beginPath();
-        ctx.arc(x, y, 15, 0, 2 * Math.PI);
+        ctx.arc(x, y, 12, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Asset particle with rotation
+        // Asset bird
         ctx.translate(x, y);
-        ctx.rotate(bird.progress * Math.PI * 4);
+        ctx.rotate(bird.progress * Math.PI * 2);
         ctx.scale(bird.size, bird.size);
         ctx.shadowColor = bird.glow;
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 12;
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
         ctx.fillText(bird.emoji, 0, 0);
