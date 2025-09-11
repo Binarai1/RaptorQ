@@ -266,7 +266,7 @@ const BlockchainSync = ({
                 </>
               )}
             </div>
-            <div className="flex justify-between text-xs text-gray-400">
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>Block {syncStatus.currentBlock.toLocaleString()}</span>
               <span>{syncStatus.blocksLeft.toLocaleString()} blocks remaining</span>
             </div>
