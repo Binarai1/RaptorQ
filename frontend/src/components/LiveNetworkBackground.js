@@ -340,7 +340,7 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
         
         // 3D orbit around Earth
         const orbitRadius = earthRadius * 1.3;
-        const angle = (bird.progress * Math.PI * 2) + (bird.id.hashCode() * 0.1);
+        const angle = (bird.progress * Math.PI * 2) + (simpleHash(bird.id) * 0.1);
         const x = earthCenterX + Math.cos(angle) * orbitRadius;
         const y = earthCenterY + Math.sin(angle) * orbitRadius * 0.6; // Elliptical orbit
         
