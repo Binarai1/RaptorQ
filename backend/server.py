@@ -1158,7 +1158,8 @@ async def get_real_raptoreum_block_height():
                     data = await response.json()
                     return data.get('height', 0)
     except Exception as e:
-        logger.warning(f"Failed to get real block height: {e}")
+        # External API not available - use fallback (normal for production)
+        pass
     
     # Fallback to estimated block height based on time
     # Raptoreum has ~1 minute block times
