@@ -214,7 +214,7 @@ const BlockchainSync = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Progress Bar with Animation */}
+          {/* Progress Bar with Flowing Sync Animation */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Progress</span>
