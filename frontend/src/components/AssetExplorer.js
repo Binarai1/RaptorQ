@@ -763,9 +763,12 @@ const AssetExplorer = ({ isOpen, onClose, wallet, fillMode = false, showHeader =
       {!loading && filteredAssets.length === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-400 mb-4">
-            <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg">No assets found</p>
-            <p className="text-sm">Try adjusting your search criteria</p>
+            <Layers className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg text-white">No Assets on Blockchain</p>
+            <p className="text-sm">The Raptoreum blockchain currently has no assets created yet.</p>
+            <p className="text-xs mt-2 text-gray-500">
+              Assets will appear here as they are created by users on the network.
+            </p>
           </div>
         </div>
       )}
@@ -776,6 +779,43 @@ const AssetExplorer = ({ isOpen, onClose, wallet, fillMode = false, showHeader =
         isOpen={showAssetDetail}
         onClose={() => setShowAssetDetail(false)}
       />
+    </>
+  );
+
+  // Return different layouts based on fillMode
+  if (fillMode) {
+    return (
+      <Card className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 border-gray-700/50 min-h-96">
+        <CardContent className="p-6 h-full">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <Layers className="h-5 w-5 text-blue-400" />
+              <h3 className="text-white font-semibold">Raptoreum Blockchain Assets</h3>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Badge className="bg-blue-900/30 text-blue-300">
+                Main Chain
+              </Badge>
+              <Button
+                onClick={loadAssets}
+                disabled={loading}
+                size="sm"
+                variant="ghost"
+                className="text-gray-400 hover:text-white"
+              >
+                {loading ? <RefreshCw className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+              </Button>
+            </div>
+          </div>
+          <ContentComponent />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <ContentComponent />
     </div>
   );
 };
