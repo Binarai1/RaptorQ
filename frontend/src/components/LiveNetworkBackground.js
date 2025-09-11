@@ -53,9 +53,19 @@ const ipToCountry = (ip) => {
 const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimize }) => {
   const [networkData, setNetworkData] = useState({ smartnodes: [], transactions: [] });
   const [countryStats, setCountryStats] = useState(countries);
+  const [loading, setLoading] = useState(true);
+  const [animationNodes, setAnimationNodes] = useState([]);
+  const [filters, setFilters] = useState({
+    assetTransactions: true,
+    rtmTransactions: true,
+    smartnodes: true
+  });
+  const [earthRotation, setEarthRotation] = useState(0);
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const transactionBirds = useRef([]);
+  const assetBirds = useRef([]);
+  const rtmBirds = useRef([]);
 
   useEffect(() => {
     if (isActive) {
