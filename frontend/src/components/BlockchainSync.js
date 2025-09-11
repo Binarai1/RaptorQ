@@ -227,10 +227,44 @@ const BlockchainSync = ({
                 value={syncStatus.progress} 
                 className="h-3 bg-gray-800"
               />
+              {/* Base progress bar */}
               <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-1000 animate-pulse"
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-1000"
                 style={{ width: `${syncStatus.progress}%` }}
               />
+              
+              {/* Flowing sync animation when syncing */}
+              {showSyncAnimation && (
+                <>
+                  {/* Flowing neon green gradient with smoke effects */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-80 animate-flow-sync rounded-full"
+                    style={{
+                      background: `linear-gradient(90deg, 
+                        transparent 0%, 
+                        #10b981 20%, 
+                        #34d399 50%, 
+                        #6ee7b7 80%, 
+                        transparent 100%)`,
+                      animation: 'flowSync 3s ease-in-out infinite',
+                      filter: 'blur(0.5px) drop-shadow(0 0 10px #10b981)'
+                    }}
+                  />
+                  {/* Smooth flowing overlay */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-green-500/30 via-emerald-400/40 to-green-500/30 animate-pulse rounded-full"
+                    style={{
+                      background: `linear-gradient(90deg, 
+                        rgba(16, 185, 129, 0.2) 0%, 
+                        rgba(52, 211, 153, 0.6) 25%, 
+                        rgba(110, 231, 183, 0.8) 50%, 
+                        rgba(52, 211, 153, 0.6) 75%, 
+                        rgba(16, 185, 129, 0.2) 100%)`,
+                      animation: 'flowSyncSmooth 2s linear infinite'
+                    }}
+                  />
+                </>
+              )}
             </div>
             <div className="flex justify-between text-xs text-gray-400">
               <span>Block {syncStatus.currentBlock.toLocaleString()}</span>
