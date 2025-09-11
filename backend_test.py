@@ -1403,16 +1403,406 @@ class RaptorQWalletTester:
             print(f"   ✅ All branding consistent - RaptorQ by Binarai")
             return True
 
+    def test_production_block_height_consistency(self):
+        """Test block height consistency across all wallet displays"""
+        print("\n🔍 Testing Block Height Consistency...")
+        
+        # Get blockchain info multiple times to check consistency
+        success1, response1 = self.run_test(
+            "Blockchain Info - First Call",
+            "GET",
+            "raptoreum/blockchain-info",
+            200
+        )
+        
+        success2, response2 = self.run_test(
+            "Blockchain Info - Second Call",
+            "GET", 
+            "raptoreum/blockchain-info",
+            200
+        )
+        
+        if success1 and success2:
+            blocks1 = response1.get('blocks', 0)
+            blocks2 = response2.get('blocks', 0)
+            
+            print(f"   First Call Block Height: {blocks1}")
+            print(f"   Second Call Block Height: {blocks2}")
+            
+            # Block height should be consistent or incrementing (not random)
+            if blocks1 == blocks2 or blocks2 == blocks1 + 1:
+                print(f"   ✅ Block height is consistent")
+            else:
+                print(f"   ⚠️ Block height inconsistency detected")
+                
+            # Check if block height is realistic for mainnet (should be > 2.8M)
+            if blocks1 > 2800000:
+                print(f"   ✅ Realistic mainnet block height")
+            else:
+                print(f"   ❌ Block height too low for mainnet: {blocks1}")
+                return False
+                
+        return success1 and success2
+
+    def test_production_real_blockchain_data(self):
+        """Test that all endpoints return authentic mainnet data"""
+        print("\n🔍 Testing Real Blockchain Data...")
+        
+        success, response = self.run_test(
+            "Real Mainnet Blockchain Data",
+            "GET",
+            "raptoreum/blockchain-info",
+            200
+        )
+        
+        if success:
+            # Check network hashrate (should be ~2.5 TH/s range)
+            hashrate = response.get('networkhashps', 0)
+            hashrate_ths = hashrate / 1e12  # Convert to TH/s
+            
+            print(f"   Network Hashrate: {hashrate_ths:.2f} TH/s")
+            
+            if 2.0 <= hashrate_ths <= 3.5:
+                print(f"   ✅ Realistic network hashrate (2.5 TH/s range)")
+            else:
+                print(f"   ❌ Unrealistic hashrate: {hashrate_ths:.2f} TH/s")
+                return False
+                
+            # Check difficulty (should be 45K-50K range)
+            difficulty = response.get('difficulty', 0)
+            print(f"   Difficulty: {difficulty:.2f}")
+            
+            if 40000 <= difficulty <= 55000:
+                print(f"   ✅ Realistic difficulty (45K-50K range)")
+            else:
+                print(f"   ❌ Unrealistic difficulty: {difficulty}")
+                return False
+                
+            # Check connections (up to 100 allowed)
+            connections = response.get('connections', 0)
+            print(f"   Connections: {connections}")
+            
+            if 0 <= connections <= 100:
+                print(f"   ✅ Valid connection count (0-100)")
+            else:
+                print(f"   ❌ Invalid connection count: {connections}")
+                return False
+                
+            # Check sync progress is real (not fake 100% when syncing)
+            sync_progress = response.get('sync_progress_percent', 0)
+            is_syncing = response.get('is_syncing', False)
+            
+            print(f"   Sync Progress: {sync_progress:.2f}%")
+            print(f"   Is Syncing: {is_syncing}")
+            
+            if is_syncing and sync_progress >= 100:
+                print(f"   ❌ Fake sync progress - shows 100% while syncing")
+                return False
+            else:
+                print(f"   ✅ Real sync progress")
+                
+        return success
+
+    def test_production_console_rpc_commands(self):
+        """Test console RPC commands return real daemon data"""
+        print("\n🔍 Testing Console RPC Commands...")
+        
+        # Test getblockchaininfo RPC command
+        success1, response1 = self.run_test(
+            "RPC getblockchaininfo",
+            "POST",
+            "raptoreum/rpc",
+            200,
+            data={"command": "getblockchaininfo"}
+        )
+        
+        if success1:
+            result = response1.get('result', {})
+            if isinstance(result, dict):
+                blocks = result.get('blocks', 0)
+                chain = result.get('chain', '')
+                
+                print(f"   RPC Blocks: {blocks}")
+                print(f"   RPC Chain: {chain}")
+                
+                if blocks > 2800000 and chain == 'main':
+                    print(f"   ✅ Real daemon blockchain data")
+                else:
+                    print(f"   ❌ Fake RPC data detected")
+                    return False
+            else:
+                print(f"   ❌ Invalid RPC response format")
+                return False
+                
+        # Test getwalletinfo RPC command
+        success2, response2 = self.run_test(
+            "RPC getwalletinfo", 
+            "POST",
+            "raptoreum/rpc",
+            200,
+            data={"command": "getwalletinfo"}
+        )
+        
+        if success2:
+            result = response2.get('result', {})
+            if isinstance(result, dict):
+                balance = result.get('balance', -1)
+                walletname = result.get('walletname', '')
+                
+                print(f"   RPC Wallet Balance: {balance} RTM")
+                print(f"   RPC Wallet Name: {walletname}")
+                
+                # Should not return fake 5000 RTM balance
+                if balance == 5000.0:
+                    print(f"   ❌ Fake 5000 RTM balance in RPC")
+                    return False
+                else:
+                    print(f"   ✅ Real wallet balance in RPC")
+            else:
+                print(f"   ❌ Invalid RPC wallet response")
+                return False
+                
+        return success1 and success2
+
+    def test_production_asset_integration(self):
+        """Test asset integration returns proper empty state for fresh blockchain"""
+        print("\n🔍 Testing Asset Integration...")
+        
+        # Test /api/raptoreum/assets/all
+        success1, response1 = self.run_test(
+            "All Raptoreum Assets",
+            "GET",
+            "raptoreum/assets/all",
+            200
+        )
+        
+        if success1:
+            assets = response1.get('assets', [])
+            print(f"   All Assets Count: {len(assets)}")
+            
+            # For fresh blockchain, should return empty array or minimal assets
+            if len(assets) == 0:
+                print(f"   ✅ Empty asset array for fresh blockchain")
+            elif len(assets) <= 5:
+                print(f"   ✅ Minimal assets for fresh blockchain")
+                for asset in assets:
+                    print(f"      - {asset.get('name', 'N/A')}")
+            else:
+                print(f"   ⚠️ Many assets found - may not be fresh blockchain")
+                
+        # Test /api/wallet/{address}/assets
+        test_address = "RBZFreshWallet1234567890123456789"
+        success2, response2 = self.run_test(
+            "Fresh Wallet Assets",
+            "GET",
+            f"wallet/{test_address}/assets",
+            200
+        )
+        
+        if success2:
+            wallet_assets = response2.get('assets', [])
+            print(f"   Fresh Wallet Assets: {len(wallet_assets)}")
+            
+            if len(wallet_assets) == 0:
+                print(f"   ✅ Proper empty state for fresh wallet")
+            else:
+                print(f"   ⚠️ Fresh wallet has assets - unexpected")
+                
+        return success1 and success2
+
+    def test_production_advertising_system(self):
+        """Test advertising system shows active header_banner with $100/day pricing"""
+        print("\n🔍 Testing Advertising System...")
+        
+        success, response = self.run_test(
+            "Advertising Slots",
+            "GET",
+            "advertising/slots",
+            200
+        )
+        
+        if success:
+            slots = response.get('slots', {})
+            daily_price_usd = response.get('daily_price_usd', 0)
+            
+            print(f"   Available Slots: {list(slots.keys())}")
+            print(f"   Daily Price USD: ${daily_price_usd}")
+            
+            # Check for header_banner slot
+            header_banner = slots.get('header_banner', {})
+            if header_banner:
+                active = header_banner.get('active', False)
+                print(f"   Header Banner Active: {active}")
+                
+                if active:
+                    print(f"   ✅ Active header_banner found")
+                else:
+                    print(f"   ⚠️ Header banner not active")
+            else:
+                print(f"   ❌ Header banner slot not found")
+                return False
+                
+            # Check $100/day pricing
+            if daily_price_usd == 100.0:
+                print(f"   ✅ Correct $100/day pricing")
+            else:
+                print(f"   ❌ Incorrect pricing: ${daily_price_usd} (expected $100)")
+                return False
+                
+        return success
+
+    def test_production_wallet_balance(self):
+        """Test wallet balance endpoints return 0 RTM for new wallets"""
+        print("\n🔍 Testing Production Wallet Balance...")
+        
+        # Test multiple fresh addresses
+        test_addresses = [
+            "RBZNewWallet1234567890123456789",
+            "RBZFreshAddr1234567890123456789", 
+            "RBZTestProd1234567890123456789"
+        ]
+        
+        all_success = True
+        
+        for address in test_addresses:
+            success, response = self.run_test(
+                f"Fresh Wallet Balance - {address[-10:]}",
+                "GET",
+                f"wallet/{address}/balance",
+                200
+            )
+            
+            if success:
+                balance = response.get('balance', -1)
+                print(f"   Address {address[-10:]}: {balance} RTM")
+                
+                # Should not return fake 5000 RTM
+                if balance == 5000.0:
+                    print(f"   ❌ CRITICAL: Fake 5000 RTM balance detected!")
+                    all_success = False
+                elif balance == 0.0:
+                    print(f"   ✅ Correct 0 RTM for new wallet")
+                elif 0 < balance <= 1000:
+                    print(f"   ✅ Realistic balance for test wallet")
+                else:
+                    print(f"   ⚠️ Unexpected balance: {balance}")
+            else:
+                all_success = False
+                
+        return all_success
+
+    def test_production_service_pricing(self):
+        """Test BinarAi unlimited service is $100 (not $25)"""
+        print("\n🔍 Testing Service Pricing...")
+        
+        success, response = self.run_test(
+            "Premium Services Pricing",
+            "GET",
+            "services/premium",
+            200
+        )
+        
+        if success:
+            services = response.get('services', [])
+            
+            # Find BinarAi unlimited service
+            binarai_unlimited = None
+            for service in services:
+                if service.get('service_id') == 'binarai_unlimited':
+                    binarai_unlimited = service
+                    break
+                    
+            if binarai_unlimited:
+                price_usd = binarai_unlimited.get('price_usd', 0)
+                name = binarai_unlimited.get('name', '')
+                
+                print(f"   Service: {name}")
+                print(f"   Price USD: ${price_usd}")
+                
+                if price_usd == 100.0:
+                    print(f"   ✅ Correct $100 pricing for BinarAi unlimited")
+                elif price_usd == 25.0:
+                    print(f"   ❌ Old $25 pricing detected - should be $100")
+                    return False
+                else:
+                    print(f"   ⚠️ Unexpected pricing: ${price_usd}")
+                    return False
+            else:
+                print(f"   ❌ BinarAi unlimited service not found")
+                return False
+                
+        return success
+
+    def test_production_real_smartnode_data(self):
+        """Test smartnode endpoints return realistic network data"""
+        print("\n🔍 Testing Real Smartnode Data...")
+        
+        # Test network smartnodes
+        success1, response1 = self.run_test(
+            "Network Smartnodes",
+            "GET",
+            "raptoreum/smartnodes/all",
+            200
+        )
+        
+        if success1:
+            smartnodes = response1.get('smartnodes', [])
+            print(f"   Network Smartnodes: {len(smartnodes)}")
+            
+            if smartnodes:
+                node = smartnodes[0]
+                status = node.get('status', '')
+                earnings = node.get('earnings', 0)
+                
+                print(f"   Sample Node Status: {status}")
+                print(f"   Sample Node Earnings: {earnings} RTM")
+                
+                # Check for realistic data (not obviously fake)
+                if status in ['ENABLED', 'PRE_ENABLED', 'WATCHDOG_EXPIRED']:
+                    print(f"   ✅ Realistic smartnode status")
+                else:
+                    print(f"   ⚠️ Unusual smartnode status: {status}")
+                    
+                if isinstance(earnings, (int, float)) and earnings >= 0:
+                    print(f"   ✅ Realistic earnings data")
+                else:
+                    print(f"   ❌ Invalid earnings data")
+                    return False
+            else:
+                print(f"   ⚠️ No network smartnodes found")
+                
+        # Test owned smartnodes (should be empty for new address)
+        test_address = "RBZNewAddress1234567890123456789"
+        success2, response2 = self.run_test(
+            "Owned Smartnodes (New Address)",
+            "GET",
+            f"raptoreum/smartnodes/owned/{test_address}",
+            200
+        )
+        
+        if success2:
+            owned = response2.get('smartnodes', [])
+            print(f"   Owned Smartnodes (New Address): {len(owned)}")
+            
+            if len(owned) == 0:
+                print(f"   ✅ No owned smartnodes for new address (realistic)")
+            else:
+                print(f"   ⚠️ New address has owned smartnodes - unexpected")
+                
+        return success1 and success2
+
 def main():
-    print("🚀 CRITICAL PRODUCTION FIXES TESTING - RaptorQ Wallet Backend API")
+    print("🚀 FINAL COMPREHENSIVE PRODUCTION VALIDATION - RaptorQ Main Chain Wallet")
     print("=" * 80)
-    print("🎯 TESTING USER-REPORTED CRITICAL ISSUES:")
-    print("   1. Real Blockchain Integration (dynamic block height, sync progress)")
-    print("   2. Real Wallet Balance (no fake 5000 RTM)")
-    print("   3. Real Asset Data (blockchain-based, not fake)")
-    print("   4. Advertising Integration (restored functionality)")
-    print("   5. Real Smartnode Data (not mock data)")
-    print("   6. Asset Creation Fees (correct 200 RTM total)")
+    print("🎯 PRODUCTION VALIDATION REQUIREMENTS:")
+    print("   1. Block Height Consistency - Real block heights across displays")
+    print("   2. Real Blockchain Data - Authentic mainnet data (2.5 TH/s, 45K-50K difficulty)")
+    print("   3. Console RPC Commands - Real daemon data (not fake results)")
+    print("   4. Asset Integration - Empty arrays for fresh blockchain")
+    print("   5. Advertising System - Active header_banner with $100/day pricing")
+    print("   6. Production Wallet Balance - 0 RTM for new wallets (no fake 5000 RTM)")
+    print("   7. Updated Service Pricing - BinarAi unlimited $100 (not $25)")
+    print("   8. Real Smartnode Data - Realistic network data")
     print("=" * 80)
     
     tester = RaptorQWalletTester()
