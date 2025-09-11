@@ -1178,11 +1178,9 @@ async def get_raptoreum_blockchain_info():
         # Get current timestamp for realistic data
         current_time = datetime.now(timezone.utc)
         
-        # Calculate sync progress (simulates syncing with main network)
-        sync_start_block = 340000
-        total_blocks_to_sync = current_block - sync_start_block
-        blocks_synced = min(total_blocks_to_sync, total_blocks_to_sync * 0.95 + (time_diff % 3600) / 3600 * 0.05 * total_blocks_to_sync)
-        verification_progress = min(0.9999, blocks_synced / total_blocks_to_sync)
+        # Calculate realistic sync progress for main Raptoreum chain
+        # Assume we're mostly synced (realistic for production wallet)
+        verification_progress = 0.9999  # 99.99% synced (realistic for running wallet)
         
         # In production, this would connect to actual Raptoreum nodes:
         # Example: await rpc_client.getblockchaininfo()
