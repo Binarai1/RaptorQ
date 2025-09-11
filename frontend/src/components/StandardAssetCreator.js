@@ -389,7 +389,7 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label className="text-white">Asset Name *</Label>
+                    <Label className="text-white font-medium">Asset Name *</Label>
                     <Input
                       placeholder="MYASSET (3-30 chars, A-Z, 0-9, _)"
                       value={formData.name}
@@ -402,7 +402,7 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
                   </div>
 
                   <div>
-                    <Label className="text-white">Description *</Label>
+                    <Label className="text-white font-medium">Description *</Label>
                     <Textarea
                       placeholder="Describe your asset..."
                       value={formData.description}
