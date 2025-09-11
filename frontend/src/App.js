@@ -1110,6 +1110,9 @@ const WalletSetup = ({ onWalletCreated }) => {
   const [setupBlockHeight, setSetupBlockHeight] = useState(0);
   const [setupSyncProgress, setSetupSyncProgress] = useState(0);
   const [setupIsConnected, setSetupIsConnected] = useState(false);
+  
+  // Network visualization state
+  const [showNetworkViz, setShowNetworkViz] = useState(false);
 
   // Check for existing wallet on component mount
   useEffect(() => {
