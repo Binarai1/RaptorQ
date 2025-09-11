@@ -1762,7 +1762,7 @@ const AboutDialog = ({ isOpen, onClose }) => (
       <DialogHeader>
         <DialogTitle className="flex items-center space-x-2">
           <QuantumLogo size={32} />
-          <span>About QUANTXO</span>
+          <span>About RaptorQ</span>
         </DialogTitle>
       </DialogHeader>
       
