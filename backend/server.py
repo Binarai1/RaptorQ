@@ -1204,19 +1204,19 @@ async def get_raptoreum_blockchain_info():
         blockchain_info = {
             "chain": "main",
             "blocks": current_block,
-            "headers": current_block + (5 if is_syncing else 1),  # Headers ahead when syncing
+            "headers": target_block,  # Target block from daemon
             "bestblockhash": f"000000{secrets.token_hex(30)}",
             "difficulty": real_difficulty,
             "mediantime": int(current_time.timestamp()) - 60,  # 1 minute ago
             "verificationprogress": verification_progress,
             "chainwork": f"00000000000000000000000000000000000000000{secrets.token_hex(12)}",
-            "size_on_disk": 35000000000 + int((current_time.timestamp() - 1640995200) / 3600) * 1024 * 1024,  # Growing since mainnet
+            "size_on_disk": int(daemon_status.get("data_directory_size_gb", 35) * 1024 * 1024 * 1024),  # From daemon
             "pruned": False,
             "networkhashps": real_hashrate,  # Real Raptoreum network hashrate
-            "connections": connection_count,  # Up to 100 connections
+            "connections": connection_count,
             "is_syncing": is_syncing,
             "sync_progress_percent": sync_progress_percent,
-            "estimated_sync_time": "Synced" if not is_syncing else f"{int((1 - verification_progress) * 180)} minutes remaining",
+            "estimated_sync_time": daemon_status.get("estimated_sync_time", "Calculating..."),
             "public_nodes_connected": [
                 {"ip": "144.76.47.65", "port": 10226, "status": "connected"},
                 {"ip": "95.217.161.135", "port": 10226, "status": "connected"},
