@@ -735,8 +735,42 @@ const Dashboard = ({ wallet, onLogout }) => {
 
           {/* Wallet Tab */}
           <TabsContent value="wallet" className="space-y-6">
-            {/* Premium Advertising Banner - restored as requested */}
-            <AdvertisingBanner position="header" className="mb-6" />
+            {/* Premium Advertising Banner - Clickable "Advertise Here" */}
+            <Card className="bg-gradient-to-r from-purple-950/30 to-blue-950/30 border-purple-800/30 hover:border-purple-600/50 transition-all duration-300 cursor-pointer mb-6">
+              <CardContent className="p-4" onClick={() => setShowPremiumServices(true)}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                      <Zap className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="flex-grow">
+                      <div className="flex items-center space-x-2">
+                        <h3 className="text-white font-semibold">Advertise Here</h3>
+                        <Badge className="bg-purple-900/30 text-purple-300 text-xs">
+                          $100/day
+                        </Badge>
+                      </div>
+                      <p className="text-gray-300 text-sm mt-1">
+                        Reach thousands of RTM users with premium advertising space
+                      </p>
+                      <div className="text-xs text-gray-400 mt-1">
+                        Click to purchase advertising slot • Prime wallet placement
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPremiumServices(true);
+                    }}
+                  >
+                    Purchase
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Button
