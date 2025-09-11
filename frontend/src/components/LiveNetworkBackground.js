@@ -163,15 +163,8 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
   const drawEarth = (ctx, canvas) => {
     const { width, height } = canvas;
     
-    // Clear canvas with clean deep space background
-    const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
-    gradient.addColorStop(0, 'rgba(6, 12, 34, 1)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-    
-    // Draw ocean base (static)
-    ctx.fillStyle = 'rgba(30, 64, 175, 0.3)'; // Ocean blue
+    // Pure black background
+    ctx.fillStyle = 'rgba(0, 0, 0, 1)';
     ctx.fillRect(0, 0, width, height);
     
     ctx.save();
@@ -179,10 +172,10 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     ctx.rotate(earthRotation * 0.05); // Very slow, smooth rotation
     ctx.translate(-width/2, -height/2);
     
-    // Draw continents (filled, not just outlines)
-    ctx.fillStyle = 'rgba(34, 139, 34, 0.4)'; // Forest green
-    ctx.strokeStyle = 'rgba(34, 139, 34, 0.8)';
-    ctx.lineWidth = 1;
+    // Draw continent outlines in blue (same as logo)
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.8)'; // Blue-500 like the logo
+    ctx.lineWidth = 2;
+    ctx.fillStyle = 'transparent';
     
     // North America
     ctx.beginPath();
@@ -194,7 +187,6 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     ctx.lineTo(width * 0.15, height * 0.45);
     ctx.lineTo(width * 0.08, height * 0.35);
     ctx.closePath();
-    ctx.fill();
     ctx.stroke();
     
     // Europe/Asia
@@ -208,7 +200,6 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     ctx.lineTo(width * 0.65, height * 0.52);
     ctx.lineTo(width * 0.47, height * 0.42);
     ctx.closePath();
-    ctx.fill();
     ctx.stroke();
     
     // Africa
@@ -221,13 +212,11 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     ctx.lineTo(width * 0.43, height * 0.68);
     ctx.lineTo(width * 0.42, height * 0.55);
     ctx.closePath();
-    ctx.fill();
     ctx.stroke();
     
     // Australia
     ctx.beginPath();
     ctx.ellipse(width * 0.77, height * 0.7, width * 0.06, height * 0.04, 0, 0, 2 * Math.PI);
-    ctx.fill();
     ctx.stroke();
     
     // South America
@@ -240,26 +229,9 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     ctx.lineTo(width * 0.20, height * 0.78);
     ctx.lineTo(width * 0.18, height * 0.65);
     ctx.closePath();
-    ctx.fill();
     ctx.stroke();
     
     ctx.restore();
-    
-    // Add subtle cloud layer (static pattern, not random)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    const cloudPattern = [
-      {x: 0.15, y: 0.2, w: 0.12, h: 0.06},
-      {x: 0.35, y: 0.15, w: 0.15, h: 0.08},
-      {x: 0.6, y: 0.25, w: 0.18, h: 0.07},
-      {x: 0.2, y: 0.6, w: 0.14, h: 0.05},
-      {x: 0.7, y: 0.65, w: 0.16, h: 0.06}
-    ];
-    
-    cloudPattern.forEach(cloud => {
-      ctx.beginPath();
-      ctx.ellipse(width * cloud.x, height * cloud.y, width * cloud.w, height * cloud.h, 0, 0, 2 * Math.PI);
-      ctx.fill();
-    });
   };
 
   const drawSmartnodes = (ctx, canvas) => {
