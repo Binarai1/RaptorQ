@@ -1770,6 +1770,7 @@ const WalletSetup = ({ onWalletCreated }) => {
 
 // Main App Component
 function App() {
+  const { clearSession } = useSession();
   const [wallet, setWallet] = useState(null);
 
   const handleWalletCreated = (newWallet) => {
