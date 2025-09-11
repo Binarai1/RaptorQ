@@ -1,73 +1,47 @@
 <analysis>
-The previous AI engineer meticulously developed the RaptorQ wallet from an initial Discord bot concept, pivoting to a web application. Key development phases included initial web app scaffolding, multiple re-branding efforts (Talon -> QUANTXO -> RaptorQ), and an unwavering focus on quantum-resistant cryptography (SHA3-2048 equivalent using SHAKE256). The engineer implemented core wallet features like QR code generation/scanning, secure asset management, and a comprehensive documentation suite. Significant user feedback drove feature additions such as auto-lock, 2FA/3FA settings, custom themes, BinarAi image creation, mobile blockchain pruning, and performance optimizations. A sophisticated RTM-based premium service and advertising system with dynamic CoinGecko pricing was integrated. Crucially, anti-theft measures, payment address encryption, and the removal of all emergent branding were implemented for enhanced security and independence. The current work addresses a critical user concern regarding code consistency across GitHub forks, ensuring the application's visual and functional integrity before further development or deployment.
+The AI engineer successfully developed the RaptorQ wallet from a Discord bot concept to a web application, incorporating quantum-resistant cryptography (SHAKE256/SHA3-2048). The trajectory shows an iterative development process, with initial focus on UI/UX, basic wallet functions, and re-branding. Significant user feedback led to major feature expansions: premium services, AI-powered asset creation, mobile optimizations, and comprehensive documentation. The work progressed from visual consistency verification to a massive feature upgrade, including a full asset explorer, smartnode manager, and real blockchain integration. However, despite several declarations of production-ready, the user consistently identified critical integration gaps and functional errors, leading to repeated cycles of bug fixing and refactoring, notably around dynamic theming, component integration, and real-time blockchain data display. The current state reflects an ongoing effort to address these core production-readiness issues.
 </analysis>
 
 <product_requirements>
-The RaptorQ wallet, initially conceived as a Discord bot for Raptoreum (RTM) transactions, evolved into a web-based, MetaMask-like application. Its core purpose is to provide a secure, quantum-resistant wallet for managing RTM coins and assets.
-
-**Key features developed based on user requests:**
-*   **Secure Wallet Operations**: Private key management, seed phrase backup/recovery, UTXO/InstaSend transaction support, real-time balance.
-*   **Quantum Resistance**: Implemented SHA3-2048 equivalent cryptography (SHAKE256), quantum-safe key derivation, self-healing security.
-*   **User Experience (UI/UX)**: Clean black, chrome, dark red theme; Poppins font; custom wallet colors; auto-lock; real-time balance auto-refresh; smooth animations; seed phrase verification; 2FA/3FA options.
-*   **Asset Management**: Display of IPFS asset images, asset minting/viewing, mobile-style asset grid, AI-powered NFT image/GIF creation (BinarAi), social sharing.
-*   **Transaction Features**: Custom QR codes for receiving (with wallet logo), copy address, device camera scan for sending RTM QR codes.
-*   **Premium Services & Advertising**: Paid services (BinarAi, Smartnode, Themes, Analytics, Advertising) with dynamic RTM pricing from CoinGecko, direct purchase, confirmation dialogs, encrypted payment address. Advertising includes banner slots, time tracking, analytics, and image validation.
-*   **Mobile Optimization**: Blockchain pruning for reduced storage and improved speed, performance optimizations.
-*   **Security & Branding**: Payment address encryption, anti-theft measures, complete removal of emergent branding.
-*   **Comprehensive Documentation**: Whitepaper, Litepaper, Quantum Security Study, Competitive Analysis, Developer Integration Guide.
+The RaptorQ wallet aims to be a secure, quantum-resistant web application for managing Raptoreum (RTM) coins and assets, evolving from a Discord bot. Key requirements include: secure wallet operations (private keys, seed phrases, UTXO/InstaSend), SHA3-2048 equivalent quantum resistance, user-friendly UI/UX (dark theme, custom colors, auto-lock, real-time balance), asset management (IPFS images, minting, BinarAi image creation, asset explorer with search, rich lists, transaction history), transaction features (QR codes), premium services (BinarAi, Smartnode, Ads, dynamic CoinGecko pricing), mobile optimization (blockchain pruning), and robust security (payment address encryption, anti-theft). The application must transition from a demo to a real production-ready wallet, syncing with the actual RTM blockchain, displaying real data (balance, block height, nodes), enabling standard asset creation (100 RTM create + 100 RTM mint in one step, with circulation field), and offering a 'Pro Mode' for command-line interaction, smartnode deployment (with quantum enhancements), and node management (lock/unlock collateral). A separate, private analytics dashboard is also required for monitoring wallet usage and performance.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-Stack Development**: React 18 (Frontend), FastAPI (Backend), Python 3.11, MongoDB.
+-   **Full-Stack Development**: React 18, FastAPI, Python 3.11, MongoDB.
 -   **Blockchain Integration**: Raptoreum (UTXO, InstaSend, RPC API).
--   **Cryptography**: SHA3-2048 (SHAKE256), PBKDF2, Fernet encryption, quantum-resistant key derivation, system fingerprinting.
+-   **Cryptography**: SHA3-2048 (SHAKE256), PBKDF2, Fernet encryption.
 -   **UI/UX Frameworks**: Shadcn UI, Tailwind CSS, Radix UI.
 -   **Decentralized Storage**: IPFS.
--   **API Integration**: CoinGecko (real-time RTM price).
+-   **API Integration**: CoinGecko (RTM price).
 -   **QR Code**:  (Python),  (JS).
 </key_technical_concepts>
 
 <code_architecture>
-The application follows a standard full-stack architecture:
+The application follows a standard full-stack architecture with a React frontend and FastAPI backend.
 
 
 
 **Detailed File Descriptions and Changes:**
--   : Main FastAPI application.
-    -   **Summary:** Handles API routes for wallet, transactions, asset management, premium services, advertising, dynamic pricing, and security.
-    -   **Changes:**
-        -   Added QR code generation/validation, blockchain pruning endpoints.
-        -   Implemented premium service, advertising endpoints, and dynamic RTM pricing from CoinGecko.
-        -   Added security measures: , ,  for hidden RTM address, anti-theft mechanisms.
-        -   Removed all emergent references. Configured .
--   : Main React component.
-    -   **Summary:** Renders the wallet's UI, manages state, routing, and interacts with the backend.
-    -   **Changes:**
-        -   Integrated QR code, auto-lock,  (custom colors, 2FA/3FA).
-        -   Re-branded AI Asset Creator to BinarAi Image Creation with dynamic pricing.
-        -   Added Swaps tab, Premium Services dialog with direct purchase.
-        -   Incorporated mobile optimizations and advertising banners.
-        -   Replaced all QUANTXO branding with RaptorQ. Removed all emergent references.
--   : Global styles.
-    -   **Summary:** Defines visual styling using Tailwind CSS.
-    -   **Changes:** Updated for custom color themes, font, and quantum-themed elements.
--   : Backend environment variables.
-    -   **Summary:** Stores .  was present but no longer directly used.
--   : Frontend environment variables.
-    -   **Summary:** Stores .
-    -   **Changes:** Ensured correct backend URL configuration.
+-   : The main FastAPI application, handling API routes for wallet, transactions, asset management, premium services, advertising, dynamic pricing, and security.
+    -   **Changes**: Implemented QR code generation/validation, blockchain pruning, premium services with CoinGecko pricing, anti-theft mechanisms (, ), and removed emergent references. Critically, Raptoreum-specific RPC endpoints were added, and asset creation fees were fixed to 200 RTM (100 create + 100 mint).
+-   : The primary React component, responsible for rendering the UI, state management, routing, and backend interaction.
+    -   **Changes**: Integrated QR code, auto-lock, , BinarAi Image Creation, Swaps, premium services, mobile optimizations, and advertising banners. All QUANTXO and emergent branding was replaced with RaptorQ. This file underwent extensive refactoring to fix mobile responsiveness, integrate new components (, , , , ), implement dynamic theme application using CSS variables, add password creation during wallet setup, session handling, real balance, and block height display. The  component was rewritten for production features.
+-   : Global styles for the frontend.
+    -   **Changes**: Updated for custom color themes, fonts, quantum-themed elements, and adapted to use CSS variables for dynamic theming across the application.
+-   : Stores .
+-   : Stores .
 -   : Python dependencies.
-    -   **Summary:** Lists necessary Python packages.
-    -   **Changes:** Added , , . Removed .
--   : Project documentation.
-    -   **Summary:** Main project README.
-    -   **Changes:** Extensively updated with RaptorQ branding, new features, API documentation, mobile features, architecture, and links to the new documentation suite.
--   : Directory for documentation.
-    -   **Summary:** Contains various detailed markdown documents.
-    -   **Changes:** Created , , , , . Existing  documents were effectively replaced.
--   : Android WebView wrapper.
-    -   **Summary:** Contains the basic structure for an Android application to wrap the web frontend.
-    -   **Changes:** Files like , , , ,  were created, forming the initial wrapper structure.
+    -   **Changes**: Added , , , and removed .
+-    & : Project documentation.
+    -   **Changes**: Extensively updated with RaptorQ branding, new features, API documentation, mobile features, architecture, and a new suite of documentation (Whitepaper, Litepaper, Quantum Study, Comparison, Developer Guide). The  was specifically updated to reflect the production wallet features and exclude mentions of the analytics dashboard.
+-   : Basic Android WebView wrapper structure.
+-   : New components created for production features.
+    -   : For searching and viewing blockchain assets.
+    -   : For creating Raptoreum assets with correct fees and circulation.
+    -   : Displays real-time blockchain sync progress.
+    -   : Provides a command-line interface for RPC interactions.
+    -   : Manages smartnode deployment and monitoring.
+-   : A completely separate application for private monitoring and analytics, including a Node.js backend () and a React/HTML dashboard (, ), along with service files and environment configuration.
 </code_architecture>
 
 <pending_tasks>
@@ -75,20 +49,25 @@ The application follows a standard full-stack architecture:
 -   Implement multi-platform support beyond just documentation.
 -   Integrate the legal disclaimer and About section into the wallet's UI.
 -   Implement auto-upgrade upon detecting new blockchain files from Raptoreum GitHub.
--   Implement self-monitoring and self-fixing capabilities.
+-   Implement self-monitoring and self-fixing capabilities (beyond the separate analytics dashboard).
 -   Implement master asset and sub-asset hierarchy.
 -   Add a UI element to change the selected asset from RTM to an RTM asset.
 -   Enable users to download the wallet to run their own Raptoreum node.
 -   Refine the monitoring system to prevent pornographic images as assets.
+-   Fix incorrect block height/Raptoreum daemon sync issues.
+-   Display real assets (currently blank, should be empty if none).
+-   Style 4 large buttons with chrome shades, prominent text/icons.
+-   Ensure asset creation screen text (asset properties) and decimal dropdown are white.
+-   Correct wallet balance display on standard asset creation screen (should be real).
+-   Display real smartnode data instead of fake ones in Smartnode Manager.
+-   Fix fake placement data on the Deploy Node screen.
+-   Address glitching and errors in the smartnode deployment screen input fields.
 </pending_tasks>
 
 <current_work>
-The previous AI engineer was immediately engaged in addressing a critical user concern regarding codebase consistency. The user reported that after attempting to fork the project on GitHub, the new session's application appeared totally different visually and functionally, despite the previous session being marked as complete. The user explicitly requested that the engineer ensure all style and layout and every single thing on the front end and the back end to make the app display the way it does in this preview here works on the GitHub exactly the same when the repository is pulled by a new session. The AI engineer has acknowledged this, stating the intention to systematically verify everything is working perfectly in this session and properly saved to GitHub before the user attempts another fork. This task involves a thorough check of the entire application's integrity, ensuring that all frontend styling, layout, and backend functionality are correctly reflected in the current working environment and would persist across GitHub forking.
+The previous AI engineer was in the middle of addressing a new set of critical production issues raised by the user (Chat 228). The user reported that despite previous claims of being production-ready, the wallet still had significant problems, including: the absence of a password creation step for new wallets, incorrect block height suggesting a daemon sync issue, fake asset display, incorrect styling for large buttons, text and dropdown colors on the asset creation screen, a fake 5000 RTM balance, fake smartnode data in the manager, fake deployment data, and glitches in the smartnode deployment input fields. The AI engineer had only just begun to address these issues, specifically fixing the password creation for wallet setup. The engineer then summarized the current status, listing all the remaining unfixed issues, and explicitly asked the user whether to complete all the remaining critical production fixes before providing a comprehensive summary for GitHub fork, provide the summary now (with outstanding issues), or focus solely on the summary for immediate GitHub fork.
 </current_work>
 
 <optional_next_step>
-The next step is to systematically verify all frontend styling, layout, and backend functionality in the current session to ensure it precisely matches the expected state, and then confirm its readiness for a reliable GitHub save/fork.
-
-**Direct Quote from Most Recent Conversation:**
-Ok so make sure all style and layout and every single thing on the front end and the back end to make the app display the way it does in this preview here works on the GitHub exactly the same when the repository is pulled by a new session. Check it first here to make sure. I cannot open a new session until you are 100% sure it will because Im wasting tokens with 2 new forks of this session that arent the same visually or functionally. Thankyou. Once you have helped me with that I will appreciate it.
+Complete the remaining critical production fixes to address block height, real asset/node data, styling, and smartnode deployment issues.
 </optional_next_step>
