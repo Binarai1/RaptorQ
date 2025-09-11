@@ -100,11 +100,11 @@ const SettingsDialog = ({ isOpen, onClose, settings, onColorChange, onSecurityUp
               <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
-                <SelectItem value="blue">Quantum Blue</SelectItem>
-                <SelectItem value="purple">Cosmic Purple</SelectItem>
-                <SelectItem value="green">Matrix Green</SelectItem>
-                <SelectItem value="red">Crimson Red</SelectItem>
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
+                <SelectItem value="blue" className="text-white hover:bg-gray-700">Quantum Blue</SelectItem>
+                <SelectItem value="purple" className="text-white hover:bg-gray-700">Cosmic Purple</SelectItem>
+                <SelectItem value="green" className="text-white hover:bg-gray-700">Matrix Green</SelectItem>
+                <SelectItem value="red" className="text-white hover:bg-gray-700">Crimson Red</SelectItem>
               </SelectContent>
             </Select>
           </div>
