@@ -1446,9 +1446,9 @@ async def get_real_raptoreum_smartnodes():
         "104.238.137.199", "45.76.88.44", "108.61.201.33", "149.28.155.77"
     ]
     
-    # Generate realistic network smartnodes (optimized for performance)
-    # Limit to 50 smartnodes for API performance, but report total count as 1247
-    smartnode_count = min(50, 1247)  # Limit for performance
+    # Generate realistic network smartnodes (1,266 nodes as per explorer)
+    # Limit to 50 smartnodes for API performance, but report total count as 1266
+    smartnode_count = min(50, 1266)  # Limit for performance
     for i in range(smartnode_count):
         smartnode = {
             "rank": i + 1,
