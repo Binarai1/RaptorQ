@@ -1292,6 +1292,27 @@ const WalletSetup = ({ onWalletCreated }) => {
             <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
             <CardTitle className="text-white">Welcome Back to RaptorQ</CardTitle>
             <p className="text-gray-400 text-sm">Enter your password to access your wallet</p>
+            
+            {/* Daemon Sync Status at Login Screen */}
+            <div className="mt-4 p-3 bg-gray-800/30 rounded-lg">
+              <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                <span>Daemon Status</span>
+                <div className="flex items-center space-x-1">
+                  <div className={`w-2 h-2 rounded-full ${setupIsConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                  <span>{setupIsConnected ? 'Connected' : 'Connecting'}</span>
+                </div>
+              </div>
+              <div className="w-full bg-gray-700 rounded-full h-2 mb-1">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-cyan-400 h-2 rounded-full transition-all duration-1000"
+                  style={{ width: `${setupSyncProgress}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>Block {setupBlockHeight.toLocaleString()}</span>
+                <span>{setupSyncProgress.toFixed(1)}% synced</span>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
