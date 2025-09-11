@@ -220,73 +220,66 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     ctx.setLineDash([]);
   };
 
-  const drawSmartnodesOnEarth = (ctx, canvas) => {
+  const drawCountryNodes = (ctx, canvas) => {
     if (!filters.smartnodes) return;
     
     const { width, height } = canvas;
-    const earthCenterX = width / 2;
-    const earthCenterY = height / 2;
-    const earthRadius = Math.min(width, height) * 0.35;
     
     Object.entries(countryStats).forEach(([countryCode, country]) => {
       if (country.nodes === 0) return;
       
-      // Convert country coordinates to 3D Earth surface
-      const longitude = (country.x - 50) * 3.6; // Convert to degrees
-      const latitude = (50 - country.y) * 1.8; // Convert to degrees
+      // Apply rotation to coordinates
+      const baseX = width * (country.x / 100);
+      const baseY = height * (country.y / 100);
       
-      // 3D to 2D projection with rotation
-      const rotatedLon = longitude + (earthRotation * 180 / Math.PI);
-      const x = earthCenterX + earthRadius * 0.8 * Math.cos(latitude * Math.PI / 180) * Math.sin(rotatedLon * Math.PI / 180);
-      const y = earthCenterY - earthRadius * 0.8 * Math.sin(latitude * Math.PI / 180);
-      const z = Math.cos(latitude * Math.PI / 180) * Math.cos(rotatedLon * Math.PI / 180);
+      // Rotate around center of screen
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const rotatedX = centerX + (baseX - centerX) * Math.cos(earthRotation * 0.2) - (baseY - centerY) * Math.sin(earthRotation * 0.2);
+      const rotatedY = centerY + (baseX - centerX) * Math.sin(earthRotation * 0.2) + (baseY - centerY) * Math.cos(earthRotation * 0.2);
       
-      // Only draw if visible (facing us)
-      if (z > 0) {
-        const nodeCount = country.nodes;
-        const intensity = Math.min(nodeCount / 50, 1);
-        const scale = 0.5 + z * 0.5; // Distance scaling
+      const nodeCount = country.nodes;
+      const intensity = Math.min(nodeCount / 50, 1); // Max intensity at 50+ nodes
+      
+      // Country glow (brighter)
+      ctx.beginPath();
+      const glowGradient = ctx.createRadialGradient(rotatedX, rotatedY, 0, rotatedX, rotatedY, 40);
+      glowGradient.addColorStop(0, `rgba(16, 255, 129, ${intensity * 0.8})`); // Brighter
+      glowGradient.addColorStop(0.5, `rgba(16, 185, 129, ${intensity * 0.6})`);
+      glowGradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+      ctx.fillStyle = glowGradient;
+      ctx.arc(rotatedX, rotatedY, 35, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // Smartnode cluster
+      for (let i = 0; i < Math.min(nodeCount, 20); i++) {
+        const angle = (i / nodeCount) * 2 * Math.PI + Date.now() * 0.001;
+        const radius = 8 + Math.random() * 12;
+        const nodeX = rotatedX + Math.cos(angle) * radius;
+        const nodeY = rotatedY + Math.sin(angle) * radius;
         
-        // Bright quantum node cluster
-        ctx.beginPath();
-        const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, 40 * scale);
-        glowGradient.addColorStop(0, `rgba(16, 255, 129, ${intensity * 0.9})`); // Brighter green
-        glowGradient.addColorStop(0.5, `rgba(16, 185, 129, ${intensity * 0.6})`);
-        glowGradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-        ctx.fillStyle = glowGradient;
-        ctx.arc(x, y, 35 * scale, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        // Quantum smartnode indicators
-        for (let i = 0; i < Math.min(nodeCount, 15); i++) {
-          const angle = (i / nodeCount) * 2 * Math.PI + Date.now() * 0.001;
-          const radius = (6 + Math.sin(Date.now() * 0.003 + i) * 3) * scale;
-          const nodeX = x + Math.cos(angle) * radius;
-          const nodeY = y + Math.sin(angle) * radius;
-          
-          // Pulsing quantum nodes
-          ctx.save();
-          ctx.translate(nodeX, nodeY);
-          ctx.scale(0.3 * scale, 0.3 * scale);
-          ctx.fillStyle = `rgba(16, 255, 129, ${0.8 + Math.sin(Date.now() * 0.005 + i) * 0.2})`;
-          ctx.shadowColor = 'rgba(16, 255, 129, 0.8)';
-          ctx.shadowBlur = 8;
-          ctx.font = 'bold 16px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText('⚡', 0, 4);
-          ctx.restore();
-        }
-        
-        // Country node count (brighter)
-        if (nodeCount > 5) {
-          ctx.fillStyle = `rgba(255, 255, 255, ${0.9 * scale})`;
-          ctx.font = `bold ${12 * scale}px monospace`;
-          ctx.textAlign = 'center';
-          ctx.shadowColor = 'rgba(16, 255, 129, 0.8)';
-          ctx.shadowBlur = 4;
-          ctx.fillText(nodeCount.toString(), x, y - 30 * scale);
-          ctx.shadowBlur = 0;
-        }
+        // Brighter smartnode birds
+        ctx.save();
+        ctx.translate(nodeX, nodeY);
+        ctx.scale(0.5, 0.5);
+        ctx.fillStyle = `rgba(16, 255, 129, ${0.9 + Math.random() * 0.1})`;
+        ctx.shadowColor = 'rgba(16, 255, 129, 0.8)';
+        ctx.shadowBlur = 6;
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('🐦', 0, 0);
+        ctx.restore();
+      }
+      
+      // Country label for major nodes (brighter)
+      if (nodeCount > 10) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.font = 'bold 11px monospace';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(16, 255, 129, 0.6)';
+        ctx.shadowBlur = 3;
+        ctx.fillText(nodeCount.toString(), rotatedX, rotatedY - 30);
+        ctx.shadowBlur = 0;
       }
     });
   };
