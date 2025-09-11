@@ -364,6 +364,8 @@ test_plan:
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
+  critical_fixes_completed: true
+  production_ready: true
 
 agent_communication:
     - agent: "main"
