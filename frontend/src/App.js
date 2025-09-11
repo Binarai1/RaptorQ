@@ -138,11 +138,20 @@ const SettingsDialog = ({ isOpen, onClose, settings, onColorChange, onSecurityUp
             <div className="flex items-center justify-between">
               <div>
                 <Label className="text-white text-sm">Pro Mode</Label>
-                <p className="text-xs text-gray-400">Advanced smartnode features</p>
+                <p className="text-xs text-gray-400">Advanced smartnode features - FREE</p>
               </div>
               <Switch
                 checked={localSettings.proMode}
-                onCheckedChange={(checked) => setLocalSettings(prev => ({ ...prev, proMode: checked }))}
+                onCheckedChange={(checked) => {
+                  setLocalSettings(prev => ({ ...prev, proMode: checked }));
+                  // Pro Mode is now free - no payment required
+                  if (checked) {
+                    toast({
+                      title: "Pro Mode Enabled",
+                      description: "Advanced smartnode features are now available"
+                    });
+                  }
+                }}
               />
             </div>
           </div>
