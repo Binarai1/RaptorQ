@@ -784,7 +784,22 @@ const SmartnodeManager = ({ isOpen, onClose, wallet, embedded = false }) => {
           </div>
         </div>
 
-        <CreateSmartnodeDialog />
+      <CreateSmartnodeDialog />
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div className="space-y-6">
+        <SmartnodeContent />
+      </div>
+    );
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-6xl max-h-[90vh] overflow-y-auto mobile-dialog">
+        <SmartnodeContent />
       </DialogContent>
     </Dialog>
   );
