@@ -21,7 +21,17 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
-const BlockchainSync = ({ wallet, isVisible = true }) => {
+const BlockchainSync = ({ 
+  isVisible, 
+  autoSync = true, 
+  wallet, 
+  syncProgress = 0, 
+  blockHeight = 0, 
+  isConnected = false, 
+  daemonSyncing = false, 
+  networkStats = { hashrate: 0, difficulty: 0, connections: 0 }, 
+  showSyncAnimation = false 
+}) => {
   const [syncStatus, setSyncStatus] = useState({
     isSync: false,
     currentBlock: 0,
