@@ -901,30 +901,14 @@ const Dashboard = ({ wallet, onLogout }) => {
             </Card>
           </TabsContent>
 
-          {/* Nodes Tab */}
+          {/* Nodes Tab - Auto-opens Smartnode Manager */}
           <TabsContent value="nodes" className="space-y-6">
-            <div className="flex flex-wrap gap-4 mb-6">
-              <Button
-                onClick={() => setShowSmartnodeManager(true)}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
-              >
-                <Globe className="h-4 w-4 mr-2" />
-                Smartnode Manager
-              </Button>
-              
-              <Button
-                onClick={() => setShowProConsole(true)}
-                className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800"
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                Pro Console
-              </Button>
-            </div>
-            
-            <div className="text-center py-12 text-gray-400">
-              <div className="text-lg mb-4">No smartnodes deployed</div>
-              <p className="text-sm">Deploy your first smartnode to start earning RTM</p>
-            </div>
+            <SmartnodeManager 
+              isOpen={true} 
+              onClose={() => {}} 
+              wallet={wallet}
+              embedded={true}
+            />
           </TabsContent>
 
           {/* Sync Tab */}
