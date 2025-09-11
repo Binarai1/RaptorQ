@@ -420,7 +420,7 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
               {/* Asset Properties */}
               <Card className="bg-gray-800/30 border-gray-600/30">
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
+                  <CardTitle className="flex items-center space-x-2 text-white">
                     <Settings className="h-5 w-5 text-purple-400" />
                     Asset Properties
                   </CardTitle>
