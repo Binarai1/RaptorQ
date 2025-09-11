@@ -1174,19 +1174,20 @@ async def get_real_raptoreum_block_height():
 async def get_raptoreum_blockchain_info():
     """Get real-time Raptoreum blockchain information with live data"""
     try:
-        # Get real block height from Raptoreum network
-        current_block = await get_real_raptoreum_block_height()
+        # Get daemon status for consistent data
+        daemon_status = await get_raptoreum_daemon_status()
+        
+        # Use daemon sync data for blockchain info
+        current_block = daemon_status.get("current_block", 0)
+        target_block = daemon_status.get("target_block", current_block)
+        sync_progress_percent = daemon_status.get("sync_progress_percent", 0)
+        is_syncing = daemon_status.get("is_syncing", True)
         
         # Get current timestamp for realistic data
         current_time = datetime.now(timezone.utc)
         
-        # Calculate time difference from mainnet launch for realistic data
-        genesis_time = datetime(2021, 2, 26, tzinfo=timezone.utc)  # Raptoreum mainnet launch
-        time_diff = (current_time - genesis_time).total_seconds()
-        
-        # Calculate realistic sync progress for main Raptoreum chain
-        # Assume we're mostly synced (realistic for production wallet)
-        verification_progress = 0.9999  # 99.99% synced (realistic for running wallet)
+        # Convert percentage to decimal for verification progress
+        verification_progress = sync_progress_percent / 100
         
         # Real mainnet data for production Raptoreum wallet
         # This simulates connecting to actual Raptoreum daemon
