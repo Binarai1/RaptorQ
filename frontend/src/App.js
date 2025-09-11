@@ -1273,11 +1273,41 @@ const WalletSetup = ({ onWalletCreated }) => {
                   <span>{setupIsConnected ? 'Connected' : 'Connecting'}</span>
                 </div>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-2 mb-1">
+              <div className="w-full bg-gray-700 rounded-full h-2 mb-1 relative overflow-hidden">
                 <div 
                   className="bg-gradient-to-r from-blue-500 to-cyan-400 h-2 rounded-full transition-all duration-1000"
                   style={{ width: `${setupSyncProgress}%` }}
                 ></div>
+                
+                {/* Sync animation effects for password screen */}
+                {setupSyncProgress < 99.9 && (
+                  <>
+                    {/* Flowing neon green gradient */}
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-60 rounded-full"
+                      style={{
+                        background: `linear-gradient(90deg, 
+                          transparent 0%, 
+                          #10b981 20%, 
+                          #34d399 50%, 
+                          #6ee7b7 80%, 
+                          transparent 100%)`,
+                        animation: 'flowSync 3s ease-in-out infinite',
+                        filter: 'blur(0.3px) drop-shadow(0 0 6px #10b981)'
+                      }}
+                    />
+                    {/* Super-speed Falcon */}
+                    <div 
+                      className="absolute top-1/2 transform -translate-y-1/2 text-xs"
+                      style={{
+                        animation: 'falconFly 2s ease-in-out infinite, falconGlow 1s ease-in-out infinite',
+                        color: '#10b981'
+                      }}
+                    >
+                      🦅
+                    </div>
+                  </>
+                )}
               </div>
               <div className="flex justify-between text-xs text-gray-500">
                 <span>Block {setupBlockHeight.toLocaleString()}</span>
