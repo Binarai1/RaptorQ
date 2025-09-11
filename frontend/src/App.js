@@ -887,11 +887,18 @@ const Dashboard = ({ wallet, onLogout }) => {
 
           {/* History Tab */}
           <TabsContent value="history" className="space-y-6">
-            <div className="text-center py-12 text-gray-400">
-              <History className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <div className="text-lg mb-4">No transaction history</div>
-              <p className="text-sm">Your transaction history will appear here</p>
-            </div>
+            <Card className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 border-gray-700/50">
+              <CardContent className="p-8 text-center">
+                <History className="h-16 w-16 mx-auto mb-4 text-gray-500 opacity-50" />
+                <div className="text-lg mb-2 text-white">No Transaction History</div>
+                <p className="text-sm text-gray-400 mb-4">
+                  Your RTM transaction history will appear here as you send and receive payments.
+                </p>
+                <div className="text-xs text-gray-500">
+                  Connected to Block {blockHeight.toLocaleString()} • Ready for transactions
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Nodes Tab */}
