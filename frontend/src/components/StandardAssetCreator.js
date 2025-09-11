@@ -428,7 +428,7 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-white">Circulation *</Label>
+                      <Label className="text-white font-medium">Circulation *</Label>
                       <Input
                         type="number"
                         placeholder="1000"
@@ -440,11 +440,11 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
                         }`}
                       />
                       {errors.circulation && <p className="text-red-400 text-xs mt-1">{errors.circulation}</p>}
-                      <p className="text-xs text-gray-400 mt-1">Initial circulation to mint</p>
+                      <p className="text-xs text-gray-300 mt-1">Initial circulation to mint</p>
                     </div>
 
                     <div>
-                      <Label className="text-white">Decimals</Label>
+                      <Label className="text-white font-medium">Decimals</Label>
                       <Select 
                         value={formData.decimals.toString()} 
                         onValueChange={(value) => handleInputChange('decimals', parseInt(value))}
