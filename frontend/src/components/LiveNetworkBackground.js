@@ -327,38 +327,86 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     });
   };
 
-  const drawTransactionBirds = (ctx, canvas) => {
+  const drawQuantumTransactions = (ctx, canvas) => {
     const { width, height } = canvas;
+    const earthCenterX = width / 2;
+    const earthCenterY = height / 2;
+    const earthRadius = Math.min(width, height) * 0.35;
     
-    transactionBirds.current.forEach(bird => {
-      if (bird.life <= 0) return;
-      
-      const x = width * (bird.currentX / 100);
-      const y = height * (bird.currentY / 100);
-      
-      // Transaction bird trail
-      ctx.save();
-      ctx.globalAlpha = bird.life * 0.7;
-      
-      // Glowing trail
-      const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 8);
-      trailGradient.addColorStop(0, `rgba(34, 211, 238, ${bird.glowIntensity})`);
-      trailGradient.addColorStop(1, 'rgba(34, 211, 238, 0)');
-      ctx.fillStyle = trailGradient;
-      ctx.beginPath();
-      ctx.arc(x, y, 6, 0, 2 * Math.PI);
-      ctx.fill();
-      
-      // Tiny transaction bird
-      ctx.translate(x, y);
-      ctx.scale(bird.size, bird.size);
-      ctx.fillStyle = `rgba(34, 211, 238, ${bird.life})`;
-      ctx.font = '12px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('🐦', 0, 0);
-      
-      ctx.restore();
-    });
+    // Draw RTM transactions
+    if (filters.rtmTransactions) {
+      rtmBirds.current.forEach(bird => {
+        if (bird.life <= 0) return;
+        
+        // 3D orbit around Earth
+        const orbitRadius = earthRadius * 1.3;
+        const angle = (bird.progress * Math.PI * 2) + (bird.id.hashCode() * 0.1);
+        const x = earthCenterX + Math.cos(angle) * orbitRadius;
+        const y = earthCenterY + Math.sin(angle) * orbitRadius * 0.6; // Elliptical orbit
+        
+        ctx.save();
+        ctx.globalAlpha = bird.life;
+        
+        // Quantum trail with enhanced glow
+        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 15);
+        trailGradient.addColorStop(0, bird.glow);
+        trailGradient.addColorStop(0.5, bird.glow.replace('1)', '0.4)'));
+        trailGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = trailGradient;
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Transaction particle
+        ctx.translate(x, y);
+        ctx.scale(bird.size, bird.size);
+        ctx.shadowColor = bird.glow;
+        ctx.shadowBlur = 15;
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(bird.emoji, 0, 0);
+        
+        ctx.restore();
+      });
+    }
+    
+    // Draw Asset transactions
+    if (filters.assetTransactions) {
+      assetBirds.current.forEach(bird => {
+        if (bird.life <= 0) return;
+        
+        // Higher orbit for assets
+        const orbitRadius = earthRadius * 1.5;
+        const angle = (bird.progress * Math.PI * 1.5) + (bird.id.hashCode() * 0.2);
+        const x = earthCenterX + Math.cos(angle) * orbitRadius;
+        const y = earthCenterY + Math.sin(angle) * orbitRadius * 0.7;
+        
+        ctx.save();
+        ctx.globalAlpha = bird.life;
+        
+        // Asset quantum signature trail
+        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 18);
+        trailGradient.addColorStop(0, bird.glow);
+        trailGradient.addColorStop(0.3, bird.glow.replace('1)', '0.6)'));
+        trailGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = trailGradient;
+        ctx.beginPath();
+        ctx.arc(x, y, 15, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Asset particle with rotation
+        ctx.translate(x, y);
+        ctx.rotate(bird.progress * Math.PI * 4);
+        ctx.scale(bird.size, bird.size);
+        ctx.shadowColor = bird.glow;
+        ctx.shadowBlur = 20;
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(bird.emoji, 0, 0);
+        
+        ctx.restore();
+      });
+    }
   };
 
   const updateTransactionBirds = () => {
