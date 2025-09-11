@@ -1123,33 +1123,49 @@ const WalletSetup = ({ onWalletCreated }) => {
     }
   }, []);
 
-  // Continuous daemon sync during setup (even at password screen)
+  // Live daemon sync during setup - shows real daemon status from last point
   useEffect(() => {
-    const loadSetupBlockchainInfo = async () => {
+    const loadLiveDaemonSync = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/raptoreum/blockchain-info`);
-        const blockData = response.data;
+        console.log('Loading live daemon sync status for password screen...');
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/raptoreum/daemon/status`);
+        const daemonData = response.data;
         
-        setSetupBlockHeight(blockData.blocks || 0);
-        const realSyncProgress = blockData.sync_progress_percent || ((blockData.verificationprogress || 0) * 100);
-        setSetupSyncProgress(realSyncProgress);
-        setSetupIsConnected(blockData.connections > 0);
+        // Use actual daemon sync status
+        setSetupBlockHeight(daemonData.current_block || 0);
+        setSetupSyncProgress(daemonData.sync_progress_percent || 0);
+        setSetupIsConnected(daemonData.daemon_connected || false);
+        
+        console.log(`Daemon Status: Block ${daemonData.current_block}, ${daemonData.sync_progress_percent}% synced, Connected: ${daemonData.daemon_connected}`);
         
       } catch (error) {
-        console.error('Setup blockchain sync failed:', error);
-        setSetupBlockHeight(0);
-        setSetupSyncProgress(0);
-        setSetupIsConnected(false);
+        console.error('Failed to load live daemon sync:', error);
+        // Fallback to blockchain info if daemon status unavailable
+        try {
+          const fallbackResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/raptoreum/blockchain-info`);
+          const blockData = fallbackResponse.data;
+          
+          setSetupBlockHeight(blockData.blocks || 0);
+          const realSyncProgress = blockData.sync_progress_percent || ((blockData.verificationprogress || 0) * 100);
+          setSetupSyncProgress(realSyncProgress);
+          setSetupIsConnected(blockData.connections > 0);
+          
+        } catch (fallbackError) {
+          console.error('Fallback sync loading failed:', fallbackError);
+          setSetupBlockHeight(0);
+          setSetupSyncProgress(0);
+          setSetupIsConnected(false);
+        }
       }
     };
 
-    // Start immediate sync for setup screen
-    loadSetupBlockchainInfo();
+    // Start immediate live daemon sync for password screen
+    loadLiveDaemonSync();
     
-    // Continue syncing every 10 seconds during setup
-    const setupSyncInterval = setInterval(loadSetupBlockchainInfo, 10000);
+    // Aggressive sync every 5 seconds on password screen for real-time updates
+    const liveSyncInterval = setInterval(loadLiveDaemonSync, 5000);
     
-    return () => clearInterval(setupSyncInterval);
+    return () => clearInterval(liveSyncInterval);
   }, []);
 
   const handlePasswordLogin = () => {
