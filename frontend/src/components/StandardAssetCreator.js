@@ -450,11 +450,11 @@ const StandardAssetCreator = ({ isOpen, onClose, wallet }) => {
                         onValueChange={(value) => handleInputChange('decimals', parseInt(value))}
                       >
                         <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
-                          <SelectValue />
+                          <SelectValue className="text-white" />
                         </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-gray-600">
+                        <SelectContent className="bg-gray-800 border-gray-600 text-white">
                           {[0,1,2,3,4,5,6,7,8].map(d => (
-                            <SelectItem key={d} value={d.toString()}>{d}</SelectItem>
+                            <SelectItem key={d} value={d.toString()} className="text-white hover:bg-gray-700">{d}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
