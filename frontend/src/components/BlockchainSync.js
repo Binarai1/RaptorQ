@@ -113,28 +113,7 @@ const BlockchainSync = ({
     
   }, [blockHeight, syncProgress, daemonSyncing, networkStats, isConnected]);
 
-  const updateMockSyncStatus = () => {
-    setSyncStatus(prev => {
-      const blocksToAdd = Math.floor(Math.random() * 5) + 1;
-      const newCurrentBlock = Math.min(prev.currentBlock + blocksToAdd, 350000);
-      const highestBlock = 350000;
-      const blocksLeft = highestBlock - newCurrentBlock;
-      
-      return {
-        ...prev,
-        currentBlock: newCurrentBlock,
-        highestBlock: highestBlock,
-        blocksLeft: blocksLeft,
-        progress: (newCurrentBlock / highestBlock) * 100,
-        isSync: newCurrentBlock < highestBlock,
-        connectionCount: 8 + Math.floor(Math.random() * 4),
-        syncSpeed: 2.5 + Math.random() * 2,
-        eta: blocksLeft / 3,
-        chainSize: (newCurrentBlock / highestBlock) * 25 * 1024 * 1024 * 1024, // ~25GB
-        verificationProgress: Math.min((newCurrentBlock / highestBlock) * 100, 100)
-      };
-    });
-  };
+
 
   const handlePauseResume = async () => {
     try {
