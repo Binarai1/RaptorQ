@@ -390,62 +390,74 @@ const SmartnodeManager = ({ isOpen, onClose, wallet }) => {
           {/* Configuration Form */}
           <div className="space-y-4">
             <div>
-              <Label className="text-white">Smartnode Alias *</Label>
+              <Label className="text-white font-medium">Smartnode Alias *</Label>
               <Input
                 placeholder="RaptorQ-Node-01"
                 value={newNode.alias}
-                onChange={(e) => setNewNode(prev => ({...prev, alias: e.target.value}))}
-                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                onChange={(e) => setNewNode(prev => ({...prev, alias: e.target.value.trim()}))}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                maxLength={50}
               />
+              <p className="text-xs text-gray-300 mt-1">Unique identifier for your smartnode</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-white">VPS IP Address *</Label>
+                <Label className="text-white font-medium">VPS IP Address *</Label>
                 <Input
                   placeholder="45.32.123.45"
                   value={newNode.vpsIP}
-                  onChange={(e) => setNewNode(prev => ({...prev, vpsIP: e.target.value}))}
-                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                  onChange={(e) => setNewNode(prev => ({...prev, vpsIP: e.target.value.trim()}))}
+                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                  pattern="[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"
                 />
               </div>
               <div>
-                <Label className="text-white">Port</Label>
+                <Label className="text-white font-medium">Port</Label>
                 <Input
                   type="number"
+                  min="1"
+                  max="65535"
                   value={newNode.vpsPort}
-                  onChange={(e) => setNewNode(prev => ({...prev, vpsPort: parseInt(e.target.value) || 10226}))}
-                  className="bg-gray-800/50 border-gray-600 text-white"
+                  onChange={(e) => {
+                    const port = parseInt(e.target.value);
+                    if (port >= 1 && port <= 65535) {
+                      setNewNode(prev => ({...prev, vpsPort: port}));
+                    }
+                  }}
+                  className="bg-gray-800/50 border-gray-600 text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <Label className="text-white">VPS Username *</Label>
+              <Label className="text-white font-medium">VPS Username *</Label>
               <Input
                 placeholder="root"
                 value={newNode.vpsUser}
-                onChange={(e) => setNewNode(prev => ({...prev, vpsUser: e.target.value}))}
-                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                onChange={(e) => setNewNode(prev => ({...prev, vpsUser: e.target.value.trim()}))}
+                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                maxLength={50}
               />
             </div>
 
             <div>
-              <Label className="text-white">VPS Password *</Label>
+              <Label className="text-white font-medium">VPS Password *</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter VPS password"
                   value={newNode.vpsPassword}
                   onChange={(e) => setNewNode(prev => ({...prev, vpsPassword: e.target.value}))}
-                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 pr-10"
+                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 pr-10 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                  maxLength={128}
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
