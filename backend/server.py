@@ -1265,6 +1265,7 @@ async def execute_raptoreum_rpc(rpc_request: dict):
     try:
         command = rpc_request.get("command", "").strip()
         wallet_address = rpc_request.get("wallet_address")
+        current_time = datetime.now(timezone.utc)
         
         # Simulate RPC command execution
         # In production, this would connect to actual Raptoreum Core daemon
