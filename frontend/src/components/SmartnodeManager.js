@@ -550,40 +550,38 @@ const SmartnodeManager = ({ isOpen, onClose, wallet, embedded = false }) => {
     </Dialog>
   );
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-6xl max-h-[90vh] overflow-y-auto mobile-dialog">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Server className="h-5 w-5 text-purple-400" />
-              <span>Smartnode Manager</span>
-              <Badge className="bg-purple-900/30 text-purple-300">
-                {smartnodes.length} Active
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className="w-32 bg-gray-800/50 border-gray-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-600">
-                  <SelectItem value="owned">My Nodes</SelectItem>
-                  <SelectItem value="all">All Nodes</SelectItem>
-                  <SelectItem value="enabled">Enabled</SelectItem>
-                  <SelectItem value="disabled">Disabled</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={() => setShowCreateDialog(true)}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Deploy Node
-              </Button>
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+  const SmartnodeContent = () => (
+    <>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-2">
+          <Server className="h-5 w-5 text-purple-400" />
+          <span className="text-xl font-semibold text-white">Smartnode Manager</span>
+          <Badge className="bg-purple-900/30 text-purple-300">
+            {smartnodes.length} Active
+          </Badge>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-32 bg-gray-800/50 border-gray-600 text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectItem value="owned">My Nodes</SelectItem>
+              <SelectItem value="all">All Nodes</SelectItem>
+              <SelectItem value="enabled">Enabled</SelectItem>
+              <SelectItem value="disabled">Disabled</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={() => setShowCreateDialog(true)}
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Deploy Node
+          </Button>
+        </div>
+      </div>
 
         <div className="space-y-6">
           {/* Network Statistics */}
