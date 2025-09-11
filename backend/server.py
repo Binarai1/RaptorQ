@@ -1179,6 +1179,10 @@ async def get_raptoreum_blockchain_info():
         # Get current timestamp for realistic data
         current_time = datetime.now(timezone.utc)
         
+        # Calculate time difference from mainnet launch for realistic data
+        genesis_time = datetime(2021, 2, 26, tzinfo=timezone.utc)  # Raptoreum mainnet launch
+        time_diff = (current_time - genesis_time).total_seconds()
+        
         # Calculate realistic sync progress for main Raptoreum chain
         # Assume we're mostly synced (realistic for production wallet)
         verification_progress = 0.9999  # 99.99% synced (realistic for running wallet)
