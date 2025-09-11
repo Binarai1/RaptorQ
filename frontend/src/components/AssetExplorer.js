@@ -573,7 +573,7 @@ const AssetDetailDialog = ({ asset, isOpen, onClose }) => {
   );
 };
 
-const AssetExplorer = () => {
+const AssetExplorer = ({ isOpen, onClose, wallet, fillMode = false, showHeader = true }) => {
   const [assets, setAssets] = useState([]);
   const [filteredAssets, setFilteredAssets] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
