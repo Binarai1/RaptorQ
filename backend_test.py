@@ -740,6 +740,313 @@ class RaptorQWalletTester:
         
         return success
 
+    def test_raptoreum_blockchain_info(self):
+        """Test Raptoreum blockchain info endpoint"""
+        success, response = self.run_test(
+            "Raptoreum Blockchain Info",
+            "GET",
+            "raptoreum/blockchain-info",
+            200
+        )
+        
+        if success:
+            print(f"   Chain: {response.get('chain', 'N/A')}")
+            print(f"   Blocks: {response.get('blocks', 'N/A')}")
+            print(f"   Headers: {response.get('headers', 'N/A')}")
+            print(f"   Difficulty: {response.get('difficulty', 'N/A')}")
+            print(f"   Network Hash/s: {response.get('networkhashps', 'N/A')}")
+            print(f"   Connections: {response.get('connections', 'N/A')}")
+            
+            # Check Raptoreum-specific features
+            raptoreum_specific = response.get('raptoreum_specific', {})
+            print(f"   Smartnodes Count: {raptoreum_specific.get('smartnodes_count', 'N/A')}")
+            print(f"   Smartnodes Enabled: {raptoreum_specific.get('smartnodes_enabled', 'N/A')}")
+            print(f"   Assets Created: {raptoreum_specific.get('assets_created', 'N/A')}")
+            print(f"   Quantum Signatures Active: {raptoreum_specific.get('quantum_signatures_active', 'N/A')}")
+            print(f"   Post-Quantum Security: {raptoreum_specific.get('post_quantum_security', 'N/A')}")
+        
+        return success
+
+    def test_raptoreum_create_asset(self):
+        """Test Raptoreum asset creation with 200 RTM fees"""
+        asset_data = {
+            "wallet_address": "RBZTestWallet1234567890123456789",
+            "asset_data": {
+                "name": "TEST_ASSET",
+                "qty": 1000,
+                "units": 8,
+                "reissuable": True,
+                "has_ipfs": False
+            }
+        }
+        
+        success, response = self.run_test(
+            "Raptoreum Asset Creation (200 RTM fees)",
+            "POST",
+            "raptoreum/createasset",
+            200,
+            data=asset_data
+        )
+        
+        if success:
+            result = response.get('result', {})
+            fees = response.get('fees', {})
+            
+            print(f"   Success: {response.get('success', 'N/A')}")
+            print(f"   Asset Name: {result.get('asset_name', 'N/A')}")
+            print(f"   Asset ID: {result.get('asset_id', 'N/A')}")
+            print(f"   Creation TxID: {result.get('creation_txid', 'N/A')}")
+            print(f"   Minting TxID: {result.get('minting_txid', 'N/A')}")
+            print(f"   Circulation: {result.get('circulation', 'N/A')}")
+            
+            # Verify 200 RTM total fees (100 creation + 100 minting + 0.001 transaction)
+            total_fee = result.get('fees_paid', {}).get('total_fee', 0)
+            creation_fee = result.get('fees_paid', {}).get('creation_fee', 0)
+            minting_fee = result.get('fees_paid', {}).get('minting_fee', 0)
+            
+            print(f"   Creation Fee: {creation_fee} RTM")
+            print(f"   Minting Fee: {minting_fee} RTM")
+            print(f"   Total Fee: {total_fee} RTM")
+            
+            if total_fee == 200.001 and creation_fee == 100 and minting_fee == 100:
+                print(f"   ✅ Correct 200 RTM fees (100+100+0.001)")
+            else:
+                print(f"   ⚠️ Fee structure incorrect - expected 200.001 RTM total")
+        
+        return success
+
+    def test_raptoreum_rpc_console(self):
+        """Test Raptoreum RPC console for Pro Mode"""
+        # Test help command
+        success1, response1 = self.run_test(
+            "Raptoreum RPC - Help Command",
+            "POST",
+            "raptoreum/rpc",
+            200,
+            data={"command": "help", "wallet_address": "RBZTestWallet1234567890123456789"}
+        )
+        
+        if success1:
+            print(f"   Command: {response1.get('command', 'N/A')}")
+            print(f"   Success: {response1.get('success', 'N/A')}")
+            print(f"   Execution Time: {response1.get('execution_time', 'N/A')}")
+            print(f"   RPC Version: {response1.get('rpc_version', 'N/A')}")
+        
+        # Test getblockchaininfo command
+        success2, response2 = self.run_test(
+            "Raptoreum RPC - Get Blockchain Info",
+            "POST",
+            "raptoreum/rpc",
+            200,
+            data={"command": "getblockchaininfo", "wallet_address": "RBZTestWallet1234567890123456789"}
+        )
+        
+        # Test smartnode list command
+        success3, response3 = self.run_test(
+            "Raptoreum RPC - Smartnode List",
+            "POST",
+            "raptoreum/rpc",
+            200,
+            data={"command": "smartnode list", "wallet_address": "RBZTestWallet1234567890123456789"}
+        )
+        
+        if success3:
+            result = response3.get('result', [])
+            if isinstance(result, list) and len(result) > 0:
+                print(f"   Smartnodes Found: {len(result)}")
+                first_node = result[0]
+                print(f"   First Node Alias: {first_node.get('alias', 'N/A')}")
+                print(f"   First Node Status: {first_node.get('status', 'N/A')}")
+        
+        return success1 and success2 and success3
+
+    def test_raptoreum_smartnodes_owned(self):
+        """Test owned smartnodes endpoint"""
+        test_address = "RBZTestWallet1234567890123456789"
+        
+        success, response = self.run_test(
+            "Raptoreum Owned Smartnodes",
+            "GET",
+            f"raptoreum/smartnodes/owned/{test_address}",
+            200
+        )
+        
+        if success:
+            smartnodes = response.get('smartnodes', [])
+            print(f"   Owned Smartnodes: {len(smartnodes)}")
+            
+            if smartnodes:
+                first_node = smartnodes[0]
+                print(f"   Node ID: {first_node.get('id', 'N/A')}")
+                print(f"   Alias: {first_node.get('alias', 'N/A')}")
+                print(f"   Status: {first_node.get('status', 'N/A')}")
+                print(f"   IP: {first_node.get('ip', 'N/A')}:{first_node.get('port', 'N/A')}")
+                print(f"   Collateral Locked: {first_node.get('collateral_locked', 'N/A')}")
+                print(f"   Quantum Enhanced: {first_node.get('quantum_enhanced', 'N/A')}")
+                print(f"   Earnings: {first_node.get('earnings', 'N/A')} RTM")
+                print(f"   Blocks Won: {first_node.get('blocks_won', 'N/A')}")
+        
+        return success
+
+    def test_raptoreum_smartnodes_all(self):
+        """Test all smartnodes endpoint"""
+        success, response = self.run_test(
+            "Raptoreum All Smartnodes",
+            "GET",
+            "raptoreum/smartnodes/all",
+            200
+        )
+        
+        if success:
+            smartnodes = response.get('smartnodes', [])
+            print(f"   Total Network Smartnodes: {len(smartnodes)}")
+            
+            if smartnodes:
+                first_node = smartnodes[0]
+                print(f"   Sample Node Alias: {first_node.get('alias', 'N/A')}")
+                print(f"   Sample Node Status: {first_node.get('status', 'N/A')}")
+                print(f"   Sample Node Quantum Enhanced: {first_node.get('quantum_enhanced', 'N/A')}")
+        
+        return success
+
+    def test_raptoreum_smartnode_creation(self):
+        """Test smartnode creation with 1.8M RTM collateral"""
+        smartnode_data = {
+            "alias": "RaptorQ-Test-Node",
+            "vpsIP": "45.32.123.45",
+            "vpsPort": 10226,
+            "enableQuantumSecurity": True,
+            "autoRestart": True,
+            "monitoringEnabled": True
+        }
+        
+        success, response = self.run_test(
+            "Raptoreum Smartnode Creation (1.8M RTM)",
+            "POST",
+            "raptoreum/smartnodes/create",
+            200,
+            data=smartnode_data
+        )
+        
+        if success:
+            config = response.get('config', {})
+            print(f"   Success: {response.get('success', 'N/A')}")
+            print(f"   Smartnode ID: {response.get('smartnode_id', 'N/A')}")
+            print(f"   Alias: {config.get('alias', 'N/A')}")
+            print(f"   IP: {config.get('ip', 'N/A')}:{config.get('port', 'N/A')}")
+            print(f"   Collateral Required: {config.get('collateral', 'N/A')} RTM")
+            print(f"   Quantum Enhanced: {config.get('quantum_enhanced', 'N/A')}")
+            print(f"   Status: {config.get('status', 'N/A')}")
+            print(f"   Estimated Activation: {response.get('estimated_activation_time', 'N/A')}")
+            
+            # Verify 1.8M RTM collateral requirement
+            collateral = config.get('collateral', 0)
+            if collateral == 1800000:
+                print(f"   ✅ Correct 1.8M RTM collateral requirement")
+            else:
+                print(f"   ⚠️ Incorrect collateral - expected 1,800,000 RTM, got {collateral}")
+        
+        return success
+
+    def test_raptoreum_smartnode_collateral_management(self):
+        """Test smartnode collateral lock/unlock"""
+        test_node_id = "mn_test123456"
+        
+        # Test collateral lock
+        success1, response1 = self.run_test(
+            "Smartnode Collateral Lock",
+            "POST",
+            f"raptoreum/smartnodes/{test_node_id}/lock-collateral",
+            200,
+            data={"wallet_address": "RBZTestWallet1234567890123456789"}
+        )
+        
+        if success1:
+            print(f"   Lock Success: {response1.get('success', 'N/A')}")
+            print(f"   Collateral Amount: {response1.get('collateral_amount', 'N/A')} RTM")
+            print(f"   Locked At: {response1.get('locked_at', 'N/A')}")
+            print(f"   Unlockable: {response1.get('unlockable', 'N/A')}")
+        
+        # Test collateral unlock
+        success2, response2 = self.run_test(
+            "Smartnode Collateral Unlock",
+            "POST",
+            f"raptoreum/smartnodes/{test_node_id}/unlock-collateral",
+            200,
+            data={"wallet_address": "RBZTestWallet1234567890123456789"}
+        )
+        
+        if success2:
+            print(f"   Unlock Success: {response2.get('success', 'N/A')}")
+            print(f"   Collateral Amount: {response2.get('collateral_amount', 'N/A')} RTM")
+            print(f"   Unlocked At: {response2.get('unlocked_at', 'N/A')}")
+            print(f"   Spendable: {response2.get('spendable', 'N/A')}")
+        
+        return success1 and success2
+
+    def test_session_wallet_balance(self):
+        """Test wallet balance endpoints (should return 0 for new wallets)"""
+        test_wallet_id = "new_test_wallet_123"
+        
+        success, response = self.run_test(
+            "New Wallet Balance (Should be 0)",
+            "GET",
+            f"wallet/{test_wallet_id}/balance",
+            200
+        )
+        
+        if success:
+            rtm_balance = response.get('rtm_balance', -1)
+            assets = response.get('assets', [])
+            
+            print(f"   RTM Balance: {rtm_balance}")
+            print(f"   Assets Count: {len(assets)}")
+            
+            # New wallets should have 0 balance
+            if rtm_balance == 0:
+                print(f"   ✅ Correct - new wallet has 0 RTM balance")
+            else:
+                print(f"   ⚠️ Unexpected balance for new wallet")
+        
+        return success
+
+    def test_quantum_signature_generation(self):
+        """Test quantum signature generation"""
+        # This is tested through asset creation, but let's verify the signature format
+        asset_data = {
+            "wallet_id": "test_wallet_quantum",
+            "metadata": {
+                "name": "Quantum Signature Test Asset",
+                "description": "Testing quantum signature generation",
+                "file_type": "png"
+            }
+        }
+        
+        success, response = self.run_test(
+            "Quantum Signature Generation",
+            "POST",
+            "assets/create",
+            200,
+            data=asset_data
+        )
+        
+        if success:
+            quantum_signature = response.get('quantum_signature', {})
+            signature = quantum_signature.get('signature', '')
+            
+            print(f"   Quantum Signature Present: {'Yes' if signature else 'No'}")
+            print(f"   Signature Length: {len(signature)} characters")
+            print(f"   Security Level: {quantum_signature.get('security_level', 'N/A')}")
+            print(f"   Quantum Strength: {quantum_signature.get('quantum_strength', 'N/A')}")
+            
+            # Quantum signatures should be long (SHA3-2048 equivalent)
+            if len(signature) >= 512:  # 2048 bits = 512 hex characters
+                print(f"   ✅ Quantum signature has sufficient length for SHA3-2048 equivalent")
+            else:
+                print(f"   ⚠️ Quantum signature may be too short for claimed security level")
+        
+        return success
+
     def test_branding_consistency(self):
         """Test that all endpoints use RaptorQ branding, not emergent"""
         print("\n🔍 Testing Branding Consistency...")
@@ -789,6 +1096,35 @@ class RaptorQWalletTester:
             
             if 'raptorq' in title:
                 print(f"   ✅ Legal disclaimer has proper RaptorQ branding")
+        
+        # Test asset creation branding
+        asset_data = {
+            "wallet_id": "branding_test_wallet",
+            "metadata": {
+                "name": "Branding Test Asset",
+                "description": "Testing branding consistency",
+                "file_type": "png"
+            }
+        }
+        
+        success4, response4 = self.run_test(
+            "Asset Creation Branding",
+            "POST",
+            "assets/create",
+            200,
+            data=asset_data
+        )
+        
+        if success4:
+            created_by = response4.get('created_by', '').lower()
+            quantum_sig = response4.get('quantum_signature', {})
+            created_with = quantum_sig.get('created_with', '').lower()
+            
+            if 'emergent' in created_by or 'emergent' in created_with:
+                branding_issues.append("Asset creation contains 'emergent' branding")
+            
+            if 'raptorq' in created_by and 'binarai' in created_with:
+                print(f"   ✅ Asset creation has proper RaptorQ by Binarai branding")
         
         if branding_issues:
             print(f"   ⚠️ Branding issues found:")
