@@ -683,6 +683,25 @@ select:focus-visible {
   color: #10b981;
 }
 
+/* Floating animation for smartnode birds */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(2deg);
+  }
+}
+
+.floating-bird {
+  animation: float 3s ease-in-out infinite;
+}
+
+.floating-bird:hover {
+  animation: float 1.5s ease-in-out infinite;
+  transform: scale(1.2);
+}
+
 .animate-flow-sync {
   animation: flowSync 3s ease-in-out infinite;
 }
