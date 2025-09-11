@@ -1492,7 +1492,7 @@ async def get_all_smartnodes():
             "last_updated": datetime.now(timezone.utc).isoformat(),
             "network": "mainnet",
             "real_data": True,
-            "note": f"Showing first {len(network_smartnodes)} of {1247} smartnodes for performance"
+            "note": f"Showing first {len(network_smartnodes)} of {1266} smartnodes for performance"
         }
         
     except Exception as e:
