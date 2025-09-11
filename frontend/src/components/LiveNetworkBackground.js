@@ -307,7 +307,7 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
   const drawTransactions = (ctx, canvas) => {
     const { width, height } = canvas;
     
-    // Simplified RTM transaction drawing
+    // RTM transactions with neon green trails
     if (filters.rtmTransactions) {
       rtmBirds.current.forEach(bird => {
         if (bird.life <= 0.2) return;
@@ -315,26 +315,30 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
         const x = width * (bird.currentX / 100);
         const y = height * (bird.currentY / 100);
         
-        // Simple, efficient glow
+        // Neon green trail
         ctx.save();
-        ctx.globalAlpha = bird.life;
-        ctx.fillStyle = 'rgba(0, 191, 255, 0.8)'; // Clean cyan
-        ctx.shadowColor = 'rgba(0, 191, 255, 0.9)';
-        ctx.shadowBlur = 8;
+        ctx.globalAlpha = bird.life * 0.8;
+        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 20);
+        trailGradient.addColorStop(0, 'rgba(0, 255, 0, 1)'); // Bright neon green
+        trailGradient.addColorStop(0.5, 'rgba(0, 255, 0, 0.6)');
+        trailGradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
+        ctx.fillStyle = trailGradient;
         ctx.beginPath();
-        ctx.arc(x, y, 6, 0, 2 * Math.PI);
+        ctx.arc(x, y, 15, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Clean transaction indicator
-        ctx.shadowBlur = 6;
-        ctx.font = 'bold 12px Arial';
+        // Transaction indicator
+        ctx.shadowColor = 'rgba(0, 255, 0, 0.9)';
+        ctx.shadowBlur = 8;
+        ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('💎', x, y + 3);
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+        ctx.fillText('💎', x, y + 4);
         ctx.restore();
       });
     }
     
-    // Simplified Asset transaction drawing  
+    // Asset transactions with neon green trails
     if (filters.assetTransactions) {
       assetBirds.current.forEach(bird => {
         if (bird.life <= 0.2) return;
@@ -342,21 +346,25 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
         const x = width * (bird.currentX / 100);
         const y = height * (bird.currentY / 100);
         
-        // Simple, efficient glow
+        // Neon green trail
         ctx.save();
-        ctx.globalAlpha = bird.life;
-        ctx.fillStyle = 'rgba(255, 215, 0, 0.9)'; // Clean gold
-        ctx.shadowColor = 'rgba(255, 215, 0, 0.9)';
-        ctx.shadowBlur = 10;
+        ctx.globalAlpha = bird.life * 0.9;
+        const trailGradient = ctx.createRadialGradient(x, y, 0, x, y, 25);
+        trailGradient.addColorStop(0, 'rgba(0, 255, 0, 1)'); // Bright neon green
+        trailGradient.addColorStop(0.4, 'rgba(0, 255, 0, 0.7)');
+        trailGradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
+        ctx.fillStyle = trailGradient;
         ctx.beginPath();
-        ctx.arc(x, y, 7, 0, 2 * Math.PI);
+        ctx.arc(x, y, 18, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Clean asset indicator
-        ctx.shadowBlur = 8;
-        ctx.font = 'bold 14px Arial';
+        // Asset indicator
+        ctx.shadowColor = 'rgba(0, 255, 0, 0.9)';
+        ctx.shadowBlur = 10;
+        ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('🔰', x, y + 4);
+        ctx.fillStyle = 'rgba(255, 215, 0, 1)';
+        ctx.fillText('🔰', x, y + 5);
         ctx.restore();
       });
     }
