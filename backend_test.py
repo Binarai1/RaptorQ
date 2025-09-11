@@ -984,29 +984,280 @@ class RaptorQWalletTester:
         
         return success1 and success2
 
-    def test_session_wallet_balance(self):
-        """Test wallet balance endpoints (should return 0 for new wallets)"""
-        test_wallet_id = "new_test_wallet_123"
+    def test_real_wallet_balance(self):
+        """Test real wallet balance endpoint (should return 0 for new addresses, not fake 5000 RTM)"""
+        test_address = "RBZTestAddress1234567890123456789"
         
         success, response = self.run_test(
-            "New Wallet Balance (Should be 0)",
+            "Real Wallet Balance (No Fake 5000 RTM)",
             "GET",
-            f"wallet/{test_wallet_id}/balance",
+            f"wallet/{test_address}/balance",
             200
         )
         
         if success:
-            rtm_balance = response.get('rtm_balance', -1)
-            assets = response.get('assets', [])
+            balance = response.get('balance', -1)
+            confirmed_balance = response.get('confirmed_balance', -1)
+            spendable_balance = response.get('spendable_balance', -1)
             
-            print(f"   RTM Balance: {rtm_balance}")
-            print(f"   Assets Count: {len(assets)}")
+            print(f"   Balance: {balance} RTM")
+            print(f"   Confirmed Balance: {confirmed_balance} RTM")
+            print(f"   Spendable Balance: {spendable_balance} RTM")
+            print(f"   Transaction Count: {response.get('transaction_count', 'N/A')}")
+            print(f"   Sync Status: {response.get('sync_status', 'N/A')}")
             
-            # New wallets should have 0 balance
-            if rtm_balance == 0:
-                print(f"   ✅ Correct - new wallet has 0 RTM balance")
+            # Check that we're not returning fake 5000 RTM balance
+            if balance == 5000.0:
+                print(f"   ❌ CRITICAL: Still returning fake 5000 RTM balance!")
+                return False
+            elif balance >= 0 and balance <= 1000:  # Realistic balance for test addresses
+                print(f"   ✅ Real balance returned (not fake 5000 RTM)")
             else:
-                print(f"   ⚠️ Unexpected balance for new wallet")
+                print(f"   ⚠️ Unexpected balance: {balance}")
+        
+        return success
+
+    def test_real_wallet_assets(self):
+        """Test real wallet assets endpoint (should return real blockchain data)"""
+        test_address = "RBZTestAddress1234567890123456789"
+        
+        success, response = self.run_test(
+            "Real Wallet Assets (No Fake Data)",
+            "GET",
+            f"wallet/{test_address}/assets",
+            200
+        )
+        
+        if success:
+            assets = response.get('assets', [])
+            total_assets = response.get('total_assets', 0)
+            
+            print(f"   Assets Count: {len(assets)}")
+            print(f"   Total Assets: {total_assets}")
+            print(f"   Last Updated: {response.get('last_updated', 'N/A')}")
+            
+            # For new addresses, should have empty assets (realistic)
+            if len(assets) == 0:
+                print(f"   ✅ Real asset data - empty for new address")
+            else:
+                print(f"   Assets found:")
+                for asset in assets[:3]:  # Show first 3
+                    print(f"      - {asset.get('asset_name', 'N/A')}: {asset.get('balance', 'N/A')}")
+        
+        return success
+
+    def test_real_blockchain_info_dynamic(self):
+        """Test real blockchain info with dynamic block height and sync progress"""
+        success, response = self.run_test(
+            "Real Blockchain Info (Dynamic Data)",
+            "GET",
+            "raptoreum/blockchain-info",
+            200
+        )
+        
+        if success:
+            blocks = response.get('blocks', 0)
+            headers = response.get('headers', 0)
+            verification_progress = response.get('verificationprogress', 0)
+            is_syncing = response.get('is_syncing', False)
+            connections = response.get('connections', 0)
+            
+            print(f"   Current Block Height: {blocks}")
+            print(f"   Headers: {headers}")
+            print(f"   Verification Progress: {verification_progress * 100:.2f}%")
+            print(f"   Is Syncing: {is_syncing}")
+            print(f"   Connections: {connections}")
+            print(f"   Sync Progress: {response.get('sync_progress_percent', 'N/A')}%")
+            print(f"   Estimated Sync Time: {response.get('estimated_sync_time', 'N/A')}")
+            
+            # Check for dynamic data (not static)
+            if blocks > 340000:  # Should be above base block height
+                print(f"   ✅ Dynamic block height detected")
+            else:
+                print(f"   ⚠️ Block height seems static")
+                
+            # Check public node connections
+            public_nodes = response.get('public_nodes_connected', [])
+            if len(public_nodes) > 0:
+                print(f"   ✅ Connected to {len(public_nodes)} public nodes")
+                for node in public_nodes[:2]:
+                    print(f"      - {node.get('ip', 'N/A')}:{node.get('port', 'N/A')} ({node.get('status', 'N/A')})")
+            else:
+                print(f"   ⚠️ No public node connections found")
+        
+        return success
+
+    def test_advertising_integration(self):
+        """Test advertising integration endpoints"""
+        print("\n🔍 Testing Advertising Integration...")
+        
+        # Test advertising slots
+        success1, response1 = self.run_test(
+            "Advertising Slots",
+            "GET",
+            "advertising/slots",
+            200
+        )
+        
+        if success1:
+            slots = response1.get('slots', {})
+            print(f"   Available Slots: {len(slots)}")
+            for slot_name, slot_data in slots.items():
+                print(f"      - {slot_name}: Active={slot_data.get('active', 'N/A')}")
+        
+        # Test track impression
+        success2, response2 = self.run_test(
+            "Track Advertisement Impression",
+            "POST",
+            "advertising/track-impression",
+            200,
+            data={"slot": "wallet_bottom", "advertiser_wallet": "RBZTestAdvertiser123456789"}
+        )
+        
+        if success2:
+            print(f"   Impression Tracked: {response2.get('success', 'N/A')}")
+            print(f"   Total Impressions: {response2.get('total_impressions', 'N/A')}")
+        
+        # Test track click
+        success3, response3 = self.run_test(
+            "Track Advertisement Click",
+            "POST",
+            "advertising/track-click",
+            200,
+            data={"slot": "wallet_bottom", "advertiser_wallet": "RBZTestAdvertiser123456789"}
+        )
+        
+        if success3:
+            print(f"   Click Tracked: {response3.get('success', 'N/A')}")
+            print(f"   Total Clicks: {response3.get('total_clicks', 'N/A')}")
+        
+        return success1 and success2 and success3
+
+    def test_real_smartnode_data(self):
+        """Test real smartnode data endpoints (not fake mock data)"""
+        print("\n🔍 Testing Real Smartnode Data...")
+        
+        test_address = "RBZTestAddress1234567890123456789"
+        
+        # Test owned smartnodes
+        success1, response1 = self.run_test(
+            "Real Owned Smartnodes Data",
+            "GET",
+            f"raptoreum/smartnodes/owned/{test_address}",
+            200
+        )
+        
+        if success1:
+            smartnodes = response1.get('smartnodes', [])
+            print(f"   Owned Smartnodes: {len(smartnodes)}")
+            
+            if smartnodes:
+                node = smartnodes[0]
+                print(f"   Sample Node Status: {node.get('status', 'N/A')}")
+                print(f"   Sample Node Earnings: {node.get('earnings', 'N/A')} RTM")
+                print(f"   Sample Node Blocks Won: {node.get('blocks_won', 'N/A')}")
+                print(f"   Sample Node Quantum Enhanced: {node.get('quantum_enhanced', 'N/A')}")
+                
+                # Check for realistic data (not obviously fake)
+                earnings = node.get('earnings', 0)
+                if isinstance(earnings, (int, float)) and earnings >= 0:
+                    print(f"   ✅ Realistic earnings data")
+                else:
+                    print(f"   ⚠️ Suspicious earnings data")
+        
+        # Test all smartnodes
+        success2, response2 = self.run_test(
+            "Real All Smartnodes Data",
+            "GET",
+            "raptoreum/smartnodes/all",
+            200
+        )
+        
+        if success2:
+            all_smartnodes = response2.get('smartnodes', [])
+            print(f"   Network Smartnodes: {len(all_smartnodes)}")
+            
+            if all_smartnodes:
+                node = all_smartnodes[0]
+                print(f"   Sample Network Node Status: {node.get('status', 'N/A')}")
+                print(f"   Sample Network Node Active Time: {node.get('active_time', 'N/A')}")
+        
+        return success1 and success2
+
+    def test_all_raptoreum_assets_real(self):
+        """Test all Raptoreum assets endpoint for real blockchain data"""
+        success, response = self.run_test(
+            "All Raptoreum Assets (Real Data)",
+            "GET",
+            "raptoreum/assets/all",
+            200
+        )
+        
+        if success:
+            assets = response.get('assets', [])
+            total_assets = response.get('total_assets', 0)
+            
+            print(f"   Total Blockchain Assets: {total_assets}")
+            print(f"   Assets Returned: {len(assets)}")
+            print(f"   Last Updated: {response.get('last_updated', 'N/A')}")
+            
+            if assets:
+                print(f"   Sample Assets:")
+                for asset in assets[:3]:
+                    print(f"      - {asset.get('name', 'N/A')}: {asset.get('quantity', 'N/A')} units")
+                    print(f"        Type: {asset.get('type', 'N/A')}, Reissuable: {asset.get('reissuable', 'N/A')}")
+            else:
+                print(f"   ✅ Empty asset list (realistic for new blockchain)")
+        
+        return success
+
+    def test_asset_creation_fees_200rtm(self):
+        """Test asset creation maintains correct 200 RTM total fees"""
+        asset_data = {
+            "wallet_address": "RBZTestWallet1234567890123456789",
+            "asset_data": {
+                "name": "FEE_TEST_ASSET",
+                "qty": 1000,
+                "units": 8,
+                "reissuable": True,
+                "has_ipfs": False
+            }
+        }
+        
+        success, response = self.run_test(
+            "Asset Creation Fees (200 RTM Total)",
+            "POST",
+            "raptoreum/createasset",
+            200,
+            data=asset_data
+        )
+        
+        if success:
+            result = response.get('result', {})
+            fees_paid = result.get('fees_paid', {})
+            
+            creation_fee = fees_paid.get('creation_fee', 0)
+            minting_fee = fees_paid.get('minting_fee', 0)
+            transaction_fee = fees_paid.get('transaction_fee', 0)
+            total_fee = fees_paid.get('total_fee', 0)
+            
+            print(f"   Creation Fee: {creation_fee} RTM")
+            print(f"   Minting Fee: {minting_fee} RTM")
+            print(f"   Transaction Fee: {transaction_fee} RTM")
+            print(f"   Total Fee: {total_fee} RTM")
+            
+            # Verify exact fee structure: 100 + 100 + 0.001 = 200.001
+            if (creation_fee == 100 and 
+                minting_fee == 100 and 
+                transaction_fee == 0.001 and 
+                total_fee == 200.001):
+                print(f"   ✅ CORRECT: 200 RTM total fees (100 creation + 100 minting + 0.001 transaction)")
+                return True
+            else:
+                print(f"   ❌ INCORRECT FEE STRUCTURE:")
+                print(f"      Expected: 100 + 100 + 0.001 = 200.001 RTM")
+                print(f"      Got: {creation_fee} + {minting_fee} + {transaction_fee} = {total_fee} RTM")
+                return False
         
         return success
 
