@@ -565,7 +565,7 @@ const Dashboard = ({ wallet, onLogout }) => {
   // Continuous daemon sync - runs automatically regardless of user actions
   useEffect(() => {
     // Start immediate sync on mount
-    loadBalance();
+    loadWalletData();
     loadBlockchainInfo();
     
     // Continuous sync every 10 seconds (faster for production wallet)
@@ -575,7 +575,7 @@ const Dashboard = ({ wallet, onLogout }) => {
     
     // Balance update every 30 seconds
     const balanceInterval = setInterval(() => {
-      loadBalance();
+      loadWalletData();
     }, 30000);
     
     return () => {
