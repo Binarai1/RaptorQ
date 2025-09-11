@@ -521,8 +521,14 @@ const Dashboard = ({ wallet, onLogout }) => {
   // Core state management
   const [balance, setBalance] = useState(0);
   const [blockHeight, setBlockHeight] = useState(0);
-  const [syncProgress, setSyncProgress] = useState(100);
   const [isConnected, setIsConnected] = useState(false);
+  const [syncProgress, setSyncProgress] = useState(0);
+  const [daemonSyncing, setDaemonSyncing] = useState(true);
+  const [networkStats, setNetworkStats] = useState({
+    hashrate: 0,
+    difficulty: 0,
+    connections: 0
+  });
   const [lastUpdate, setLastUpdate] = useState(new Date());
   
   // UI state
