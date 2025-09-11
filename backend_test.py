@@ -1101,35 +1101,52 @@ class RaptorQWalletTester:
         
         if success1:
             slots = response1.get('slots', {})
+            daily_price_rtm = response1.get('daily_price_rtm', 'N/A')
+            daily_price_usd = response1.get('daily_price_usd', 'N/A')
+            
             print(f"   Available Slots: {len(slots)}")
+            print(f"   Daily Price: {daily_price_rtm} RTM (${daily_price_usd})")
+            
             for slot_name, slot_data in slots.items():
-                print(f"      - {slot_name}: Active={slot_data.get('active', 'N/A')}")
+                active = slot_data.get('active', False)
+                clicks = slot_data.get('clicks', 0)
+                impressions = slot_data.get('impressions', 0)
+                print(f"      - {slot_name}: Active={active}, Clicks={clicks}, Impressions={impressions}")
         
-        # Test track impression
+        # Test track impression (using correct parameter name)
         success2, response2 = self.run_test(
             "Track Advertisement Impression",
             "POST",
             "advertising/track-impression",
             200,
-            data={"slot": "wallet_bottom", "advertiser_wallet": "RBZTestAdvertiser123456789"}
+            data={"slot_name": "wallet_bottom"}
         )
         
         if success2:
             print(f"   Impression Tracked: {response2.get('success', 'N/A')}")
-            print(f"   Total Impressions: {response2.get('total_impressions', 'N/A')}")
+            print(f"   Slot Name: {response2.get('slot_name', 'N/A')}")
+            print(f"   Timestamp: {response2.get('timestamp', 'N/A')}")
         
-        # Test track click
+        # Test track click (using correct parameter names)
         success3, response3 = self.run_test(
             "Track Advertisement Click",
             "POST",
             "advertising/track-click",
             200,
-            data={"slot": "wallet_bottom", "advertiser_wallet": "RBZTestAdvertiser123456789"}
+            data={"slot_name": "wallet_bottom", "url": "https://example.com/ad"}
         )
         
         if success3:
             print(f"   Click Tracked: {response3.get('success', 'N/A')}")
-            print(f"   Total Clicks: {response3.get('total_clicks', 'N/A')}")
+            print(f"   Slot Name: {response3.get('slot_name', 'N/A')}")
+            print(f"   URL: {response3.get('url', 'N/A')}")
+            print(f"   Timestamp: {response3.get('timestamp', 'N/A')}")
+        
+        # Verify advertising functionality is restored
+        if success1 and success2 and success3:
+            print(f"   ✅ Advertising integration fully restored and functional")
+        else:
+            print(f"   ❌ Advertising integration has issues")
         
         return success1 and success2 and success3
 
