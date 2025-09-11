@@ -633,44 +633,47 @@ const Dashboard = ({ wallet, onLogout }) => {
 
           {/* Wallet Tab */}
           <TabsContent value="wallet" className="space-y-6">
+            {/* Premium Advertising Banner - restored as requested */}
+            <AdvertisingBanner position="header" className="mb-6" />
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Button
                 onClick={() => setShowQRReceive(true)}
-                className="h-24 bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                className="h-24 bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg shadow-green-500/20 border border-green-500/30"
               >
                 <div className="text-center">
-                  <QrCode className="h-8 w-8 mx-auto mb-2" />
-                  <span>Receive RTM</span>
+                  <QrCode className="h-8 w-8 mx-auto mb-2 text-white" />
+                  <span className="font-semibold text-white">Receive RTM</span>
                 </div>
               </Button>
               
               <Button
                 onClick={() => setShowSendDialog(true)}
-                className="h-24 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                className="h-24 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/20 border border-blue-500/30"
               >
                 <div className="text-center">
-                  <Send className="h-8 w-8 mx-auto mb-2" />
-                  <span>Send RTM</span>
+                  <Send className="h-8 w-8 mx-auto mb-2 text-white" />
+                  <span className="font-semibold text-white">Send RTM</span>
                 </div>
               </Button>
               
               <Button
                 onClick={() => setShowQRScan(true)}
-                className="h-24 bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+                className="h-24 bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg shadow-purple-500/20 border border-purple-500/30"
               >
                 <div className="text-center">
-                  <Camera className="h-8 w-8 mx-auto mb-2" />
-                  <span>Scan QR</span>
+                  <Camera className="h-8 w-8 mx-auto mb-2 text-white" />
+                  <span className="font-semibold text-white">Scan QR</span>
                 </div>
               </Button>
               
               <Button
                 onClick={() => setShowPremiumServices(true)}
-                className="h-24 bg-gradient-to-br from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800"
+                className="h-24 bg-gradient-to-br from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 shadow-lg shadow-yellow-500/20 border border-yellow-500/30"
               >
                 <div className="text-center">
-                  <Zap className="h-8 w-8 mx-auto mb-2" />
-                  <span>Premium</span>
+                  <Zap className="h-8 w-8 mx-auto mb-2 text-white" />
+                  <span className="font-semibold text-white">Premium</span>
                 </div>
               </Button>
             </div>
