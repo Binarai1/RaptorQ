@@ -707,11 +707,19 @@ const Dashboard = ({ wallet, onLogout }) => {
               </Button>
             </div>
             
-            <div className="text-center py-12 text-gray-400">
-              <Layers className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <div className="text-lg mb-4">No assets found</div>
-              <p className="text-sm">Create your first asset to get started</p>
-            </div>
+            {/* Real empty state for fresh wallet on main Raptoreum chain */}
+            <Card className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 border-gray-700/50">
+              <CardContent className="p-8 text-center">
+                <Layers className="h-16 w-16 mx-auto mb-4 text-gray-500 opacity-50" />
+                <div className="text-lg mb-2 text-white">No Assets Yet</div>
+                <p className="text-sm text-gray-400 mb-4">
+                  This is a fresh wallet on the main Raptoreum blockchain. You haven't created or received any assets yet.
+                </p>
+                <div className="text-xs text-gray-500">
+                  Main Chain • Block {blockHeight.toLocaleString()} • {isConnected ? 'Connected' : 'Disconnected'}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* History Tab */}
