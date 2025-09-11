@@ -160,100 +160,64 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     };
   };
 
-  const drawSpaceView = (ctx, canvas) => {
+  const drawWorld = (ctx, canvas) => {
     const { width, height } = canvas;
     
-    // Deep space background with stars
-    const spaceGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
-    spaceGradient.addColorStop(0, 'rgba(2, 6, 23, 1)');
-    spaceGradient.addColorStop(0.7, 'rgba(7, 11, 38, 1)');
-    spaceGradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
-    ctx.fillStyle = spaceGradient;
+    // Clear canvas with deep space background (brighter)
+    const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+    gradient.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.98)');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
     
-    // Add stars
-    for (let i = 0; i < 200; i++) {
+    // Add subtle stars
+    for (let i = 0; i < 100; i++) {
       const x = Math.random() * width;
       const y = Math.random() * height;
       const brightness = Math.random();
       ctx.beginPath();
-      ctx.arc(x, y, brightness * 1.5, 0, 2 * Math.PI);
-      ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.8})`;
+      ctx.arc(x, y, brightness * 1, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(255, 255, 255, ${brightness * 0.6})`;
       ctx.fill();
     }
     
-    // Draw rotating Earth from space perspective
-    const earthCenterX = width / 2;
-    const earthCenterY = height / 2;
-    const earthRadius = Math.min(width, height) * 0.35;
-    
-    // Earth base with quantum glow
-    const earthGradient = ctx.createRadialGradient(
-      earthCenterX, earthCenterY, earthRadius * 0.7,
-      earthCenterX, earthCenterY, earthRadius * 1.2
-    );
-    earthGradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
-    earthGradient.addColorStop(0.8, 'rgba(16, 185, 129, 0.1)');
-    earthGradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-    
-    ctx.fillStyle = earthGradient;
-    ctx.beginPath();
-    ctx.arc(earthCenterX, earthCenterY, earthRadius * 1.1, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Earth surface
-    const surfaceGradient = ctx.createRadialGradient(
-      earthCenterX - earthRadius * 0.3, earthCenterY - earthRadius * 0.3, 0,
-      earthCenterX, earthCenterY, earthRadius
-    );
-    surfaceGradient.addColorStop(0, 'rgba(30, 58, 138, 0.9)');
-    surfaceGradient.addColorStop(0.6, 'rgba(21, 101, 192, 0.8)');
-    surfaceGradient.addColorStop(1, 'rgba(15, 23, 42, 0.9)');
-    
-    ctx.fillStyle = surfaceGradient;
-    ctx.beginPath();
-    ctx.arc(earthCenterX, earthCenterY, earthRadius, 0, 2 * Math.PI);
-    ctx.fill();
-    
-    // Rotating continents (simplified, affected by earthRotation)
+    // Draw continent outlines with rotation effect
     ctx.save();
-    ctx.translate(earthCenterX, earthCenterY);
-    ctx.rotate(earthRotation);
+    ctx.translate(width/2, height/2);
+    ctx.rotate(earthRotation * 0.1); // Slow Earth rotation
+    ctx.translate(-width/2, -height/2);
     
-    // North America
-    if (filters.smartnodes) {
-      ctx.fillStyle = 'rgba(34, 197, 94, 0.7)';
-      ctx.beginPath();
-      ctx.ellipse(-earthRadius * 0.6, -earthRadius * 0.2, earthRadius * 0.25, earthRadius * 0.35, 0.3, 0, 2 * Math.PI);
-      ctx.fill();
-    }
+    ctx.strokeStyle = 'rgba(71, 85, 105, 0.4)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([3, 4]);
+    
+    // North America (shifted slightly with rotation)
+    ctx.beginPath();
+    ctx.moveTo(width * 0.05, height * 0.3);
+    ctx.lineTo(width * 0.25, height * 0.25);
+    ctx.lineTo(width * 0.31, height * 0.33);
+    ctx.lineTo(width * 0.27, height * 0.5);
+    ctx.lineTo(width * 0.15, height * 0.45);
+    ctx.closePath();
+    ctx.stroke();
     
     // Europe/Asia
-    if (filters.smartnodes) {
-      ctx.fillStyle = 'rgba(34, 197, 94, 0.6)';
-      ctx.beginPath();
-      ctx.ellipse(earthRadius * 0.1, -earthRadius * 0.3, earthRadius * 0.4, earthRadius * 0.3, -0.2, 0, 2 * Math.PI);
-      ctx.fill();
-    }
+    ctx.beginPath();
+    ctx.moveTo(width * 0.47, height * 0.3);
+    ctx.lineTo(width * 0.85, height * 0.3);
+    ctx.lineTo(width * 0.87, height * 0.45);
+    ctx.lineTo(width * 0.81, height * 0.55);
+    ctx.lineTo(width * 0.47, height * 0.42);
+    ctx.closePath();
+    ctx.stroke();
     
     // Australia
-    if (filters.smartnodes) {
-      ctx.fillStyle = 'rgba(34, 197, 94, 0.5)';
-      ctx.beginPath();
-      ctx.ellipse(earthRadius * 0.4, earthRadius * 0.5, earthRadius * 0.1, earthRadius * 0.08, 0, 0, 2 * Math.PI);
-      ctx.fill();
-    }
+    ctx.beginPath();
+    ctx.ellipse(width * 0.77, height * 0.7, width * 0.08, height * 0.06, 0, 0, 2 * Math.PI);
+    ctx.stroke();
     
     ctx.restore();
-    
-    // Quantum energy field around Earth
-    for (let i = 0; i < 3; i++) {
-      ctx.beginPath();
-      ctx.arc(earthCenterX, earthCenterY, earthRadius + 20 + (i * 15), 0, 2 * Math.PI);
-      ctx.strokeStyle = `rgba(16, 185, 129, ${0.2 - i * 0.05})`;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
+    ctx.setLineDash([]);
   };
 
   const drawSmartnodesOnEarth = (ctx, canvas) => {
