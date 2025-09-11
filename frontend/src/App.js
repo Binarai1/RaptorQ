@@ -350,7 +350,7 @@ const mockAssets = [
         twitter: '@quantumai_studio',
         website: 'quantumai.art'
       },
-      quantxo_signature: {
+      raptorq_signature: {
         created_with: "RaptorQ by Binarai",
         quantum_resistant: true,
         utxo_blockchain: "Raptoreum",
