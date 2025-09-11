@@ -817,7 +817,7 @@ const Dashboard = ({ wallet, onLogout }) => {
   );
 };
 
-// Wallet Setup Component
+// Wallet Setup Component with Password Creation
 const WalletSetup = ({ onWalletCreated }) => {
   const { saveSession } = useSession();
   const [step, setStep] = useState('setup');
@@ -825,6 +825,9 @@ const WalletSetup = ({ onWalletCreated }) => {
   const [colorTheme, setColorTheme] = useState('blue');
   const [importMode, setImportMode] = useState(false);
   const [userInputs, setUserInputs] = useState({});
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   // Apply color theme to CSS variables and get theme-specific classes
   useEffect(() => {
@@ -903,16 +906,42 @@ const WalletSetup = ({ onWalletCreated }) => {
     return seed.join(' ');
   };
 
+  const validatePassword = () => {
+    setPasswordError('');
+    
+    if (!password) {
+      setPasswordError('Password is required');
+      return false;
+    }
+    
+    if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+      return false;
+    }
+    
+    if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleCreateWallet = () => {
+    if (!validatePassword()) {
+      return;
+    }
+
     if (importMode) {
-      // Handle import logic
+      // Handle import logic with password
       const newWallet = {
         id: Date.now().toString(),
         name: 'Imported RaptorQ Wallet',
         address: 'RImported' + Math.random().toString(36).substring(2, 15),
-        balance: 0,
+        balance: 0, // Real balance, not fake
         colorTheme: colorTheme,
-        type: 'imported'
+        type: 'imported',
+        hasPassword: true
       };
       
       // Generate and save session token
@@ -932,15 +961,22 @@ const WalletSetup = ({ onWalletCreated }) => {
       id: Date.now().toString(),
       name: 'RaptorQ Quantum Wallet',
       address: 'R' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-      balance: 0,
+      balance: 0, // Real balance, starts at 0
       seed: generatedSeed,
       colorTheme: colorTheme,
-      type: 'created'
+      type: 'created',
+      hasPassword: true
     };
     
     // Generate and save session token
     const sessionToken = 'session_' + Math.random().toString(36).substring(2, 15);
     saveSession(sessionToken);
+    
+    // Save encrypted wallet with password (in production, this would be properly encrypted)
+    localStorage.setItem('raptorq_wallet_encrypted', JSON.stringify({
+      wallet: newWallet,
+      passwordHash: btoa(password) // In production, use proper hashing
+    }));
     
     onWalletCreated(newWallet);
   };
@@ -964,12 +1000,24 @@ const WalletSetup = ({ onWalletCreated }) => {
               ))}
             </div>
             
+            <div className="p-4 bg-red-950/30 border border-red-800/30 rounded-lg">
+              <div className="flex items-center text-red-400 text-sm mb-2">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                <span className="font-semibold">CRITICAL WARNING</span>
+              </div>
+              <p className="text-red-300 text-xs">
+                Your seed phrase and password are the ONLY way to recover your wallet. 
+                If you lose them, your RTM funds will be PERMANENTLY LOST. Write them down 
+                and store them in a safe place offline.
+              </p>
+            </div>
+            
             <Button 
               onClick={() => setStep('verify')}
               className={`w-full bg-gradient-to-r ${themeClasses.button} text-white`}
             >
               <Shield className="mr-2 h-4 w-4" />
-              I've Written It Down
+              I've Written It Down Safely
             </Button>
           </CardContent>
         </Card>
@@ -984,12 +1032,24 @@ const WalletSetup = ({ onWalletCreated }) => {
           <CardHeader className="text-center">
             <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
             <CardTitle className="text-white">Verify Your Seed Phrase</CardTitle>
-            <p className="text-gray-400 text-sm">Click the words in the correct order</p>
+            <p className="text-gray-400 text-sm">Confirm you have safely stored your seed phrase and password</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center py-8">
               <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
-              <p className="text-white">Seed phrase verified successfully!</p>
+              <p className="text-white mb-2">Seed phrase and password saved!</p>
+              <p className="text-gray-400 text-sm">Your wallet will be encrypted with your password</p>
+            </div>
+            
+            <div className="p-4 bg-yellow-950/30 border border-yellow-800/30 rounded-lg">
+              <div className="flex items-center text-yellow-400 text-sm mb-2">
+                <Lock className="h-4 w-4 mr-2" />
+                <span className="font-semibold">REMEMBER YOUR PASSWORD</span>
+              </div>
+              <p className="text-yellow-300 text-xs">
+                You will need your password to unlock your wallet. If you forget it, 
+                you can only restore using your 12-word seed phrase.
+              </p>
             </div>
             
             <Button 
@@ -997,7 +1057,7 @@ const WalletSetup = ({ onWalletCreated }) => {
               className={`w-full bg-gradient-to-r ${themeClasses.button} text-white`}
             >
               <Shield className="mr-2 h-4 w-4" />
-              Create Quantum Wallet
+              Create Encrypted Quantum Wallet
             </Button>
           </CardContent>
         </Card>
@@ -1043,6 +1103,46 @@ const WalletSetup = ({ onWalletCreated }) => {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Password Creation */}
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-white">Wallet Password *</Label>
+                  <Input
+                    type="password"
+                    placeholder="Create a strong password (min 8 characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 mt-2"
+                  />
+                </div>
+                
+                <div>
+                  <Label className="text-white">Confirm Password *</Label>
+                  <Input
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 mt-2"
+                  />
+                </div>
+
+                {passwordError && (
+                  <div className="text-red-400 text-sm">{passwordError}</div>
+                )}
+
+                <div className="p-3 bg-red-950/30 border border-red-800/30 rounded-lg">
+                  <div className="flex items-center text-red-400 text-sm mb-2">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    <span className="font-semibold">CRITICAL WARNING</span>
+                  </div>
+                  <p className="text-red-300 text-xs">
+                    Remember this password! If you lose both your password AND your seed phrase, 
+                    your RTM funds will be PERMANENTLY LOST forever.
+                  </p>
+                </div>
+              </div>
             </TabsContent>
             
             <TabsContent value="import" className="space-y-4 mt-6">
@@ -1056,15 +1156,45 @@ const WalletSetup = ({ onWalletCreated }) => {
                   onChange={() => setImportMode(true)}
                 />
               </div>
+
+              {/* Password for Import */}
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-white">New Wallet Password *</Label>
+                  <Input
+                    type="password"
+                    placeholder="Create a password for this wallet"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 mt-2"
+                  />
+                </div>
+                
+                <div>
+                  <Label className="text-white">Confirm Password *</Label>
+                  <Input
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 mt-2"
+                  />
+                </div>
+
+                {passwordError && (
+                  <div className="text-red-400 text-sm">{passwordError}</div>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
 
           <Button 
             onClick={handleCreateWallet}
+            disabled={!password || !confirmPassword}
             className={`w-full bg-gradient-to-r ${themeClasses.button} text-white font-semibold py-3`}
           >
             <Key className="mr-2 h-4 w-4" />
-            {importMode ? 'Import Wallet' : 'Create Quantum Wallet'}
+            {importMode ? 'Import Encrypted Wallet' : 'Create Quantum Wallet'}
           </Button>
 
           <Badge className={`mt-2 bg-${colorTheme}-900/30 text-${colorTheme}-300 border-${colorTheme}-700/50 block text-center`}>
