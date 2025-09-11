@@ -1673,6 +1673,48 @@ async def get_raptoreum_connection_status():
             "error": str(e)
         }
 
+@api_router.post("/advertising/track-click")
+async def track_advertisement_click(click_data: dict):
+    """Track advertisement click for analytics"""
+    try:
+        slot_name = click_data.get("slot_name")
+        url = click_data.get("url")
+        
+        if slot_name in advertisement_slots and advertisement_slots[slot_name]["active"]:
+            advertisement_slots[slot_name]["clicks"] += 1
+            
+        return {
+            "success": True,
+            "message": "Click tracked successfully",
+            "slot_name": slot_name,
+            "url": url,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to track advertisement click: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track click")
+
+@api_router.post("/advertising/track-impression")
+async def track_advertisement_impression(impression_data: dict):
+    """Track advertisement impression for analytics"""
+    try:
+        slot_name = impression_data.get("slot_name")
+        
+        if slot_name in advertisement_slots and advertisement_slots[slot_name]["active"]:
+            advertisement_slots[slot_name]["impressions"] += 1
+            
+        return {
+            "success": True,
+            "message": "Impression tracked successfully",
+            "slot_name": slot_name,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to track advertisement impression: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track impression")
+
 @api_router.post("/ai/generate-asset")
 async def generate_ai_asset_with_payment(asset_request):
     """Generate AI asset with dynamic RTM pricing"""
