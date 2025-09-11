@@ -160,53 +160,106 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     };
   };
 
-  const drawWorld = (ctx, canvas) => {
+  const drawEarth = (ctx, canvas) => {
     const { width, height } = canvas;
     
     // Clear canvas with clean deep space background
     const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
-    gradient.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.98)');
+    gradient.addColorStop(0, 'rgba(6, 12, 34, 1)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
     
-    // Draw continent outlines with rotation effect
+    // Draw ocean base (static)
+    ctx.fillStyle = 'rgba(30, 64, 175, 0.3)'; // Ocean blue
+    ctx.fillRect(0, 0, width, height);
+    
     ctx.save();
     ctx.translate(width/2, height/2);
-    ctx.rotate(earthRotation * 0.1); // Slow Earth rotation
+    ctx.rotate(earthRotation * 0.05); // Very slow, smooth rotation
     ctx.translate(-width/2, -height/2);
     
-    ctx.strokeStyle = 'rgba(71, 85, 105, 0.4)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([3, 4]);
+    // Draw continents (filled, not just outlines)
+    ctx.fillStyle = 'rgba(34, 139, 34, 0.4)'; // Forest green
+    ctx.strokeStyle = 'rgba(34, 139, 34, 0.8)';
+    ctx.lineWidth = 1;
     
-    // North America (shifted slightly with rotation)
+    // North America
     ctx.beginPath();
     ctx.moveTo(width * 0.05, height * 0.3);
     ctx.lineTo(width * 0.25, height * 0.25);
     ctx.lineTo(width * 0.31, height * 0.33);
-    ctx.lineTo(width * 0.27, height * 0.5);
+    ctx.lineTo(width * 0.28, height * 0.48);
+    ctx.lineTo(width * 0.22, height * 0.52);
     ctx.lineTo(width * 0.15, height * 0.45);
+    ctx.lineTo(width * 0.08, height * 0.35);
     ctx.closePath();
+    ctx.fill();
     ctx.stroke();
     
     // Europe/Asia
     ctx.beginPath();
-    ctx.moveTo(width * 0.47, height * 0.3);
-    ctx.lineTo(width * 0.85, height * 0.3);
+    ctx.moveTo(width * 0.47, height * 0.28);
+    ctx.lineTo(width * 0.85, height * 0.26);
+    ctx.lineTo(width * 0.88, height * 0.35);
     ctx.lineTo(width * 0.87, height * 0.45);
     ctx.lineTo(width * 0.81, height * 0.55);
+    ctx.lineTo(width * 0.75, height * 0.58);
+    ctx.lineTo(width * 0.65, height * 0.52);
     ctx.lineTo(width * 0.47, height * 0.42);
     ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    
+    // Africa
+    ctx.beginPath();
+    ctx.moveTo(width * 0.45, height * 0.45);
+    ctx.lineTo(width * 0.52, height * 0.42);
+    ctx.lineTo(width * 0.55, height * 0.52);
+    ctx.lineTo(width * 0.53, height * 0.72);
+    ctx.lineTo(width * 0.48, height * 0.75);
+    ctx.lineTo(width * 0.43, height * 0.68);
+    ctx.lineTo(width * 0.42, height * 0.55);
+    ctx.closePath();
+    ctx.fill();
     ctx.stroke();
     
     // Australia
     ctx.beginPath();
-    ctx.ellipse(width * 0.77, height * 0.7, width * 0.08, height * 0.06, 0, 0, 2 * Math.PI);
+    ctx.ellipse(width * 0.77, height * 0.7, width * 0.06, height * 0.04, 0, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+    
+    // South America
+    ctx.beginPath();
+    ctx.moveTo(width * 0.22, height * 0.55);
+    ctx.lineTo(width * 0.28, height * 0.52);
+    ctx.lineTo(width * 0.32, height * 0.62);
+    ctx.lineTo(width * 0.30, height * 0.82);
+    ctx.lineTo(width * 0.25, height * 0.85);
+    ctx.lineTo(width * 0.20, height * 0.78);
+    ctx.lineTo(width * 0.18, height * 0.65);
+    ctx.closePath();
+    ctx.fill();
     ctx.stroke();
     
     ctx.restore();
-    ctx.setLineDash([]);
+    
+    // Add subtle cloud layer (static pattern, not random)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    const cloudPattern = [
+      {x: 0.15, y: 0.2, w: 0.12, h: 0.06},
+      {x: 0.35, y: 0.15, w: 0.15, h: 0.08},
+      {x: 0.6, y: 0.25, w: 0.18, h: 0.07},
+      {x: 0.2, y: 0.6, w: 0.14, h: 0.05},
+      {x: 0.7, y: 0.65, w: 0.16, h: 0.06}
+    ];
+    
+    cloudPattern.forEach(cloud => {
+      ctx.beginPath();
+      ctx.ellipse(width * cloud.x, height * cloud.y, width * cloud.w, height * cloud.h, 0, 0, 2 * Math.PI);
+      ctx.fill();
+    });
   };
 
   const drawCountryNodes = (ctx, canvas) => {
