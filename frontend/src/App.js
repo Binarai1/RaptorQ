@@ -1160,6 +1160,35 @@ const WalletSetup = ({ onWalletCreated }) => {
     }
   }, []);
 
+  // Continuous daemon sync during setup (even at password screen)
+  useEffect(() => {
+    const loadSetupBlockchainInfo = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/raptoreum/blockchain-info`);
+        const blockData = response.data;
+        
+        setSetupBlockHeight(blockData.blocks || 0);
+        const realSyncProgress = blockData.sync_progress_percent || ((blockData.verificationprogress || 0) * 100);
+        setSetupSyncProgress(realSyncProgress);
+        setSetupIsConnected(blockData.connections > 0);
+        
+      } catch (error) {
+        console.error('Setup blockchain sync failed:', error);
+        setSetupBlockHeight(0);
+        setSetupSyncProgress(0);
+        setSetupIsConnected(false);
+      }
+    };
+
+    // Start immediate sync for setup screen
+    loadSetupBlockchainInfo();
+    
+    // Continue syncing every 10 seconds during setup
+    const setupSyncInterval = setInterval(loadSetupBlockchainInfo, 10000);
+    
+    return () => clearInterval(setupSyncInterval);
+  }, []);
+
   const handlePasswordLogin = () => {
     if (!password) {
       setPasswordError('Password is required');
