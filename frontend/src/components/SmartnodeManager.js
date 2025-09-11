@@ -106,11 +106,11 @@ const SmartnodeManager = ({ isOpen, onClose, wallet }) => {
 
   const loadWalletBalance = async () => {
     try {
-      const response = await axios.get(`/api/wallet/${wallet?.address}/balance`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/wallet/${wallet?.address}/balance`);
       setWalletBalance(response.data.balance || 0);
     } catch (error) {
       console.error('Failed to load wallet balance:', error);
-      setWalletBalance(2500000); // Mock balance
+      setWalletBalance(0); // Real balance starts at 0 for new wallets
     }
   };
 
