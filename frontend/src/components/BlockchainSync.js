@@ -263,6 +263,10 @@ const BlockchainSync = ({
                       animation: 'flowSyncSmooth 2s linear infinite'
                     }}
                   />
+                  {/* Super-speed Falcon Flying Effect */}
+                  <div className="falcon-flight">
+                    🦅
+                  </div>
                 </>
               )}
             </div>
