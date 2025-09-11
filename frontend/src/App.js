@@ -562,18 +562,40 @@ const Dashboard = ({ wallet, onLogout }) => {
     proMode: false
   });
 
-  // Load real wallet data on mount
+  // Continuous daemon sync - runs automatically regardless of user actions
   useEffect(() => {
+    // Start immediate sync on mount
     loadWalletData();
     loadBlockchainInfo();
     
-    const interval = setInterval(() => {
-      loadWalletData();
+    // Continuous sync every 10 seconds (faster for production wallet)
+    const syncInterval = setInterval(() => {
       loadBlockchainInfo();
+    }, 10000);
+    
+    // Balance update every 30 seconds
+    const balanceInterval = setInterval(() => {
+      loadWalletData();
     }, 30000);
     
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(syncInterval);
+      clearInterval(balanceInterval);
+    };
   }, [wallet, sessionToken]);
+
+  // Continuous sync even when wallet is locked (only stops when window closed)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Resume aggressive syncing when window becomes visible
+        loadBlockchainInfo();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // Apply theme changes throughout the app
   useEffect(() => {
