@@ -1212,7 +1212,7 @@ async def get_raptoreum_blockchain_info():
                 "local_daemon_active": True,
                 "local_blockchain_size_gb": round((26843545600 + int(time_diff / 3600) * 1024 * 1024) / 1024 / 1024 / 1024, 2),
                 "last_block_time": current_time.isoformat(),
-                "chain_tip_age": int((current_time.timestamp() - (current_time.timestamp() - 60)).total_seconds()),
+                "chain_tip_age": 60,  # Seconds since last block (simulated)
                 "wallet_version": 169900
             }
         }
