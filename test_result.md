@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Complete QR code functionality for RaptorQ wallet: 1) Receive functionality - generate custom QR codes with wallet logo in the middle, and allow copying of the selected address. 2) Send functionality - allow device camera (mobile or desktop) to read other RTM QR codes for transactions. Then implement all other pending features including lock function, 2FA/3FA, custom wallet colors, Pro Mode, mobile blockchain pruning, and ensure AI image creation is called 'BinarAi image creation'. Make wallet fast and snappy."
+user_problem_statement: "Fix critical production issues in RaptorQ main chain wallet: 1) Passphrase verification missing - must check user wrote down seed 2) Session token not working - should remember user and ask password only 3) Fake assets still displayed - must be blank for fresh wallet 4) Pro mode should be free not paid 5) BinarAi unlimited should be $100 6) Remove duplicate blue refresh button 7) Settings color dropdown text must be white 8) Advertising section not visible in UI 9) Scan QR errors on laptop 10) Block height must match real Raptoreum daemon 11) Sync status bar must be accurate for main chain production wallet"
 
 backend:
   - task: "Real Blockchain Integration"
