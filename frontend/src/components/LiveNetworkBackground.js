@@ -409,13 +409,13 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     }
   };
 
-  // String hash function for deterministic positioning
-  String.prototype.hashCode = function() {
+  // Simple hash function for deterministic positioning
+  const simpleHash = (str) => {
     let hash = 0;
-    for (let i = 0; i < this.length; i++) {
-      const char = this.charCodeAt(i);
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
+      hash = hash & hash;
     }
     return Math.abs(hash);
   };
