@@ -409,34 +409,51 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     }
   };
 
-  const updateTransactionBirds = () => {
-    // Create new transaction birds randomly
-    if (Math.random() < 0.15) { // 15% chance per frame
-      const newBird = createTransactionBird();
+  // String hash function for deterministic positioning
+  String.prototype.hashCode = function() {
+    let hash = 0;
+    for (let i = 0; i < this.length; i++) {
+      const char = this.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  };
+
+  const updateQuantumTransactions = () => {
+    // Create RTM transactions
+    if (filters.rtmTransactions && Math.random() < 0.08) {
+      const newBird = createTransactionBird('rtm');
       if (newBird) {
-        transactionBirds.current.push(newBird);
+        rtmBirds.current.push(newBird);
       }
     }
     
-    // Update existing birds
-    transactionBirds.current = transactionBirds.current.filter(bird => {
+    // Create Asset transactions (less frequent, more valuable)
+    if (filters.assetTransactions && Math.random() < 0.04) {
+      const newBird = createTransactionBird('asset');
+      if (newBird) {
+        assetBirds.current.push(newBird);
+      }
+    }
+    
+    // Update RTM transactions
+    rtmBirds.current = rtmBirds.current.filter(bird => {
       bird.progress += bird.speed;
-      bird.life *= 0.998; // Gradual fade
-      
-      // Smooth curve interpolation
-      const t = Math.min(bird.progress, 1);
-      const smoothT = t * t * (3 - 2 * t); // Smooth step function
-      
-      bird.currentX = bird.fromX + (bird.toX - bird.fromX) * smoothT;
-      bird.currentY = bird.fromY + (bird.toY - bird.fromY) * smoothT;
-      
-      return bird.life > 0.1 && bird.progress < 1.2;
+      bird.life *= 0.997;
+      return bird.life > 0.1 && bird.progress < 1.5;
     });
     
-    // Limit number of birds for performance
-    if (transactionBirds.current.length > 50) {
-      transactionBirds.current = transactionBirds.current.slice(-40);
-    }
+    // Update Asset transactions
+    assetBirds.current = assetBirds.current.filter(bird => {
+      bird.progress += bird.speed * 0.8; // Slower for assets
+      bird.life *= 0.996;
+      return bird.life > 0.1 && bird.progress < 1.8;
+    });
+    
+    // Limit for performance
+    if (rtmBirds.current.length > 30) rtmBirds.current = rtmBirds.current.slice(-25);
+    if (assetBirds.current.length > 20) assetBirds.current = assetBirds.current.slice(-15);
   };
 
   const animate = () => {
