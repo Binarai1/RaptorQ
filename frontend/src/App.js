@@ -378,7 +378,7 @@ const mockAssets = [
         soundcloud: 'quantumbeats',
         website: 'quantumbeats.io'
       },
-      quantxo_signature: {
+      raptorq_signature: {
         created_with: "RaptorQ by Binarai",
         quantum_resistant: true,
         utxo_blockchain: "Raptoreum",
