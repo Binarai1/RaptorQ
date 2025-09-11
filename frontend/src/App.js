@@ -832,6 +832,53 @@ const WalletSetup = ({ onWalletCreated }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [existingWallet, setExistingWallet] = useState(null);
+
+  // Check for existing wallet on component mount
+  useEffect(() => {
+    const savedWallet = localStorage.getItem('raptorq_wallet_encrypted');
+    if (savedWallet) {
+      try {
+        const walletData = JSON.parse(savedWallet);
+        setExistingWallet(walletData);
+        setStep('login');
+      } catch (error) {
+        console.error('Failed to load saved wallet:', error);
+        localStorage.removeItem('raptorq_wallet_encrypted');
+      }
+    }
+  }, []);
+
+  const handlePasswordLogin = () => {
+    if (!password) {
+      setPasswordError('Password is required');
+      return;
+    }
+
+    if (existingWallet) {
+      const storedPasswordHash = existingWallet.passwordHash;
+      
+      // In production, use proper password hashing verification
+      if (btoa(password) === storedPasswordHash) {
+        // Generate new session token
+        const newSessionToken = 'session_' + Math.random().toString(36).substring(2, 15);
+        saveSession(newSessionToken);
+        onWalletCreated(existingWallet.wallet);
+        
+        toast({
+          title: "Welcome Back!",
+          description: "Successfully logged into your RaptorQ wallet"
+        });
+      } else {
+        setPasswordError('Invalid password');
+        toast({
+          title: "Invalid Password",
+          description: "Please check your password and try again",
+          variant: "destructive"
+        });
+      }
+    }
+  };
 
   // Apply color theme to CSS variables and get theme-specific classes
   useEffect(() => {
