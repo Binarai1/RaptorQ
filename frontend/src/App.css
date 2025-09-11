@@ -526,7 +526,7 @@ select:focus-visible {
 }
 
 .quantum-signature::after {
-  content: 'QUANTXO by Binarai';
+  content: 'RaptorQ by Binarai';
   position: absolute;
   bottom: 2px;
   right: 2px;
