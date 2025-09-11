@@ -947,46 +947,38 @@ const Dashboard = ({ wallet, onLogout }) => {
               </Button>
             </div>
             
-            {/* Real blockchain asset explorer for main Raptoreum chain */}
+            {/* Minimized Personal Assets Section - expands to show asset explorer */}
             <Card className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 border-gray-700/50 mb-4">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Layers className="h-5 w-5 text-blue-400" />
-                    <h3 className="text-white font-semibold">Your Assets</h3>
+                    <Layers className="h-4 w-4 text-blue-400" />
+                    <h3 className="text-white text-sm font-medium">Your Personal Assets</h3>
+                    <Badge className="bg-gray-700/50 text-gray-400 text-xs">0</Badge>
                   </div>
-                  <Badge className="bg-blue-900/30 text-blue-300">
-                    Main Chain
-                  </Badge>
-                </div>
-                
-                <div className="text-center py-8">
-                  <Layers className="h-12 w-12 mx-auto mb-3 text-gray-500 opacity-50" />
-                  <div className="text-white mb-2">No Personal Assets</div>
-                  <p className="text-sm text-gray-400 mb-4">
-                    You haven't created or received any assets on the Raptoreum blockchain yet.
-                  </p>
                   <Button
                     onClick={() => setShowStandardAssetCreator(true)}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Asset
+                    <Plus className="h-3 w-3 mr-1" />
+                    Create Asset
                   </Button>
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  No assets created yet. Explore blockchain assets below.
+                </p>
               </CardContent>
             </Card>
 
-            {/* Real Raptoreum Blockchain Asset Explorer - fills remaining space */}
-            <div className="min-h-96">
-              <AssetExplorer 
-                isOpen={true} 
-                onClose={() => {}} 
-                wallet={wallet}
-                fillMode={true}
-                showHeader={false}
-              />
-            </div>
+            {/* Full Raptoreum Blockchain Asset Explorer */}
+            <AssetExplorer 
+              isOpen={true} 
+              onClose={() => {}} 
+              wallet={wallet}
+              fillMode={true}
+              showHeader={true}
+            />
           </TabsContent>
 
           {/* History Tab */}
