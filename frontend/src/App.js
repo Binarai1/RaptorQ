@@ -24,6 +24,7 @@ import BlockchainSync from './components/BlockchainSync';
 import ProModeConsole from './components/ProModeConsole';
 import SmartnodeManager from './components/SmartnodeManager';
 import AdvertisingBanner, { AdvertisingPurchaseDialog } from './components/AdvertisingBanner';
+import GlobalSmartnodeMap from './components/GlobalSmartnodeMap';
 
 import { 
   Wallet, Plus, Download, Upload, Eye, EyeOff, Copy, Send, History, Settings, Shield, 
