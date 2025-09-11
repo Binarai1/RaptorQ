@@ -366,17 +366,17 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     return Math.abs(hash);
   };
 
-  const updateQuantumTransactions = () => {
+  const updateTransactionBirds = () => {
     // Create RTM transactions
-    if (filters.rtmTransactions && Math.random() < 0.08) {
+    if (filters.rtmTransactions && Math.random() < 0.10) {
       const newBird = createTransactionBird('rtm');
       if (newBird) {
         rtmBirds.current.push(newBird);
       }
     }
     
-    // Create Asset transactions (less frequent, more valuable)
-    if (filters.assetTransactions && Math.random() < 0.04) {
+    // Create Asset transactions (less frequent)
+    if (filters.assetTransactions && Math.random() < 0.05) {
       const newBird = createTransactionBird('asset');
       if (newBird) {
         assetBirds.current.push(newBird);
@@ -386,20 +386,36 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     // Update RTM transactions
     rtmBirds.current = rtmBirds.current.filter(bird => {
       bird.progress += bird.speed;
-      bird.life *= 0.997;
-      return bird.life > 0.1 && bird.progress < 1.5;
+      bird.life *= 0.998;
+      
+      // Smooth movement between countries
+      const t = Math.min(bird.progress, 1);
+      const smoothT = t * t * (3 - 2 * t);
+      
+      bird.currentX = bird.fromX + (bird.toX - bird.fromX) * smoothT;
+      bird.currentY = bird.fromY + (bird.toY - bird.fromY) * smoothT;
+      
+      return bird.life > 0.1 && bird.progress < 1.2;
     });
     
     // Update Asset transactions
     assetBirds.current = assetBirds.current.filter(bird => {
-      bird.progress += bird.speed * 0.8; // Slower for assets
-      bird.life *= 0.996;
-      return bird.life > 0.1 && bird.progress < 1.8;
+      bird.progress += bird.speed;
+      bird.life *= 0.997;
+      
+      // Smooth movement between countries
+      const t = Math.min(bird.progress, 1);
+      const smoothT = t * t * (3 - 2 * t);
+      
+      bird.currentX = bird.fromX + (bird.toX - bird.fromX) * smoothT;
+      bird.currentY = bird.fromY + (bird.toY - bird.fromY) * smoothT;
+      
+      return bird.life > 0.1 && bird.progress < 1.3;
     });
     
     // Limit for performance
     if (rtmBirds.current.length > 30) rtmBirds.current = rtmBirds.current.slice(-25);
-    if (assetBirds.current.length > 20) assetBirds.current = assetBirds.current.slice(-15);
+    if (assetBirds.current.length > 15) assetBirds.current = assetBirds.current.slice(-12);
   };
 
   const animate = () => {
