@@ -609,8 +609,20 @@ const Dashboard = ({ wallet, onLogout }) => {
       const realSyncProgress = blockData.sync_progress_percent || ((blockData.verificationprogress || 0) * 100);
       setSyncProgress(realSyncProgress);
       
+      // Update daemon syncing status
+      setDaemonSyncing(blockData.is_syncing || realSyncProgress < 99.9);
+      
       // Set connection status based on real sync state
-      setIsConnected(blockData.connections > 0 && realSyncProgress > 50);
+      setIsConnected(blockData.connections > 0);
+      
+      // Update network stats for sync tab
+      setNetworkStats({
+        hashrate: blockData.networkhashps || 0,
+        difficulty: blockData.difficulty || 0,
+        connections: blockData.connections || 0
+      });
+      
+      setLastUpdate(new Date());
       
     } catch (error) {
       console.error('Failed to load blockchain info:', error);
@@ -618,6 +630,8 @@ const Dashboard = ({ wallet, onLogout }) => {
       setBlockHeight(0);
       setSyncProgress(0);
       setIsConnected(false);
+      setDaemonSyncing(true); // Keep trying to sync
+      setNetworkStats({ hashrate: 0, difficulty: 0, connections: 0 });
     }
   };
 
