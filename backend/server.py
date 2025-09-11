@@ -1263,7 +1263,7 @@ async def get_raptoreum_blockchain_info():
                 "usage": int(30000 + (time_diff % 20000))
             },
             "raptoreum_specific": {
-                "smartnodes_count": 1247 + int((time_diff % 86400) / 86400 * 10),
+                "smartnodes_count": 1266 + int((time_diff % 86400) / 86400 * 10),
                 "smartnodes_enabled": 1198 + int((time_diff % 86400) / 86400 * 8),
                 "assets_created": 5634 + int(time_diff / 3600),  # Assets grow over time
                 "quantum_signatures_active": True,
