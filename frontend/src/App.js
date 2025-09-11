@@ -1022,45 +1022,7 @@ const Dashboard = ({ wallet, onLogout }) => {
         </Tabs>
       </main>
 
-      {/* Sync Animation Bar - spans full width at bottom */}
-      {(syncProgress < 99.9 || !isConnected) && (
-        <div className="fixed bottom-0 left-0 right-0 h-2 bg-gray-900/90 overflow-hidden z-40">
-          <div className="relative h-full">
-            {/* Flowing neon green gradient with smoke effects */}
-            <div 
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-80 animate-flow-sync"
-              style={{
-                background: `linear-gradient(90deg, 
-                  transparent 0%, 
-                  #10b981 20%, 
-                  #34d399 50%, 
-                  #6ee7b7 80%, 
-                  transparent 100%)`,
-                animation: 'flowSync 3s ease-in-out infinite',
-                filter: 'blur(0.5px) drop-shadow(0 0 10px #10b981)'
-              }}
-            />
-            {/* Smooth flowing overlay */}
-            <div 
-              className="absolute inset-0 bg-gradient-to-r from-green-500/30 via-emerald-400/40 to-green-500/30 animate-pulse"
-              style={{
-                background: `linear-gradient(90deg, 
-                  rgba(16, 185, 129, 0.2) 0%, 
-                  rgba(52, 211, 153, 0.6) 25%, 
-                  rgba(110, 231, 183, 0.8) 50%, 
-                  rgba(52, 211, 153, 0.6) 75%, 
-                  rgba(16, 185, 129, 0.2) 100%)`,
-                animation: 'flowSyncSmooth 2s linear infinite'
-              }}
-            />
-            {/* Progress indicator */}
-            <div 
-              className="absolute left-0 top-0 h-full bg-green-400/60 transition-all duration-1000"
-              style={{ width: `${syncProgress}%` }}
-            />
-          </div>
-        </div>
-      )}
+      {/* Note: Sync animation bar moved to sync tab progress area */}
 
       {/* All Dialog Components */}
       <SettingsDialog
