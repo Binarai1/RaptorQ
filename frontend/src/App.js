@@ -1011,6 +1011,16 @@ const Dashboard = ({ wallet, onLogout }) => {
 
           {/* Sync Tab */}
           <TabsContent value="sync" className="space-y-6">
+            <div className="flex flex-wrap gap-4 mb-6">
+              <Button
+                onClick={() => setShowGlobalMap(true)}
+                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                Live Global Network
+              </Button>
+            </div>
+            
             <BlockchainSync 
               isVisible={true} // Always visible in sync tab
               autoSync={true} // Always auto-sync for production wallet
