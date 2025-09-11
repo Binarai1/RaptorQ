@@ -229,42 +229,124 @@ const QRReceiveDialog = ({ isOpen, onClose, wallet }) => {
 // QR Scan Dialog
 const QRScanDialog = ({ isOpen, onClose, onAddressScanned }) => {
   const scannerRef = useRef(null);
+  const [error, setError] = useState('');
+  const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      const scanner = new Html5QrcodeScanner("qr-reader", {
-        fps: 10,
-        qrbox: { width: 250, height: 250 }
-      });
+      setError('');
+      setScanning(true);
+      
+      try {
+        const scanner = new Html5QrcodeScanner("qr-reader", {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0,
+          disableFlip: false,
+          showTorchButtonIfSupported: true,
+          showZoomSliderIfSupported: true,
+          defaultZoomValueIfSupported: 2
+        });
 
-      scanner.render(
-        (result) => {
-          onAddressScanned(result);
-          scanner.clear();
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
+        scanner.render(
+          (result) => {
+            try {
+              // Extract RTM address from QR code result
+              let address = result;
+              if (result.startsWith('raptoreum:')) {
+                address = result.replace('raptoreum:', '').split('?')[0];
+              }
+              
+              // Validate RTM address format
+              if (address.startsWith('R') && address.length >= 25) {
+                onAddressScanned(address);
+                scanner.clear();
+              } else {
+                setError('Invalid Raptoreum address in QR code');
+              }
+            } catch (err) {
+              setError('Failed to process QR code');
+            }
+          },
+          (error) => {
+            // Ignore frequent scan errors, only show critical ones
+            if (error.includes('NotAllowedError') || error.includes('NotFoundError')) {
+              setError('Camera access denied or not available');
+            }
+          }
+        );
 
-      scannerRef.current = scanner;
+        scannerRef.current = scanner;
+      } catch (err) {
+        setError('Failed to initialize camera scanner');
+        setScanning(false);
+      }
 
       return () => {
         if (scannerRef.current) {
-          scannerRef.current.clear();
+          try {
+            scannerRef.current.clear();
+          } catch (err) {
+            console.log('Scanner cleanup error:', err);
+          }
         }
       };
     }
   }, [isOpen, onAddressScanned]);
 
+  const handleClose = () => {
+    if (scannerRef.current) {
+      try {
+        scannerRef.current.clear();
+      } catch (err) {
+        console.log('Scanner cleanup error:', err);
+      }
+    }
+    setScanning(false);
+    setError('');
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-gradient-to-br from-gray-900/95 to-black/80 border-gray-700/50 text-white max-w-md mobile-dialog">
         <DialogHeader>
-          <DialogTitle>Scan QR Code</DialogTitle>
+          <DialogTitle className="flex items-center space-x-2">
+            <Camera className="h-5 w-5 text-blue-400" />
+            <span>Scan RTM QR Code</span>
+          </DialogTitle>
         </DialogHeader>
         
-        <div id="qr-reader" className="w-full"></div>
+        <div className="space-y-4">
+          {error ? (
+            <div className="p-4 bg-red-950/30 border border-red-800/30 rounded-lg">
+              <div className="flex items-center text-red-400 text-sm">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                {error}
+              </div>
+              <Button
+                onClick={() => setError('')}
+                className="mt-2 bg-red-600 hover:bg-red-700 text-white text-xs"
+              >
+                Try Again
+              </Button>
+            </div>
+          ) : (
+            <div id="qr-reader" className="w-full min-h-64 bg-gray-800/30 rounded-lg"></div>
+          )}
+          
+          <div className="text-xs text-gray-400 text-center">
+            Point your camera at a Raptoreum QR code to scan
+          </div>
+          
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+          >
+            Cancel
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
