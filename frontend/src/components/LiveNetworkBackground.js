@@ -414,56 +414,45 @@ const LiveNetworkBackground = ({ isActive = true, isFullscreen = false, onMinimi
     return Math.abs(hash);
   };
 
-  const updateTransactionBirds = () => {
-    // Create RTM transactions
-    if (filters.rtmTransactions && Math.random() < 0.10) {
+  const updateTransactions = () => {
+    // Reduced frequency for better performance
+    if (filters.rtmTransactions && Math.random() < 0.03) { // Much less frequent
       const newBird = createTransactionBird('rtm');
-      if (newBird) {
+      if (newBird && rtmBirds.current.length < 15) { // Lower limit
         rtmBirds.current.push(newBird);
       }
     }
     
-    // Create Asset transactions (less frequent)
-    if (filters.assetTransactions && Math.random() < 0.05) {
+    if (filters.assetTransactions && Math.random() < 0.015) { // Even less frequent
       const newBird = createTransactionBird('asset');
-      if (newBird) {
+      if (newBird && assetBirds.current.length < 8) { // Lower limit
         assetBirds.current.push(newBird);
       }
     }
     
-    // Update RTM transactions
+    // Efficient update with fewer operations
     rtmBirds.current = rtmBirds.current.filter(bird => {
       bird.progress += bird.speed;
-      bird.life *= 0.998;
+      bird.life *= 0.996; // Faster fade for better performance
       
-      // Smooth movement between countries
+      // Simple linear interpolation (more efficient)
       const t = Math.min(bird.progress, 1);
-      const smoothT = t * t * (3 - 2 * t);
+      bird.currentX = bird.fromX + (bird.toX - bird.fromX) * t;
+      bird.currentY = bird.fromY + (bird.toY - bird.fromY) * t;
       
-      bird.currentX = bird.fromX + (bird.toX - bird.fromX) * smoothT;
-      bird.currentY = bird.fromY + (bird.toY - bird.fromY) * smoothT;
-      
-      return bird.life > 0.1 && bird.progress < 1.2;
+      return bird.life > 0.2 && bird.progress < 1.1;
     });
     
-    // Update Asset transactions
     assetBirds.current = assetBirds.current.filter(bird => {
       bird.progress += bird.speed;
-      bird.life *= 0.997;
+      bird.life *= 0.995;
       
-      // Smooth movement between countries
       const t = Math.min(bird.progress, 1);
-      const smoothT = t * t * (3 - 2 * t);
+      bird.currentX = bird.fromX + (bird.toX - bird.fromX) * t;
+      bird.currentY = bird.fromY + (bird.toY - bird.fromY) * t;
       
-      bird.currentX = bird.fromX + (bird.toX - bird.fromX) * smoothT;
-      bird.currentY = bird.fromY + (bird.toY - bird.fromY) * smoothT;
-      
-      return bird.life > 0.1 && bird.progress < 1.3;
+      return bird.life > 0.2 && bird.progress < 1.1;
     });
-    
-    // Limit for performance
-    if (rtmBirds.current.length > 30) rtmBirds.current = rtmBirds.current.slice(-25);
-    if (assetBirds.current.length > 15) assetBirds.current = assetBirds.current.slice(-12);
   };
 
   const animate = () => {
