@@ -1527,7 +1527,7 @@ const WalletSetup = ({ onWalletCreated }) => {
     
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
-        <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
+        <Card className="w-full max-w-md backdrop-blur-sm animate-fade-in-scale bg-gray-900/25 border-green-400/40">
           <CardHeader className="text-center">
             <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
             <CardTitle className="text-white">Verify Your Seed Phrase</CardTitle>
