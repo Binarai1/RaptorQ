@@ -990,6 +990,74 @@ const WalletSetup = ({ onWalletCreated }) => {
     onWalletCreated(newWallet);
   };
 
+  // Seed verification step
+  if (step === 'verify-seed' && generatedSeed) {
+    const seedWords = generatedSeed.split(' ');
+    const [verificationWords, setVerificationWords] = useState(['', '', '']);
+    const [selectedPositions] = useState([2, 5, 8]); // Words to verify (3rd, 6th, 9th)
+    
+    const handleVerification = () => {
+      const correctWords = selectedPositions.map(pos => seedWords[pos]);
+      const inputWords = verificationWords.map(word => word.toLowerCase().trim());
+      
+      if (correctWords.every((word, index) => word === inputWords[index])) {
+        handleSeedConfirmed();
+      } else {
+        toast({
+          title: "Verification Failed",
+          description: "Please check your seed phrase and try again",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
+        <Card className="w-full max-w-md quantum-glass backdrop-blur-sm animate-fade-in-scale">
+          <CardHeader className="text-center">
+            <QuantumLogo size={64} className="mx-auto mb-4 quantum-pulse" />
+            <CardTitle className="text-white">Verify Your Seed Phrase</CardTitle>
+            <p className="text-gray-400 text-sm">Please enter the following words to confirm you wrote them down</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {selectedPositions.map((position, index) => (
+              <div key={position}>
+                <Label className="text-white">Word #{position + 1}</Label>
+                <Input
+                  placeholder={`Enter word #${position + 1}`}
+                  value={verificationWords[index]}
+                  onChange={(e) => {
+                    const newWords = [...verificationWords];
+                    newWords[index] = e.target.value;
+                    setVerificationWords(newWords);
+                  }}
+                  className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                />
+              </div>
+            ))}
+            
+            <div className="flex space-x-3 pt-4">
+              <Button
+                onClick={handleVerification}
+                disabled={verificationWords.some(word => !word.trim())}
+                className={`flex-1 ${themeClasses.button}`}
+              >
+                Verify & Create Wallet
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setStep('show-seed')}
+                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Back
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (step === 'show-seed' && generatedSeed) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950/20 flex items-center justify-center p-4 animate-fade-in">
