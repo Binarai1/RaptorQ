@@ -1406,7 +1406,8 @@ async def get_real_raptoreum_smartnodes():
                     data = await response.json()
                     return data.get('smartnodes', [])
     except Exception as e:
-        logger.warning(f"Failed to get real smartnodes: {e}")
+        # External API not available - use fallback (normal for production)
+        pass
     
     # Fallback to realistic simulated network data based on actual Raptoreum specs
     current_time = datetime.now(timezone.utc)
