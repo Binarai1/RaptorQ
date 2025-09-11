@@ -597,15 +597,33 @@ const AssetExplorer = ({ isOpen, onClose, wallet, fillMode = false, showHeader =
   const loadAssets = async () => {
     setLoading(true);
     try {
-      // Load real assets from Raptoreum blockchain
-      const realAssets = await RaptoreumAPI.searchAssets('', 'all');
-      setAssets(realAssets);
-      setFilteredAssets(realAssets);
+      // Load real assets from main Raptoreum blockchain
+      console.log('Loading real assets from Raptoreum blockchain...');
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/raptoreum/assets/all`, {
+        timeout: 15000
+      });
+      
+      if (response.data && response.data.assets && response.data.assets.length > 0) {
+        console.log(`Loaded ${response.data.assets.length} real assets from blockchain`);
+        setAssets(response.data.assets);
+        setFilteredAssets(response.data.assets);
+      } else {
+        // No assets on blockchain yet (realistic for new chain or fresh state)
+        console.log('No assets found on blockchain - showing empty state');
+        setAssets([]);
+        setFilteredAssets([]);
+      }
     } catch (error) {
-      console.error('Failed to load assets:', error);
-      // Fallback to mock data
-      setAssets(mockRaptoreumAssets);
-      setFilteredAssets(mockRaptoreumAssets);
+      console.error('Failed to load real blockchain assets:', error);
+      // For production wallet, show empty state when blockchain connection fails
+      setAssets([]);
+      setFilteredAssets([]);
+      
+      if (error.response?.status === 404) {
+        console.log('Asset endpoint not found - blockchain may have no assets');
+      } else if (error.code === 'ECONNABORTED') {
+        console.log('Request timeout - blockchain connection slow');
+      }
     } finally {
       setLoading(false);
     }
